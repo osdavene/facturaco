@@ -2,13 +2,12 @@
 set -e
 cd /var/www/html
 
-# Generar .env
 cat > .env << EOF
 APP_NAME="${APP_NAME:-FacturaCO}"
 APP_ENV=production
 APP_KEY="${APP_KEY}"
 APP_DEBUG=false
-APP_URL="${APP_URL:-https://facturaco-production.up.railway.app}"
+APP_URL="https://facturaco-production.up.railway.app"
 APP_TIMEZONE=America/Bogota
 APP_LOCALE=es
 APP_FALLBACK_LOCALE=es
@@ -41,14 +40,12 @@ MAIL_FROM_NAME="FacturaCO"
 VITE_APP_NAME="FacturaCO"
 EOF
 
-# Configurar Nginx
 cat > /etc/nginx/sites-available/default << 'NGINX'
 server {
     listen 8080;
     root /var/www/html/public;
     index index.php;
 
-    # Servir archivos estaticos directamente sin pasar por PHP
     location /build/ {
         alias /var/www/html/public/build/;
         expires 1y;
@@ -64,6 +61,8 @@ server {
         fastcgi_pass 127.0.0.1:9000;
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+        fastcgi_param HTTP_X_FORWARDED_PROTO https;
         fastcgi_read_timeout 300;
         include fastcgi_params;
     }
