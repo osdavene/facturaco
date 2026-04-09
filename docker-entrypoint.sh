@@ -3,9 +3,7 @@ set -e
 
 cd /var/www/html
 
-echo "=== DATABASE_URL recibida: ${DATABASE_URL}"
-
-# Generar .env completo en runtime
+# Generar .env con variables de Railway
 cat > .env << EOF
 APP_NAME="${APP_NAME:-FacturaCO}"
 APP_ENV="${APP_ENV:-production}"
@@ -22,13 +20,12 @@ QUEUE_CONNECTION=sync
 LOG_CHANNEL=stderr
 EOF
 
-echo "=== .env generado, iniciando migraciones ==="
-
-# Ejecutar migraciones
+# Migraciones y storage
 php artisan migrate --force
+php artisan storage:link 2>/dev/null || true
 
-# Crear enlace de storage
-php artisan storage:link || true
+# Iniciar PHP-FPM en background
+php-fpm -D
 
-# Iniciar Apache
-exec apache2-foreground
+# Iniciar Nginx en foreground
+exec nginx -g 'daemon off;'

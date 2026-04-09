@@ -1,7 +1,8 @@
-FROM php:8.3-apache
+FROM php:8.3-fpm
 
-# Instalar extensiones necesarias
+# Instalar Nginx y extensiones
 RUN apt-get update && apt-get install -y \
+    nginx \
     libpq-dev \
     libzip-dev \
     libpng-dev \
@@ -21,31 +22,32 @@ RUN apt-get update && apt-get install -y \
         mbstring \
         xml \
         bcmath \
-        opcache
+        opcache \
+    && apt-get clean
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Configurar Apache — deshabilitar mpm_event y habilitar mpm_prefork
-RUN a2dismod mpm_event || true \
-    && a2enmod mpm_prefork \
-    && a2enmod rewrite
-
-# Configurar DocumentRoot
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# Configurar Nginx
+RUN echo 'server { \
+    listen 80; \
+    root /var/www/html/public; \
+    index index.php; \
+    location / { try_files $uri $uri/ /index.php?$query_string; } \
+    location ~ \.php$ { \
+        fastcgi_pass 127.0.0.1:9000; \
+        fastcgi_index index.php; \
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \
+        include fastcgi_params; \
+    } \
+}' > /etc/nginx/sites-available/default
 
 WORKDIR /var/www/html
 COPY . .
 
-# Instalar dependencias PHP
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
-
-# Compilar assets
 RUN npm ci && npm run build
 
-# Permisos
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
