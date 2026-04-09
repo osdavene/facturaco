@@ -10,8 +10,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     unzip \
-    nodejs \
-    npm \
     && docker-php-ext-install \
         pdo \
         pdo_pgsql \
@@ -24,13 +22,24 @@ RUN apt-get update && apt-get install -y \
         opcache \
     && apt-get clean
 
+# Instalar Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 COPY . .
 
-RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
-RUN npm ci && APP_URL=https://facturaco-production.up.railway.app npm run build
+# Instalar dependencias PHP
+RUN composer install --optimize-autoloader --no-dev --no-interaction
+
+# Instalar dependencias Node y compilar assets
+RUN npm install
+RUN npm run build
+
+# Verificar que el manifest existe
+RUN ls -la public/build/ && cat public/build/manifest.json | head -5
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
