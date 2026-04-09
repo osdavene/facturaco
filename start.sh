@@ -41,7 +41,7 @@ MAIL_FROM_NAME="FacturaCO"
 VITE_APP_NAME="FacturaCO"
 EOF
 
-# Configurar Nginx en puerto 8080
+# Configurar Nginx en puerto 8080 con TCP (más confiable que socket)
 cat > /etc/nginx/sites-available/default << 'NGINX'
 server {
     listen 8080;
@@ -53,39 +53,32 @@ server {
     }
 
     location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_pass 127.0.0.1:9000;
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_read_timeout 300;
         include fastcgi_params;
     }
 
-    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
+        add_header Cache-Control "public, immutable";
         try_files $uri =404;
+    }
+
+    location ~ /\.ht {
+        deny all;
     }
 }
 NGINX
-
-# Configurar PHP-FPM para usar socket unix
-sed -i 's|listen = 127.0.0.1:9000|listen = /var/run/php-fpm.sock|' \
-    /usr/local/etc/php-fpm.d/www.conf 2>/dev/null || true
-sed -i 's|;listen.owner = www-data|listen.owner = www-data|' \
-    /usr/local/etc/php-fpm.d/www.conf 2>/dev/null || true
-sed -i 's|;listen.group = www-data|listen.group = www-data|' \
-    /usr/local/etc/php-fpm.d/www.conf 2>/dev/null || true
-sed -i 's|;listen.mode = 0660|listen.mode = 0660|' \
-    /usr/local/etc/php-fpm.d/www.conf 2>/dev/null || true
 
 php artisan migrate --force
 php artisan storage:link 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 
-# Iniciar PHP-FPM
-php-fpm -D -F &
+# Iniciar PHP-FPM en background y esperar que arranque
+php-fpm -D
+sleep 3
 
-# Esperar que FPM arranque
-sleep 2
-
-# Iniciar Nginx
 echo "=== FacturaCO corriendo en puerto 8080 ==="
 exec nginx -g 'daemon off;'
