@@ -1,0 +1,284 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ClienteController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\FacturaController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\ReciboCajaController;
+use App\Http\Controllers\OrdenCompraController;
+use App\Http\Controllers\CotizacionController;
+use App\Http\Controllers\ProximamenteController;
+use App\Http\Controllers\RemisionController;
+use App\Http\Controllers\ImpuestosController;
+use App\Http\Controllers\BusquedaController;
+use App\Http\Controllers\PerfilController;
+
+RateLimiter::for('login', function (Request $request) {
+    return Limit::perMinute(5)->by($request->ip());
+});
+
+// Remisiones
+Route::get('/remisiones',                        [RemisionController::class, 'index'])       ->name('remisiones.index');
+Route::get('/remisiones/crear',                  [RemisionController::class, 'create'])      ->name('remisiones.create');
+Route::post('/remisiones',                       [RemisionController::class, 'store'])       ->name('remisiones.store');
+Route::get('/remisiones/{remision}',             [RemisionController::class, 'show'])        ->name('remisiones.show');
+Route::delete('/remisiones/{remision}',          [RemisionController::class, 'destroy'])     ->name('remisiones.destroy');
+Route::patch('/remisiones/{remision}/estado',    [RemisionController::class, 'cambiarEstado'])->name('remisiones.estado');
+Route::post('/remisiones/{remision}/convertir',  [RemisionController::class, 'convertir'])   ->name('remisiones.convertir');
+Route::get('/remisiones/{remision}/pdf',         [RemisionController::class, 'pdf'])         ->name('remisiones.pdf');
+
+Route::get('/impuestos',     [ImpuestosController::class, 'index'])->name('impuestos.index')->middleware('auth');
+Route::get('/impuestos/pdf', [ImpuestosController::class, 'pdf'])  ->name('impuestos.pdf')  ->middleware('auth');
+
+Route::get('/busqueda', [BusquedaController::class, 'buscar'])->name('busqueda')->middleware('auth');
+
+// Perfil
+Route::get('/perfil',                [PerfilController::class, 'index'])        ->name('perfil.index')         ->middleware('auth');
+Route::put('/perfil',                [PerfilController::class, 'update'])       ->name('perfil.update')        ->middleware('auth');
+Route::put('/perfil/password',       [PerfilController::class, 'updatePassword'])->name('perfil.password')     ->middleware('auth');
+Route::post('/perfil/avatar',        [PerfilController::class, 'updateAvatar']) ->name('perfil.avatar')        ->middleware('auth');
+Route::delete('/perfil/avatar',      [PerfilController::class, 'deleteAvatar']) ->name('perfil.avatar.delete') ->middleware('auth');
+
+// Excel exports
+Route::get('/reportes/ventas/excel',     [ReporteController::class, 'ventasExcel'])    ->name('reportes.ventas.excel')    ->middleware('auth');
+Route::get('/reportes/inventario/excel', [ReporteController::class, 'inventarioExcel'])->name('reportes.inventario.excel')->middleware('auth');
+Route::get('/reportes/cartera/excel',    [ReporteController::class, 'carteraExcel'])   ->name('reportes.cartera.excel')   ->middleware('auth');
+Route::get('/impuestos/excel',           [ImpuestosController::class, 'excel'])        ->name('impuestos.excel')          ->middleware('auth');
+
+Route::post('/tema', function(\Illuminate\Http\Request $request) {
+    $tema = $request->tema === 'light' ? 'light' : 'dark';
+    auth()->user()->update(['tema' => $tema]);
+    return back();
+})->name('tema.cambiar')->middleware('auth');
+
+// ── Página de inicio ──────────────────────────────────────────
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// ── Dashboard ─────────────────────────────────────────────────
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');// ── Dashboard ─────────────────────────────────────────────────
+Route::get('/dashboard', function () {
+    $empresa = \App\Models\Empresa::obtener();
+
+    $ventasHoy   = \App\Models\Factura::whereDate('fecha_emision', today())
+                    ->where('estado','!=','anulada')->sum('total');
+    $ventasMes   = \App\Models\Factura::whereMonth('fecha_emision', now()->month)
+                    ->whereYear('fecha_emision', now()->year)
+                    ->where('estado','!=','anulada')->sum('total');
+    $cartera     = \App\Models\Factura::whereIn('estado',['emitida','vencida'])
+                    ->sum(\Illuminate\Support\Facades\DB::raw('total - total_pagado'));
+    $facturasMes = \App\Models\Factura::whereMonth('fecha_emision', now()->month)
+                    ->whereYear('fecha_emision', now()->year)->count();
+
+    $facturasVencidas   = \App\Models\Factura::where('estado','vencida')->count();
+    $productosStockBajo = \App\Models\Producto::where('activo',true)
+                           ->where('es_servicio',false)
+                           ->whereColumn('stock_actual','<=','stock_minimo')->count();
+    $cotizacionesPend   = \App\Models\Cotizacion::whereIn('estado',['enviada','aceptada'])->count();
+    $ordenesPend        = \App\Models\OrdenCompra::where('estado','aprobada')->count();
+
+    $ultimasFacturas = \App\Models\Factura::orderByDesc('created_at')->limit(6)->get();
+
+    $ventasSemana = collect();
+    for ($i = 6; $i >= 0; $i--) {
+        $dia   = now()->subDays($i);
+        $total = \App\Models\Factura::whereDate('fecha_emision', $dia)
+                  ->where('estado','!=','anulada')->sum('total');
+        $ventasSemana->push(['dia' => $dia->format('d/m'), 'total' => $total]);
+    }
+
+    $topClientes = \App\Models\Factura::select('cliente_nombre',
+                    \Illuminate\Support\Facades\DB::raw('SUM(total) as total_mes'))
+                    ->whereMonth('fecha_emision', now()->month)
+                    ->whereYear('fecha_emision', now()->year)
+                    ->where('estado','!=','anulada')
+                    ->groupBy('cliente_nombre')
+                    ->orderByDesc('total_mes')
+                    ->limit(5)->get();
+
+    return view('dashboard', compact(
+        'empresa','ventasHoy','ventasMes','cartera','facturasMes',
+        'facturasVencidas','productosStockBajo','cotizacionesPend','ordenesPend',
+        'ultimasFacturas','ventasSemana','topClientes'
+    ));
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+// ── Rutas autenticadas ────────────────────────────────────────
+Route::middleware('auth')->group(function () {
+
+    // Perfil de usuario
+    Route::get('/profile',    [ProfileController::class, 'edit'])   ->name('profile.edit');
+    Route::patch('/profile',  [ProfileController::class, 'update']) ->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // ── Clientes ──────────────────────────────────────────────
+    Route::get('/clientes',
+        [ClienteController::class, 'index'])  ->name('clientes.index');
+
+    Route::get('/clientes/crear',
+        [ClienteController::class, 'create']) ->name('clientes.create');
+
+    Route::post('/clientes',
+        [ClienteController::class, 'store'])  ->name('clientes.store');
+
+    Route::get('/clientes/{cliente}',
+        [ClienteController::class, 'show'])   ->name('clientes.show');
+
+    Route::get('/clientes/{cliente}/editar',
+        [ClienteController::class, 'edit'])   ->name('clientes.edit');
+
+    Route::put('/clientes/{cliente}',
+        [ClienteController::class, 'update']) ->name('clientes.update');
+
+    Route::delete('/clientes/{cliente}',
+        [ClienteController::class, 'destroy'])->name('clientes.destroy');
+
+    // Proveedores
+    Route::get('/proveedores',                    [ProveedorController::class, 'index'])  ->name('proveedores.index');
+    Route::get('/proveedores/crear',              [ProveedorController::class, 'create']) ->name('proveedores.create');
+    Route::post('/proveedores',                   [ProveedorController::class, 'store'])  ->name('proveedores.store');
+    Route::get('/proveedores/{proveedor}',        [ProveedorController::class, 'show'])   ->name('proveedores.show');
+    Route::get('/proveedores/{proveedor}/editar', [ProveedorController::class, 'edit'])   ->name('proveedores.edit');
+    Route::put('/proveedores/{proveedor}',        [ProveedorController::class, 'update']) ->name('proveedores.update');
+    Route::delete('/proveedores/{proveedor}',     [ProveedorController::class, 'destroy'])->name('proveedores.destroy');
+
+    // Inventario
+    Route::get('/inventario',                       [ProductoController::class, 'index'])       ->name('inventario.index');
+    Route::get('/inventario/crear',                 [ProductoController::class, 'create'])      ->name('inventario.create');
+    Route::post('/inventario',                      [ProductoController::class, 'store'])       ->name('inventario.store');
+    Route::get('/inventario/{inventario}',          [ProductoController::class, 'show'])        ->name('inventario.show');
+    Route::get('/inventario/{inventario}/editar',   [ProductoController::class, 'edit'])        ->name('inventario.edit');
+    Route::put('/inventario/{inventario}',          [ProductoController::class, 'update'])      ->name('inventario.update');
+    Route::delete('/inventario/{inventario}',       [ProductoController::class, 'destroy'])     ->name('inventario.destroy');
+    Route::post('/inventario/{inventario}/ajustar', [ProductoController::class, 'ajustarStock'])->name('inventario.ajustar');
+
+    // Facturación
+    Route::get('/facturas',                     [FacturaController::class, 'index'])  ->name('facturas.index');
+    Route::get('/facturas/crear',               [FacturaController::class, 'create']) ->name('facturas.create');
+    Route::post('/facturas',                    [FacturaController::class, 'store'])  ->name('facturas.store');
+    Route::get('/facturas/{factura}',           [FacturaController::class, 'show'])   ->name('facturas.show');
+    Route::get('/facturas/{factura}/editar',    [FacturaController::class, 'edit'])   ->name('facturas.edit');
+    Route::put('/facturas/{factura}',           [FacturaController::class, 'update']) ->name('facturas.update');
+    Route::delete('/facturas/{factura}',        [FacturaController::class, 'destroy'])->name('facturas.destroy');
+    Route::patch('/facturas/{factura}/estado',  [FacturaController::class, 'cambiarEstado'])->name('facturas.estado');
+    Route::get('/facturas/{factura}/pdf',       [FacturaController::class, 'pdf'])    ->name('facturas.pdf');
+
+    // Usuarios
+    Route::get('/usuarios',                    [UsuarioController::class, 'index'])       ->name('usuarios.index');
+    Route::get('/usuarios/crear',              [UsuarioController::class, 'create'])      ->name('usuarios.create');
+    Route::post('/usuarios',                   [UsuarioController::class, 'store'])       ->name('usuarios.store');
+    Route::get('/usuarios/{usuario}/editar',   [UsuarioController::class, 'edit'])        ->name('usuarios.edit');
+    Route::put('/usuarios/{usuario}',          [UsuarioController::class, 'update'])      ->name('usuarios.update');
+    Route::delete('/usuarios/{usuario}',       [UsuarioController::class, 'destroy'])     ->name('usuarios.destroy');
+    Route::patch('/usuarios/{usuario}/activo', [UsuarioController::class, 'toggleActivo'])->name('usuarios.activo');
+
+    // Órdenes de Compra
+    Route::get('/ordenes',                      [OrdenCompraController::class, 'index'])        ->name('ordenes.index');
+    Route::get('/ordenes/crear',                [OrdenCompraController::class, 'create'])       ->name('ordenes.create');
+    Route::post('/ordenes',                     [OrdenCompraController::class, 'store'])        ->name('ordenes.store');
+    Route::get('/ordenes/{orden}',              [OrdenCompraController::class, 'show'])         ->name('ordenes.show');
+    Route::get('/ordenes/{orden}/editar',       [OrdenCompraController::class, 'edit'])         ->name('ordenes.edit');
+    Route::put('/ordenes/{orden}',              [OrdenCompraController::class, 'update'])       ->name('ordenes.update');
+    Route::delete('/ordenes/{orden}',           [OrdenCompraController::class, 'destroy'])      ->name('ordenes.destroy');
+    Route::patch('/ordenes/{orden}/estado',     [OrdenCompraController::class, 'cambiarEstado'])->name('ordenes.estado');
+    Route::post('/ordenes/{orden}/recibir',     [OrdenCompraController::class, 'recibir'])      ->name('ordenes.recibir');
+    Route::get('/ordenes/{orden}/pdf',          [OrdenCompraController::class, 'pdf'])          ->name('ordenes.pdf');
+
+    // Cotizaciones
+    Route::get('/cotizaciones',                      [CotizacionController::class, 'index'])       ->name('cotizaciones.index');
+    Route::get('/cotizaciones/crear',                [CotizacionController::class, 'create'])      ->name('cotizaciones.create');
+    Route::post('/cotizaciones',                     [CotizacionController::class, 'store'])       ->name('cotizaciones.store');
+    Route::get('/cotizaciones/{cotizacion}',         [CotizacionController::class, 'show'])        ->name('cotizaciones.show');
+    Route::delete('/cotizaciones/{cotizacion}',      [CotizacionController::class, 'destroy'])     ->name('cotizaciones.destroy');
+    Route::patch('/cotizaciones/{cotizacion}/estado',[CotizacionController::class, 'cambiarEstado'])->name('cotizaciones.estado');
+    Route::post('/cotizaciones/{cotizacion}/convertir',[CotizacionController::class, 'convertir'])->name('cotizaciones.convertir');
+    Route::get('/cotizaciones/{cotizacion}/pdf',     [CotizacionController::class, 'pdf'])         ->name('cotizaciones.pdf');
+
+    // API buscar proveedores
+    Route::get('/api/proveedores/buscar', function(\Illuminate\Http\Request $req) {
+        $proveedores = \App\Models\Proveedor::where('activo', true)
+            ->where(function($q) use ($req) {
+                $q->where('razon_social',     'like', '%'.$req->q.'%')
+                ->orWhere('numero_documento','like', '%'.$req->q.'%');
+            })
+            ->limit(10)
+            ->get(['id','razon_social','tipo_documento','numero_documento',
+                'digito_verificacion','plazo_pago','retefuente_pct']);
+        return response()->json($proveedores);
+    })->middleware('auth');
+    
+    // API para buscar productos al facturar
+    Route::get('/api/productos/buscar', function(\Illuminate\Http\Request $req) {
+        $productos = \App\Models\Producto::where('activo', true)
+            ->where('nombre', 'like', '%'.$req->q.'%')
+            ->orWhere('codigo', 'like', '%'.$req->q.'%')
+            ->limit(10)
+            ->get(['id','codigo','nombre','precio_venta','iva_pct','unidad_medida_id']);
+        return response()->json($productos);
+    })->middleware('auth');
+
+    // Reportes
+    Route::get('/reportes',                    [ReporteController::class, 'index'])     ->name('reportes.index');
+    Route::get('/reportes/ventas',             [ReporteController::class, 'ventas'])    ->name('reportes.ventas');
+    Route::get('/reportes/inventario',         [ReporteController::class, 'inventario'])->name('reportes.inventario');
+    Route::get('/reportes/cartera',            [ReporteController::class, 'cartera'])   ->name('reportes.cartera');
+    Route::get('/reportes/ventas/pdf',         [ReporteController::class, 'ventasPdf']) ->name('reportes.ventas.pdf');
+    Route::get('/reportes/inventario/pdf',     [ReporteController::class, 'inventarioPdf'])->name('reportes.inventario.pdf');
+    Route::get('/reportes/cartera/pdf',        [ReporteController::class, 'carteraPdf'])->name('reportes.cartera.pdf');
+
+    // Empresa
+    Route::get('/empresa',              [EmpresaController::class, 'index'])      ->name('empresa.index');
+    Route::put('/empresa',              [EmpresaController::class, 'update'])     ->name('empresa.update');
+    Route::delete('/empresa/logo',      [EmpresaController::class, 'deleteLogo'])->name('empresa.logo.delete');
+
+    // Recibos de Caja
+    Route::get('/recibos',                  [ReciboCajaController::class, 'index'])  ->name('recibos.index');
+    Route::get('/recibos/crear',            [ReciboCajaController::class, 'create']) ->name('recibos.create');
+    Route::post('/recibos',                 [ReciboCajaController::class, 'store'])  ->name('recibos.store');
+    Route::get('/recibos/{recibo}',         [ReciboCajaController::class, 'show'])   ->name('recibos.show');
+    Route::delete('/recibos/{recibo}',      [ReciboCajaController::class, 'destroy'])->name('recibos.destroy');
+    Route::get('/recibos/{recibo}/pdf',     [ReciboCajaController::class, 'pdf'])    ->name('recibos.pdf');
+
+    // API buscar facturas para recibo
+    Route::get('/api/facturas/buscar', function(\Illuminate\Http\Request $req) {
+        $facturas = \App\Models\Factura::whereIn('estado', ['emitida', 'vencida'])
+            ->where(function($q) use ($req) {
+                $q->where('numero',        'like', '%'.$req->q.'%')
+                ->orWhere('cliente_nombre','like', '%'.$req->q.'%');
+            })
+            ->limit(10)
+            ->get(['id','numero','cliente_nombre','total','total_pagado'])
+            ->map(function($f) {
+                $f->saldo = max(0, $f->total - $f->total_pagado);
+                return $f;
+            });
+        return response()->json($facturas);
+    })->middleware('auth');
+
+    // API para buscar clientes
+    Route::get('/api/clientes/buscar', function(\Illuminate\Http\Request $req) {
+        $clientes = \App\Models\Cliente::where('activo', true)
+            ->where(function($q) use ($req) {
+                $q->where('nombres',          'like', '%'.$req->q.'%')
+                ->orWhere('apellidos',       'like', '%'.$req->q.'%')
+                ->orWhere('razon_social',    'like', '%'.$req->q.'%')
+                ->orWhere('numero_documento','like', '%'.$req->q.'%');
+            })
+            ->limit(10)
+            ->get(['id','nombres','apellidos','razon_social','numero_documento',
+                'tipo_documento','retefuente_pct','reteiva_pct','reteica_pct',
+                'plazo_pago','email','direccion']);
+        return response()->json($clientes);
+    })->middleware('auth');
+
+});
+
+require __DIR__.'/auth.php';

@@ -1,0 +1,631 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Fuentes ─────────────────────────────── */
+.font-display { font-family: 'Syne', sans-serif; }
+.font-sans    { font-family: 'DM Sans', sans-serif; }
+
+/* ══ FIX CRÍTICO: Color texto inputs tema oscuro ══
+   Sin esto los números/texto se ven invisibles (negro sobre oscuro)
+   Aplica a TODOS los formularios del sistema */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([disabled]),
+textarea:not([disabled]),
+select:not([disabled]) {
+    color: #e2e8f0 !important;
+    -webkit-text-fill-color: #e2e8f0 !important;
+}
+
+/* Placeholders visibles pero sutiles */
+input::placeholder,
+textarea::placeholder {
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
+    opacity: 1 !important;
+}
+
+/* Inputs deshabilitados */
+input[disabled], textarea[disabled], select[disabled] {
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
+    cursor: not-allowed;
+}
+
+/* Fix inputs tipo date — el ícono de calendario */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+    cursor: pointer;
+}
+
+/* Fix autocompletado del navegador (fondo azul/amarillo) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #1a2235 inset !important;
+    -webkit-text-fill-color: #e2e8f0 !important;
+    caret-color: #e2e8f0;
+}
+
+/* ── Scrollbar personalizado ─────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0b0f1a; }
+::-webkit-scrollbar-thumb { background: #1e2d47; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+
+/* ── Selección de texto ──────────────────── */
+::selection { background: #f59e0b33; color: #f59e0b; }
+
+/* ── Animaciones ─────────────────────────── */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.2s ease-out forwards; }
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.slide-up { animation: slideUp 0.3s ease-out forwards; }
+
+/* ── Paginación Tailwind ─────────────────── */
+nav[role="navigation"] span[aria-current="page"] span {
+    background: #f59e0b !important;
+    color: #000 !important;
+    border-color: #f59e0b !important;
+    border-radius: 0.5rem;
+    font-weight: 700;
+}
+nav[role="navigation"] a {
+    color: #94a3b8 !important;
+    border-color: #1e2d47 !important;
+    background: #141c2e !important;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+nav[role="navigation"] a:hover {
+    color: #f59e0b !important;
+    border-color: #f59e0b !important;
+}
+
+/* ══ RESPONSIVE MÓVIL ═══════════════════════ */
+@media (max-width: 640px) {
+    /* Evita zoom automático en iOS al hacer foco en inputs */
+    input, select, textarea { font-size: 16px !important; }
+
+    .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .overflow-x-auto::-webkit-scrollbar { display: none; }
+
+    main { padding: 1rem !important; }
+}
+
+/* ══ SIDEBAR MÓVIL ═══════════════════════════ */
+@media (max-width: 1024px) {
+    #sidebar { box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+}
+
+/* ══ BOTTOM NAV ══════════════════════════════ */
+.bottom-nav { display: none; }
+
+@media (max-width: 1024px) {
+    .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: #111827;
+        border-top: 1px solid #1e2d47;
+        z-index: 90;
+        padding: 0.5rem 0;
+        padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+    }
+    main { padding-bottom: 5rem !important; }
+}
+
+/* ══ BÚSQUEDA GLOBAL MÓVIL ═══════════════════ */
+@media (max-width: 640px) {
+    #busqueda-resultados {
+        position: fixed;
+        top: 56px; left: 0; right: 0;
+        max-height: calc(100vh - 72px);
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: 1px solid #1e2d47;
+    }
+}
+
+/* ══ TEMA CLARO (próxima sección) ════════════ */
+.light-mode body { background: #f1f5f9; color: #1e293b; }
+
+/* ══ PRINT ═══════════════════════════════════ */
+@media print {
+    #sidebar, .bottom-nav, header, footer { display: none !important; }
+    main { padding: 0 !important; margin: 0 !important; }
+}
+
+/* ══════════════════════════════════════════════════════
+   TEMA CLARO — Completo y corregido
+   ══════════════════════════════════════════════════════ */
+
+html:not(.dark) {
+    /* ── Fondos principales ── */
+    --bg-base:   #f0f4f8;
+    --bg-card:   #ffffff;
+    --bg-input:  #f8fafc;
+    --border:    #dde3ec;
+    --text-main: #1a202c;
+    --text-muted:#4a5568;
+}
+
+html:not(.dark) body {
+    background-color: var(--bg-base) !important;
+    color: var(--text-main) !important;
+}
+
+/* ── SIDEBAR ───────────────────────────────── */
+html:not(.dark) aside#sidebar {
+    background-color: #ffffff !important;
+    border-right-color: var(--border) !important;
+}
+
+/* Logo FacturaCO — texto visible en claro */
+html:not(.dark) aside#sidebar .font-display.font-black.text-xl.text-white {
+    color: #1a202c !important;
+}
+html:not(.dark) aside#sidebar .font-display.font-black.text-xl.text-white .text-amber-500 {
+    color: #f59e0b !important;
+}
+
+/* Subtítulo empresa bajo el logo */
+html:not(.dark) aside#sidebar .text-slate-500 {
+    color: #64748b !important;
+}
+
+/* Nav items normales */
+html:not(.dark) aside#sidebar a.text-slate-500 {
+    color: #64748b !important;
+}
+html:not(.dark) aside#sidebar a:hover {
+    background-color: #f1f5f9 !important;
+    color: #1a202c !important;
+}
+
+/* Nav item activo */
+html:not(.dark) aside#sidebar a.bg-amber-500\/10 {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+
+/* Labels de sección (PRINCIPAL, GESTIÓN...) */
+html:not(.dark) aside#sidebar .text-slate-600 {
+    color: #94a3b8 !important;
+}
+
+/* Usuario al fondo del sidebar */
+html:not(.dark) aside#sidebar .border-t {
+    border-top-color: var(--border) !important;
+}
+html:not(.dark) aside#sidebar .text-white {
+    color: #1a202c !important;
+}
+
+/* ── TOPBAR ────────────────────────────────── */
+html:not(.dark) header {
+    background-color: rgba(255,255,255,0.97) !important;
+    border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) header .font-display {
+    color: #1a202c !important;
+}
+
+/* Buscador en topbar */
+html:not(.dark) header #busqueda-global {
+    background-color: #f1f5f9 !important;
+    border-color: #dde3ec !important;
+    color: #1a202c !important;
+}
+html:not(.dark) header #busqueda-global:focus {
+    border-color: #f59e0b !important;
+    background-color: #ffffff !important;
+}
+html:not(.dark) header #busqueda-global::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Botones del topbar */
+html:not(.dark) header .bg-\[\#1a2235\] {
+    background-color: #f1f5f9 !important;
+    border-color: #dde3ec !important;
+    color: #4a5568 !important;
+}
+html:not(.dark) header .bg-\[\#1a2235\]:hover {
+    color: #1a202c !important;
+    border-color: #94a3b8 !important;
+}
+
+/* ── CARDS / PANELES ───────────────────────── */
+html:not(.dark) .bg-\[\#141c2e\] {
+    background-color: #ffffff !important;
+    border-color: var(--border) !important;
+}
+html:not(.dark) .bg-\[\#1a2235\] {
+    background-color: #f1f5f9 !important;
+    border-color: var(--border) !important;
+}
+html:not(.dark) .bg-\[\#111827\] {
+    background-color: #ffffff !important;
+}
+html:not(.dark) .bg-\[\#0b0f1a\] {
+    background-color: #f0f4f8 !important;
+}
+html:not(.dark) .bg-\[\#0f1623\] {
+    background-color: #e2e8f0 !important;
+}
+
+/* ── BORDES ────────────────────────────────── */
+html:not(.dark) .border-\[\#1e2d47\] {
+    border-color: var(--border) !important;
+}
+html:not(.dark) [class*="border-[#1e2d47]"] {
+    border-color: var(--border) !important;
+}
+
+/* ── TEXTOS ────────────────────────────────── */
+html:not(.dark) .text-slate-200 { color: #1a202c !important; }
+html:not(.dark) .text-slate-300 { color: #2d3748 !important; }
+html:not(.dark) .text-slate-400 { color: #4a5568 !important; }
+html:not(.dark) .text-slate-500 { color: #64748b !important; }
+html:not(.dark) .text-slate-600 { color: #94a3b8 !important; }
+html:not(.dark) .text-white     { color: #1a202c !important; }
+
+/* ── TABLAS ────────────────────────────────── */
+
+/* FIX CRÍTICO: hover de filas — sin transición que cause titileo */
+html:not(.dark) tbody tr {
+    transition: background-color 0.15s ease !important;
+    will-change: background-color;
+}
+html:not(.dark) tbody tr:hover {
+    background-color: #f1f5f9 !important;
+}
+html:not(.dark) tbody tr:hover td {
+    background-color: transparent !important;
+    color: #1a202c !important;
+}
+
+/* Bordes de filas */
+html:not(.dark) tbody tr td {
+    border-bottom-color: #e2e8f0 !important;
+    color: #2d3748 !important;
+}
+html:not(.dark) thead th {
+    color: #64748b !important;
+    border-bottom-color: #e2e8f0 !important;
+}
+html:not(.dark) tfoot td {
+    background-color: #f8fafc !important;
+    color: #1a202c !important;
+    border-top-color: #e2e8f0 !important;
+}
+
+/* ── INPUTS ────────────────────────────────── */
+html:not(.dark) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]),
+html:not(.dark) textarea:not([disabled]),
+html:not(.dark) select:not([disabled]) {
+    background-color: #ffffff !important;
+    border-color: #dde3ec !important;
+    color: #1a202c !important;
+    -webkit-text-fill-color: #1a202c !important;
+}
+
+html:not(.dark) input:focus:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark) textarea:focus,
+html:not(.dark) select:focus {
+    border-color: #f59e0b !important;
+    background-color: #fffbeb !important;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+}
+
+html:not(.dark) input[disabled],
+html:not(.dark) textarea[disabled] {
+    background-color: #e2e8f0 !important;
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* ── BADGES / PILLS de estado ──────────────── */
+html:not(.dark) .bg-emerald-500\/10 { background-color: #d1fae5 !important; }
+html:not(.dark) .bg-blue-500\/10    { background-color: #dbeafe !important; }
+html:not(.dark) .bg-red-500\/10     { background-color: #fee2e2 !important; }
+html:not(.dark) .bg-amber-500\/10   { background-color: #fef3c7 !important; }
+html:not(.dark) .bg-purple-500\/10  { background-color: #ede9fe !important; }
+html:not(.dark) .bg-slate-500\/10   { background-color: #f1f5f9 !important; }
+html:not(.dark) .bg-cyan-500\/10    { background-color: #cffafe !important; }
+
+/* ── PAGINACIÓN ────────────────────────────── */
+html:not(.dark) nav[role="navigation"] a {
+    background-color: #ffffff !important;
+    border-color: #dde3ec !important;
+    color: #4a5568 !important;
+}
+html:not(.dark) nav[role="navigation"] a:hover {
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+
+/* ── DROPDOWN BÚSQUEDA ─────────────────────── */
+html:not(.dark) #busqueda-resultados {
+    background-color: #ffffff !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12) !important;
+}
+html:not(.dark) #busqueda-resultados .hover\:bg-\[\#1a2235\]:hover {
+    background-color: #f1f5f9 !important;
+}
+
+/* ── BOTTOM NAV MÓVIL ──────────────────────── */
+html:not(.dark) .bottom-nav {
+    background-color: #ffffff !important;
+    border-top-color: var(--border) !important;
+}
+
+/* ── FOOTER ────────────────────────────────── */
+html:not(.dark) footer {
+    background-color: #ffffff !important;
+    border-top-color: var(--border) !important;
+}
+html:not(.dark) footer .text-slate-600 {
+    color: #94a3b8 !important;
+}
+
+/* ── OVERLAY ───────────────────────────────── */
+html:not(.dark) #overlay {
+    background-color: rgba(0,0,0,0.3) !important;
+}
+
+/* ── SCROLLBAR TEMA CLARO ──────────────────── */
+html:not(.dark) ::-webkit-scrollbar-track { background: #f0f4f8; }
+html:not(.dark) ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+html:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+
+/* ── FIX: Cards de precios en inventario ──── */
+html:not(.dark) .bg-\[\#1a2235\].rounded-xl {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* ── FIX: Inputs dentro de cards blancas ──── */
+html:not(.dark) .bg-\[\#141c2e\] input:not([disabled]),
+html:not(.dark) .bg-\[\#141c2e\] select:not([disabled]),
+html:not(.dark) .bg-\[\#141c2e\] textarea:not([disabled]) {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #1a202c !important;
+    -webkit-text-fill-color: #1a202c !important;
+}
+
+html:not(.dark) .bg-\[\#141c2e\] input::placeholder,
+html:not(.dark) .bg-\[\#141c2e\] textarea::placeholder {
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* ── FIX: Valores de precios visibles ──────── */
+html:not(.dark) .text-slate-300,
+html:not(.dark) .text-slate-400 {
+    color: #374151 !important;
+}
+
+/* ── FIX: Select en tema claro ─────────────── */
+html:not(.dark) select {
+    background-color: #ffffff !important;
+    color: #1a202c !important;
+    -webkit-text-fill-color: #1a202c !important;
+    border-color: #cbd5e1 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.5rem center !important;
+    background-size: 1.5em 1.5em !important;
+    -webkit-appearance: none !important;
+}
+
+/* ── FIX: Fondo oscuro de inputs bg-[#1a2235] ── */
+html:not(.dark) input.bg-\[\#1a2235\],
+html:not(.dark) select.bg-\[\#1a2235\],
+html:not(.dark) textarea.bg-\[\#1a2235\] {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #1a202c !important;
+    -webkit-text-fill-color: #1a202c !important;
+}
+
+/* ── FIX: Fondo cards stock/precios ─────────── */
+html:not(.dark) .bg-\[\#1a2235\].rounded-xl.p-3,
+html:not(.dark) .bg-\[\#1a2235\].rounded-xl.p-4 {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* ── FIX: Íconos en topbar claro ────────────── */
+html:not(.dark) header .text-slate-400,
+html:not(.dark) header .text-slate-500 {
+    color: #4b5563 !important;
+}
+
+/* ── FIX: Hover filas tabla definitivo ───────── */
+html:not(.dark) table tbody tr {
+    transition: background-color 0.12s ease !important;
+}
+html:not(.dark) table tbody tr:hover {
+    background-color: #f0f7ff !important;
+}
+html:not(.dark) table tbody tr:hover td {
+    background-color: transparent !important;
+}
+
+/* ── FIX: Borders de tabla ───────────────────── */
+html:not(.dark) table tbody td,
+html:not(.dark) table thead th {
+    border-color: #e5eaf2 !important;
+}
+
+/* ── FIX: Overflow sidebar en tema claro ─────── */
+html:not(.dark) aside#sidebar {
+    box-shadow: 1px 0 8px rgba(0,0,0,0.06) !important;
+}
+
+/* ── FIX: Gráficas / barras dashboard y reportes ── */
+html:not(.dark) .bg-\[\#1e2d47\].rounded-full {
+    background-color: #e2e8f0 !important;
+}
+
+/* ── FIX: Labels de formularios en tema claro ─────── */
+html:not(.dark) label,
+html:not(.dark) .text-xs.font-semibold.text-slate-400 {
+    color: #374151 !important;
+}
+
+/* ── FIX: Impuestos — cards retención ────────────── */
+html:not(.dark) .bg-\[\#1a2235\].border.rounded-xl p-3,
+html:not(.dark) .ret-box {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* ── FIX: Texto dentro de cards de retención ──────── */
+html:not(.dark) .ret-label { color: #6b7280 !important; }
+html:not(.dark) .ret-val   { color: #1a202c !important; }
+
+/* ── FIX: Texto subtítulos y descripciones ────────── */
+html:not(.dark) p.text-slate-500,
+html:not(.dark) div.text-slate-500,
+html:not(.dark) span.text-slate-500 {
+    color: #6b7280 !important;
+}
+
+/* ── FIX: Tabla de permisos por rol ───────────────── */
+html:not(.dark) .permisos-table th,
+html:not(.dark) table th {
+    color: #374151 !important;
+    background-color: #f8fafc !important;
+}
+
+/* ── FIX: Botones secundarios (volver, cancelar) ──── */
+html:not(.dark) a.bg-\[\#1a2235\].border,
+html:not(.dark) button.bg-\[\#1a2235\].border {
+    background-color: #f1f5f9 !important;
+    border-color: #dde3ec !important;
+    color: #374151 !important;
+}
+html:not(.dark) a.bg-\[\#1a2235\].border:hover,
+html:not(.dark) button.bg-\[\#1a2235\].border:hover {
+    background-color: #e2e8f0 !important;
+    color: #1a202c !important;
+}
+
+/* ── FIX: Empresa — card estado DIAN ──────────────── */
+html:not(.dark) .bg-blue-500\/5,
+html:not(.dark) .bg-amber-500\/5,
+html:not(.dark) .bg-emerald-500\/5,
+html:not(.dark) .bg-red-500\/5 {
+    background-color: #f8fafc !important;
+}
+
+/* ── FIX: Badge "Vigente" empresa ─────────────────── */
+html:not(.dark) .bg-emerald-500\/10.text-emerald-500 {
+    background-color: #d1fae5 !important;
+    color: #065f46 !important;
+}
+html:not(.dark) .bg-red-500\/10.text-red-400 {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+}
+html:not(.dark) .bg-amber-500\/10.text-amber-500 {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+
+/* ── FIX: Usuarios — cards de contadores de roles ─── */
+html:not(.dark) .bg-\[\#141c2e\].border.rounded-2xl.p-5 {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+}
+
+/* ── FIX: Número "0" en KPIs pequeños ─────────────── */
+html:not(.dark) .font-display.font-bold {
+    color: #1a202c !important;
+}
+
+/* ── FIX: Íconos de acciones en tablas ────────────── */
+html:not(.dark) .w-8.h-8.bg-\[\#1a2235\] {
+    background-color: #f1f5f9 !important;
+    border-color: #dde3ec !important;
+    color: #4b5563 !important;
+}
+html:not(.dark) .w-8.h-8.bg-\[\#1a2235\]:hover {
+    background-color: #e2e8f0 !important;
+}
+
+/* ── FIX: Inputs tipo date en claro ───────────────── */
+html:not(.dark) input[type="date"] {
+    color-scheme: light !important;
+}
+
+/* ── FIX: Botones tipo período (Bimestral/Mensual) ── */
+html:not(.dark) #btn-bimestral,
+html:not(.dark) #btn-mensual,
+html:not(.dark) #btn-anual {
+    background-color: #f1f5f9 !important;
+    border-color: #dde3ec !important;
+    color: #4b5563 !important;
+}
+
+/* ── FIX: Hover items sidebar en claro ────────────── */
+html:not(.dark) aside nav a:not(.bg-amber-500\/10):hover {
+    background-color: #f0f7ff !important;
+    color: #1e40af !important;
+}
+
+/* ── FIX: Separadores y líneas divisoras ──────────── */
+html:not(.dark) hr,
+html:not(.dark) [class*="border-t"],
+html:not(.dark) [class*="border-b"] {
+    border-color: #e5eaf2 !important;
+}
+
+/* ── FIX: Texto en font-mono (códigos, NIT) ────────── */
+html:not(.dark) .font-mono {
+    color: #374151 !important;
+}
+
+/* ── FIX: Alertas de info (azul) ─────────────────── */
+html:not(.dark) .bg-blue-500\/5.border.border-blue-500\/20 {
+    background-color: #eff6ff !important;
+    border-color: #bfdbfe !important;
+}
+
+/* ── FIX: Textos de tabla que se pierden en claro ── */
+html:not(.dark) tbody td,
+html:not(.dark) tbody td span:not([class*="text-"]) {
+    color: #1e293b !important;
+}
+
+/* Específico para cliente en remisiones/facturas */
+html:not(.dark) tbody td .text-slate-400,
+html:not(.dark) tbody td .text-slate-500 {
+    color: #4b5563 !important;
+}
+
+/* ── FIX: Meses en cards de bimestres ──────────────── */
+html:not(.dark) .text-blue-400 { color: #1d4ed8 !important; }
+html:not(.dark) .text-xs.text-slate-500:not(nav *) {
+    color: #4b5563 !important;
+}

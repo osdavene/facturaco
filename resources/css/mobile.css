@@ -1,0 +1,123 @@
+/* ══ MEJORAS RESPONSIVE MÓVIL ══════════════════════════════ */
+
+/* Inputs y selects más grandes en móvil para evitar zoom */
+@media (max-width: 640px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+        font-size: 16px !important; /* Evita zoom automático en iOS */
+    }
+
+    /* Tablas — scroll horizontal suave */
+    .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .overflow-x-auto::-webkit-scrollbar { display: none; }
+
+    /* Cards más compactas */
+    .rounded-2xl { border-radius: 1rem; }
+
+    /* Padding reducido en móvil */
+    main { padding: 1rem !important; }
+
+    /* Botones más fáciles de tocar */
+    button, a[class*="rounded"] {
+        min-height: 36px;
+    }
+
+    /* Texto más legible */
+    .font-mono { font-size: 0.8rem; }
+}
+
+/* ══ SIDEBAR MÓVIL ══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    #sidebar {
+        box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
+}
+
+/* ══ TABLAS RESPONSIVAS ════════════════════════════════════ */
+@media (max-width: 768px) {
+    /* Hacer que las tablas con muchas columnas
+       se vean bien en móvil */
+    table.tabla-movil thead { display: none; }
+    table.tabla-movil tr {
+        display: block;
+        border: 1px solid #1e2d47;
+        border-radius: 0.75rem;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background: #141c2e;
+    }
+    table.tabla-movil td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.35rem 0;
+        border: none;
+        font-size: 0.875rem;
+    }
+    table.tabla-movil td::before {
+        content: attr(data-label);
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #64748b;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+        margin-right: 0.5rem;
+    }
+}
+
+/* ══ BÚSQUEDA GLOBAL ════════════════════════════════════════ */
+@media (max-width: 640px) {
+    #busqueda-resultados {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        max-height: calc(100vh - 80px);
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+}
+
+/* ══ FORMULARIOS MÓVIL ══════════════════════════════════════ */
+@media (max-width: 640px) {
+    /* Grids de 2 columnas → 1 columna */
+    .grid-cols-2 { grid-template-columns: 1fr !important; }
+
+    /* Formularios de filtro en columna */
+    form .flex-row { flex-direction: column; }
+}
+
+/* ══ BOTTOM NAV MÓVIL ═══════════════════════════════════════ */
+.bottom-nav {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #111827;
+        border-top: 1px solid #1e2d47;
+        z-index: 90;
+        padding: 0.5rem 0;
+        padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+    }
+
+    /* Agregar espacio al contenido para que no quede tapado */
+    main {
+        padding-bottom: 5rem !important;
+    }
+}
