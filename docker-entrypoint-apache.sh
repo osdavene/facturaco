@@ -1,12 +1,17 @@
 #!/bin/bash
 set -e
-
 cd /var/www/html
 
-echo "=== FacturaCO iniciando con Apache ==="
+echo "=== FacturaCO v7 iniciando ==="
+
+# Configurar puerto de Apache
+APACHE_PORT="${PORT:-80}"
+echo "Listen ${APACHE_PORT}" > /etc/apache2/ports.conf
+sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${APACHE_PORT}>/" \
+    /etc/apache2/sites-available/000-default.conf
 
 # Generar .env
-cat > .env << EOF
+cat > .env << ENVEOF
 APP_NAME="${APP_NAME:-FacturaCO}"
 APP_ENV=production
 APP_KEY="${APP_KEY}"
@@ -42,18 +47,9 @@ MAIL_FROM_ADDRESS="facturacion@mundovirtual.co"
 MAIL_FROM_NAME="FacturaCO"
 
 VITE_APP_NAME="FacturaCO"
-EOF
+ENVEOF
 
-echo "=== .env generado ==="
-
-# Configurar puerto de Apache (Railway usa PORT env var)
-APACHE_PORT="${PORT:-80}"
-echo "Listen ${APACHE_PORT}" > /etc/apache2/ports.conf
-sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${APACHE_PORT}>/" /etc/apache2/sites-available/000-default.conf
-
-echo "=== Apache en puerto ${APACHE_PORT} ==="
-
-# Migraciones
+echo "=== Puerto Apache: ${APACHE_PORT} ==="
 php artisan migrate --force
 php artisan storage:link 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
