@@ -58,7 +58,7 @@ Route::post('/tema', function(\Illuminate\Http\Request $request) {
 
 // ── Página de inicio ──────────────────────────────────────────
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // ── Dashboard ─────────────────────────────────────────────────
