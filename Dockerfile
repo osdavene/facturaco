@@ -11,20 +11,13 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     && docker-php-ext-install \
-        pdo \
-        pdo_pgsql \
-        pgsql \
-        zip \
-        gd \
-        mbstring \
-        xml \
-        bcmath \
-        opcache \
+        pdo pdo_pgsql pgsql zip gd mbstring xml bcmath opcache \
     && apt-get clean
 
 # Instalar Node.js 20
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && apt-get clean
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -35,11 +28,10 @@ COPY . .
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
 # Instalar dependencias Node y compilar assets
-RUN npm install
-RUN npm run build
+RUN npm install && npm run build
 
-# Verificar que el manifest existe
-RUN ls -la public/build/ && cat public/build/manifest.json | head -5
+# Verificar manifest
+RUN ls public/build/.vite/manifest.json && echo "✓ Manifest encontrado"
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
