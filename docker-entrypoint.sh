@@ -14,11 +14,9 @@ server {
     root /var/www/html/public;
     index index.php index.html;
 
-    # Logs
     access_log /dev/stdout;
     error_log /dev/stderr;
 
-    # Assets estaticos con cache
     location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
@@ -34,7 +32,6 @@ server {
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         fastcgi_param HTTP_HOST \$http_host;
-        fastcgi_param HTTPS on;
         include fastcgi_params;
         fastcgi_read_timeout 300;
     }
@@ -107,11 +104,11 @@ php artisan migrate --force
 # Storage link
 php artisan storage:link 2>/dev/null || true
 
-# Limpiar caches de vistas compiladas (por si acaso)
+# Limpiar cache de vistas
 php artisan view:clear 2>/dev/null || true
 
 echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
 
-echo "=== Iniciando Nginx en puerto ${APP_PORT} ==="
+echo "=== Nginx iniciando en puerto ${APP_PORT} ==="
 exec nginx -g 'daemon off;'

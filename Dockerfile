@@ -1,4 +1,5 @@
 FROM php:8.3-fpm
+# BUILD_FORCE_v4
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
@@ -28,19 +29,22 @@ WORKDIR /var/www/html
 # Copiar proyecto
 COPY . .
 
-# Instalar dependencias PHP (sin scripts para no necesitar .env)
+# Instalar dependencias PHP
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
 
-# Instalar dependencias Node
-RUN npm install
+# Instalar dependencias Node y compilar assets
+RUN npm install && npm run build
 
-# Compilar assets con Vite
-RUN npm run build
-
-# Copiar manifest al lugar que Laravel espera
-RUN cp public/build/.vite/manifest.json public/build/manifest.json && \
-    echo "=== Manifest copiado correctamente ===" && \
-    cat public/build/manifest.json
+# Asegurar manifest.json en public/build/ (compatible con Vite 5 y Vite 6+)
+RUN echo "=== Archivos en public/build/ ===" && ls -la public/build/ && \
+    if [ -f "public/build/manifest.json" ]; then \
+        echo "OK: manifest.json ya existe en public/build/"; \
+    elif [ -f "public/build/.vite/manifest.json" ]; then \
+        cp "public/build/.vite/manifest.json" "public/build/manifest.json" && \
+        echo "OK: manifest.json copiado desde .vite/"; \
+    else \
+        echo "ERROR: No se encontro manifest.json" && exit 1; \
+    fi && echo "=== Manifest OK ==="
 
 # Permisos
 RUN chown -R www-data:www-data /var/www/html \
