@@ -3,10 +3,12 @@ set -e
 
 cd /var/www/html
 
-# Usar puerto de Railway o 8080 por defecto
-APP_PORT="${PORT:-8080}"
+# Railway siempre usa 8080
+APP_PORT="8080"
 
-# Generar configuracion de Nginx con el puerto correcto
+echo "Configurando Nginx en puerto ${APP_PORT}"
+
+# Generar configuracion de Nginx
 cat > /etc/nginx/sites-available/default << NGINX
 server {
     listen ${APP_PORT};
@@ -26,7 +28,7 @@ server {
 }
 NGINX
 
-# Generar .env completo
+# Generar .env
 cat > .env << EOF
 APP_NAME="${APP_NAME:-FacturaCO}"
 APP_ENV="${APP_ENV:-production}"
@@ -52,10 +54,8 @@ EOF
 php artisan migrate --force
 php artisan storage:link 2>/dev/null || true
 
-# Iniciar PHP-FPM en background
+# PHP-FPM en background
 php-fpm -D
 
-echo "Iniciando Nginx en puerto ${APP_PORT}"
-
-# Iniciar Nginx en foreground
+echo "Nginx iniciando en puerto ${APP_PORT}..."
 exec nginx -g 'daemon off;'
