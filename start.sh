@@ -41,12 +41,20 @@ MAIL_FROM_NAME="FacturaCO"
 VITE_APP_NAME="FacturaCO"
 EOF
 
-# Configurar Nginx en puerto 8080 con TCP (más confiable que socket)
+# Configurar Nginx
 cat > /etc/nginx/sites-available/default << 'NGINX'
 server {
     listen 8080;
     root /var/www/html/public;
     index index.php;
+
+    # Servir archivos estaticos directamente sin pasar por PHP
+    location /build/ {
+        alias /var/www/html/public/build/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
 
     location / {
         try_files $uri $uri/ /index.php?$query_string;
@@ -60,12 +68,6 @@ server {
         include fastcgi_params;
     }
 
-    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        try_files $uri =404;
-    }
-
     location ~ /\.ht {
         deny all;
     }
@@ -76,9 +78,8 @@ php artisan migrate --force
 php artisan storage:link 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 
-# Iniciar PHP-FPM en background y esperar que arranque
 php-fpm -D
-sleep 3
+sleep 2
 
-echo "=== FacturaCO corriendo en puerto 8080 ==="
+echo "=== FacturaCO en puerto 8080 ==="
 exec nginx -g 'daemon off;'
