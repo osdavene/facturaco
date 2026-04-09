@@ -3,11 +3,9 @@ set -e
 
 cd /var/www/html
 
-echo "=== Verificando variables ==="
-echo "DB_HOST: ${DB_HOST}"
-echo "DB_DATABASE: ${DB_DATABASE}"
+echo "=== DATABASE_URL recibida: ${DATABASE_URL}"
 
-# Escribir el .env en runtime con las variables de Railway
+# Generar .env completo en runtime
 cat > .env << EOF
 APP_NAME="${APP_NAME:-FacturaCO}"
 APP_ENV="${APP_ENV:-production}"
@@ -16,11 +14,7 @@ APP_DEBUG="${APP_DEBUG:-false}"
 APP_URL="${APP_URL:-http://localhost}"
 
 DB_CONNECTION=pgsql
-DB_HOST="${DB_HOST}"
-DB_PORT="${DB_PORT:-5432}"
-DB_DATABASE="${DB_DATABASE}"
-DB_USERNAME="${DB_USERNAME}"
-DB_PASSWORD="${DB_PASSWORD}"
+DATABASE_URL="${DATABASE_URL}"
 
 CACHE_DRIVER=file
 SESSION_DRIVER=file
@@ -28,8 +22,7 @@ QUEUE_CONNECTION=sync
 LOG_CHANNEL=stderr
 EOF
 
-echo "=== .env generado ==="
-cat .env | grep DB_HOST
+echo "=== .env generado, iniciando migraciones ==="
 
 # Ejecutar migraciones
 php artisan migrate --force
