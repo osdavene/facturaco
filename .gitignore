@@ -23,3 +23,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+!public/build/.vite/manifest.json
+!public/build/assets/
+!public/build/assets/**
