@@ -30,7 +30,7 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
-RUN npm ci && npm run build
+RUN npm ci && APP_URL=https://facturaco-production.up.railway.app npm run build
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
