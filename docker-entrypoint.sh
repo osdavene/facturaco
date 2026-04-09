@@ -3,22 +3,14 @@ set -e
 
 cd /var/www/html
 
-# Railway siempre usa 8080
 APP_PORT="8080"
 
-echo "Configurando Nginx en puerto ${APP_PORT}"
-
-# Generar configuracion de Nginx
 cat > /etc/nginx/sites-available/default << NGINX
 server {
     listen ${APP_PORT};
     root /var/www/html/public;
     index index.php;
-
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
-    }
-
+    location / { try_files \$uri \$uri/ /index.php?\$query_string; }
     location ~ \.php$ {
         fastcgi_pass 127.0.0.1:9000;
         fastcgi_index index.php;
@@ -28,34 +20,40 @@ server {
 }
 NGINX
 
-# Generar .env
 cat > .env << EOF
 APP_NAME="${APP_NAME:-FacturaCO}"
-APP_ENV="${APP_ENV:-production}"
+APP_ENV=production
 APP_KEY="${APP_KEY}"
-APP_DEBUG="${APP_DEBUG:-false}"
-APP_URL="${APP_URL:-http://localhost}"
-APP_LOCALE="${APP_LOCALE:-es}"
+APP_DEBUG=false
+APP_URL="${APP_URL:-https://facturaco-production.up.railway.app}"
+APP_TIMEZONE=America/Bogota
+APP_LOCALE=es
 
 DB_CONNECTION=pgsql
 DATABASE_URL="${DATABASE_URL}"
 
 CACHE_DRIVER=file
+CACHE_STORE=file
 SESSION_DRIVER=file
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=null
 QUEUE_CONNECTION=sync
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+
 LOG_CHANNEL=stderr
 LOG_LEVEL=error
 
-MAIL_MAILER="${MAIL_MAILER:-log}"
-FILESYSTEM_DISK=local
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS="facturacion@mundovirtual.co"
+MAIL_FROM_NAME="FacturaCO"
+
+VITE_APP_NAME="FacturaCO"
 EOF
 
-# Migraciones y storage
 php artisan migrate --force
 php artisan storage:link 2>/dev/null || true
-
-# PHP-FPM en background
 php-fpm -D
-
-echo "Nginx iniciando en puerto ${APP_PORT}..."
 exec nginx -g 'daemon off;'

@@ -29,6 +29,7 @@ RUN composer install --optimize-autoloader --no-dev --no-interaction
 
 # Instalar dependencias Node y compilar assets
 RUN npm install && npm run build
+RUN cp public/build/.vite/manifest.json public/build/manifest.json
 
 # Verificar manifest
 RUN ls public/build/.vite/manifest.json && echo "✓ Manifest encontrado"
