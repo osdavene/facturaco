@@ -78,16 +78,17 @@
         }
     },
     "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "php-http/discovery": true
-        },
-        "platform": {
-        "ext-gd": "1.0"
-        }
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "platform": {
+        "ext-gd": "1.0",
+        "ext-zip": "1.0",
+        "ext-xml": "1.0",
+        "ext-xmlreader": "1.0",
+        "ext-xmlwriter": "1.0",
+        "ext-simplexml": "1.0"
+    }
     },
     "minimum-stability": "stable",
     "prefer-stable": true
