@@ -21,6 +21,7 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\UnidadMedidaController;
 use App\Http\Controllers\SesionController;
 use App\Http\Controllers\AuditoriaController;
+use App\Http\Controllers\BackupController;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -185,6 +186,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/auditoria', [AuditoriaController::class, 'index'])
         ->name('auditoria.index')
         ->middleware('can:ver usuarios');
+
+    // ── Backup (solo admin) ───────────────────────────────
+    Route::get('/backup',          [BackupController::class, 'index'])         ->name('backup.index') ->middleware('can:ver usuarios');
+    Route::get('/backup/json',     [BackupController::class, 'descargarJson']) ->name('backup.json')  ->middleware('can:ver usuarios');
+    Route::post('/backup/csv',     [BackupController::class, 'descargarCsv'])  ->name('backup.csv')   ->middleware('can:ver usuarios');
+    Route::get('/backup/sql',      [BackupController::class, 'descargarSql'])  ->name('backup.sql')   ->middleware('can:ver usuarios');
 
     // ── Unidades de Medida (solo admin) ──────────────────────
     Route::get('/unidades',                   [UnidadMedidaController::class, 'index'])  ->name('unidades.index')  ->middleware('can:ver usuarios');

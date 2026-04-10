@@ -168,6 +168,11 @@
                                 :active="request()->routeIs('auditoria.*')">
                         Auditoría
                     </x-nav-item>
+                    <x-nav-item href="{{ route('backup.index') }}"
+                                icon="fas fa-hdd"
+                                :active="request()->routeIs('backup.*')">
+                        Backup
+                    </x-nav-item>
                 </x-nav-section>
                 @endcan
 
