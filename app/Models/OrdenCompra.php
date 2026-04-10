@@ -5,12 +5,11 @@ use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Traits\BelongsToEmpresa;
 
 
 class OrdenCompra extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerEmpresa, BelongsToEmpresa;
+    use HasFactory, SoftDeletes, PertenecerEmpresa;
 
     protected $table = 'ordenes_compra';
 

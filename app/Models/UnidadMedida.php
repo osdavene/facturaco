@@ -4,11 +4,10 @@ namespace App\Models;
 use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Traits\BelongsToEmpresa;
 
 class UnidadMedida extends Model
 {
-    use HasFactory, PertenecerEmpresa, BelongsToEmpresa;
+    use HasFactory, PertenecerEmpresa;
 
     protected $table = 'unidades_medida';
 
