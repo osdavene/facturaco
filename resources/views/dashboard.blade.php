@@ -117,57 +117,95 @@
     </div>
     <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider">Cartera</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Año</div>
             <div class="w-9 h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
-                <i class="fas fa-hand-holding-usd text-sm"></i>
+                <i class="fas fa-chart-bar text-sm"></i>
             </div>
         </div>
         <div class="font-display font-bold text-2xl text-amber-500">
+            ${{ number_format($ventasAno, 0, ',', '.') }}
+        </div>
+        <div class="text-xs text-slate-500 mt-1">Acumulado {{ now()->year }}</div>
+    </div>
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+            <div class="text-xs text-slate-500 uppercase tracking-wider">Cartera</div>
+            <div class="w-9 h-9 bg-red-500/10 rounded-xl flex items-center justify-center text-red-400">
+                <i class="fas fa-hand-holding-usd text-sm"></i>
+            </div>
+        </div>
+        <div class="font-display font-bold text-2xl text-red-400">
             ${{ number_format($cartera, 0, ',', '.') }}
         </div>
         <div class="text-xs text-slate-500 mt-1">Por cobrar</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider">Facturas Mes</div>
-            <div class="w-9 h-9 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
-                <i class="fas fa-file-invoice text-sm"></i>
-            </div>
-        </div>
-        <div class="font-display font-bold text-2xl text-purple-400">{{ $facturasMes }}</div>
-        <div class="text-xs text-slate-500 mt-1">Este mes</div>
-    </div>
 </div>
 
+{{-- FILA 1: Ventas 12 meses + Donut estados --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
 
-    {{-- Gráfica ventas 7 días --}}
+    {{-- Gráfica línea — ventas 12 meses --}}
+    <div class="lg:col-span-2 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="font-display font-bold text-base">Ventas Últimos 12 Meses</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Tendencia mensual</p>
+            </div>
+            <a href="{{ route('reportes.ventas') }}"
+               class="text-xs text-amber-500 hover:underline">Ver reporte →</a>
+        </div>
+        <div style="position:relative; height:200px;">
+            <canvas id="chartVentasMeses"></canvas>
+        </div>
+    </div>
+
+    {{-- Donut — estados del mes --}}
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="font-display font-bold text-base">Facturas del Mes</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Por estado</p>
+            </div>
+        </div>
+        <div style="position:relative; height:160px;">
+            <canvas id="chartEstados"></canvas>
+        </div>
+        {{-- Leyenda --}}
+        <div class="mt-4 space-y-1.5">
+            @foreach([
+                ['emitida', '#3b82f6', 'Emitidas'],
+                ['pagada',  '#10b981', 'Pagadas'],
+                ['vencida', '#ef4444', 'Vencidas'],
+                ['borrador','#64748b', 'Borradores'],
+            ] as [$estado, $color, $label])
+            @if(isset($ventasPorEstado[$estado]))
+            <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full" style="background:{{ $color }}"></div>
+                    <span class="text-slate-400">{{ $label }}</span>
+                </div>
+                <span class="font-semibold text-slate-300">{{ $ventasPorEstado[$estado]->cantidad }}</span>
+            </div>
+            @endif
+            @endforeach
+        </div>
+    </div>
+
+</div>
+
+{{-- FILA 2: Barras 7 días + Top clientes --}}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+
+    {{-- Barras — ventas 7 días --}}
     <div class="lg:col-span-2 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h3 class="font-display font-bold text-base">Ventas Últimos 7 Días</h3>
                 <p class="text-xs text-slate-500 mt-0.5">Tendencia diaria</p>
             </div>
-            <a href="{{ route('reportes.ventas') }}"
-               class="text-xs text-amber-500 hover:underline">Ver reporte →</a>
         </div>
-        @php $maxDia = $ventasSemana->max('total') ?: 1; @endphp
-        <div class="flex items-end gap-2 h-28">
-            @foreach($ventasSemana as $dia)
-            @php $pct = $maxDia > 0 ? ($dia['total']/$maxDia)*100 : 0; @endphp
-            <div class="flex-1 flex flex-col items-center gap-1">
-                <div class="text-[9px] text-slate-500 font-mono">
-                    @if($dia['total'] > 0)
-                    ${{ number_format($dia['total']/1000, 0) }}k
-                    @endif
-                </div>
-                <div class="w-full rounded-t-lg transition-all"
-                     style="height: {{ max(4, $pct * 0.9) }}px;
-                            background: {{ $pct > 0 ? 'linear-gradient(to top, #f59e0b, #fbbf24)' : '#1e2d47' }}">
-                </div>
-                <div class="text-[9px] text-slate-500">{{ $dia['dia'] }}</div>
-            </div>
-            @endforeach
+        <div style="position:relative; height:180px;">
+            <canvas id="chartVentasDias"></canvas>
         </div>
     </div>
 
@@ -186,16 +224,16 @@
                     {{ $i+1 }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="text-xs font-medium truncate" style="color:#e2e8f0">
+                    <div class="text-xs font-medium truncate text-slate-200">
                         {{ $cli->cliente_nombre }}
                     </div>
                     <div class="w-full bg-[#1e2d47] rounded-full h-1 mt-1">
-                        <div class="h-1 rounded-full bg-amber-500"
+                        <div class="h-1 rounded-full bg-amber-500 transition-all"
                              style="width:{{ ($cli->total_mes/$maxCli)*100 }}%"></div>
                     </div>
                 </div>
-                <div class="text-xs font-semibold text-emerald-500 flex-shrink-0">
-                    ${{ number_format($cli->total_mes/1000, 0) }}k
+                <div class="text-xs font-semibold text-emerald-400 flex-shrink-0">
+                    ${{ number_format($cli->total_mes/1000, 1) }}k
                 </div>
             </div>
             @empty
@@ -206,31 +244,77 @@
 
 </div>
 
-{{-- Accesos rápidos --}}
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-    @foreach([
-        [route('facturas.create'),     'fa-file-invoice', 'amber',  'Nueva Factura'],
-        [route('cotizaciones.create'), 'fa-file-alt',     'blue',   'Cotización'],
-        [route('recibos.create'),      'fa-hand-holding-usd','emerald','Recibo Caja'],
-        [route('ordenes.create'),      'fa-shopping-cart','purple', 'Orden Compra'],
-        [route('clientes.create'),     'fa-user-plus',    'cyan',   'Nuevo Cliente'],
-        [route('inventario.create'),   'fa-box',          'orange', 'Producto'],
-        [route('reportes.index'),      'fa-chart-bar',    'slate',  'Reportes'],
-        [route('empresa.index'),       'fa-cog',          'slate',  'Configuración'],
-    ] as [$url, $icon, $color, $label])
-    <a href="{{ $url }}"
-       class="flex items-center gap-3 bg-[#141c2e] border border-[#1e2d47]
-              hover:border-{{ $color }}-500/50 hover:bg-[#1a2235]
-              rounded-xl p-3.5 transition-colors group">
-        <div class="w-8 h-8 bg-{{ $color }}-500/10 rounded-lg flex items-center justify-center
-                    text-{{ $color }}-{{ $color=='slate'?'400':'500' }} flex-shrink-0">
-            <i class="fas {{ $icon }} text-sm"></i>
+{{-- FILA 3: Top productos + Accesos rápidos --}}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+
+    {{-- Top productos --}}
+    <div class="lg:col-span-2 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="font-display font-bold text-base">Top Productos del Mes</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Por valor vendido</p>
+            </div>
         </div>
-        <span class="text-sm text-slate-400 group-hover:text-slate-200 transition-colors">
-            {{ $label }}
-        </span>
-    </a>
-    @endforeach
+        @php $maxProd = $topProductos->max('total_valor') ?: 1; @endphp
+        <div class="space-y-3">
+            @forelse($topProductos as $i => $prod)
+            <div class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-black flex-shrink-0
+                            {{ $i===0 ? 'bg-amber-500 text-black' : 'bg-[#1a2235] text-slate-400' }}">
+                    {{ $i+1 }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-medium text-slate-200 truncate">{{ $prod->descripcion }}</span>
+                        <span class="text-xs text-slate-500 ml-2 flex-shrink-0">
+                            {{ number_format($prod->total_qty, 0) }} uds
+                        </span>
+                    </div>
+                    <div class="w-full bg-[#1e2d47] rounded-full h-1.5">
+                        <div class="h-1.5 rounded-full bg-blue-500"
+                             style="width:{{ ($prod->total_valor/$maxProd)*100 }}%"></div>
+                    </div>
+                </div>
+                <div class="text-xs font-semibold text-blue-400 flex-shrink-0 w-14 text-right">
+                    ${{ number_format($prod->total_valor/1000, 1) }}k
+                </div>
+            </div>
+            @empty
+            <div class="text-center text-slate-500 text-sm py-4">Sin ventas este mes</div>
+            @endforelse
+        </div>
+    </div>
+
+    {{-- Accesos rápidos --}}
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+        <h3 class="font-display font-bold text-base mb-4">Accesos Rápidos</h3>
+        <div class="grid grid-cols-2 gap-2">
+            @foreach([
+                [route('facturas.create'),     'fa-file-invoice',      'amber',  'Nueva Factura'],
+                [route('cotizaciones.create'), 'fa-file-alt',          'blue',   'Cotización'],
+                [route('recibos.create'),      'fa-hand-holding-usd',  'emerald','Recibo Caja'],
+                [route('ordenes.create'),      'fa-shopping-cart',     'purple', 'Orden Compra'],
+                [route('clientes.create'),     'fa-user-plus',         'cyan',   'Nuevo Cliente'],
+                [route('inventario.create'),   'fa-box',               'orange', 'Producto'],
+                [route('reportes.index'),      'fa-chart-bar',         'slate',  'Reportes'],
+                [route('empresa.index'),       'fa-cog',               'slate',  'Config'],
+            ] as [$url, $icon, $color, $label])
+            <a href="{{ $url }}"
+               class="flex flex-col items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                      hover:border-{{ $color }}-500/50 hover:bg-[#1e2d47]
+                      rounded-xl p-3 transition-colors group text-center">
+                <div class="w-8 h-8 bg-{{ $color }}-500/10 rounded-lg flex items-center justify-center
+                            text-{{ $color }}-{{ $color=='slate'?'400':'500' }}">
+                    <i class="fas {{ $icon }} text-sm"></i>
+                </div>
+                <span class="text-[11px] text-slate-500 group-hover:text-slate-300 transition-colors leading-tight">
+                    {{ $label }}
+                </span>
+            </a>
+            @endforeach
+        </div>
+    </div>
+
 </div>
 
 {{-- Últimas facturas --}}
@@ -260,13 +344,11 @@
                             {{ $factura->numero }}
                         </a>
                     </td>
-                    <td class="px-3 py-3 text-sm" style="color:#e2e8f0">
-                        {{ $factura->cliente_nombre }}
-                    </td>
+                    <td class="px-3 py-3 text-sm text-slate-200">{{ $factura->cliente_nombre }}</td>
                     <td class="px-3 py-3 text-sm text-slate-400 hidden md:table-cell">
                         {{ $factura->fecha_emision->format('d/m/Y') }}
                     </td>
-                    <td class="px-3 py-3 text-right text-sm font-semibold" style="color:#e2e8f0">
+                    <td class="px-3 py-3 text-right text-sm font-semibold text-slate-200">
                         ${{ number_format($factura->total, 0, ',', '.') }}
                     </td>
                     <td class="px-5 py-3">
@@ -295,3 +377,144 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+Chart.defaults.color = '#64748b';
+Chart.defaults.borderColor = '#1e2d47';
+Chart.defaults.font.family = 'Inter, sans-serif';
+
+// ── Datos desde PHP ───────────────────────────────────────
+const meses = @json($ventasPorMes->pluck('mes'));
+const totalesMeses = @json($ventasPorMes->pluck('total'));
+
+const dias = @json($ventasSemana->pluck('dia'));
+const totalesDias = @json($ventasSemana->pluck('total'));
+
+const estadosData = {
+    emitida: {{ $ventasPorEstado['emitida']->cantidad  ?? 0 }},
+    pagada:  {{ $ventasPorEstado['pagada']->cantidad   ?? 0 }},
+    vencida: {{ $ventasPorEstado['vencida']->cantidad  ?? 0 }},
+    borrador:{{ $ventasPorEstado['borrador']->cantidad ?? 0 }},
+};
+
+// ── Formateador de pesos colombianos ─────────────────────
+function formatCOP(value) {
+    if (value >= 1000000) return '$' + (value/1000000).toFixed(1) + 'M';
+    if (value >= 1000)    return '$' + (value/1000).toFixed(0) + 'k';
+    return '$' + value.toFixed(0);
+}
+
+// ── 1. Gráfica de línea — 12 meses ───────────────────────
+new Chart(document.getElementById('chartVentasMeses'), {
+    type: 'line',
+    data: {
+        labels: meses,
+        datasets: [{
+            label: 'Ventas',
+            data: totalesMeses,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245,158,11,0.08)',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#f59e0b',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            tension: 0.4,
+            fill: true,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ' ' + formatCOP(ctx.parsed.y)
+                }
+            }
+        },
+        scales: {
+            x: { grid: { color: '#1e2d47' } },
+            y: {
+                grid: { color: '#1e2d47' },
+                ticks: { callback: v => formatCOP(v) }
+            }
+        }
+    }
+});
+
+// ── 2. Gráfica de barras — 7 días ────────────────────────
+new Chart(document.getElementById('chartVentasDias'), {
+    type: 'bar',
+    data: {
+        labels: dias,
+        datasets: [{
+            label: 'Ventas',
+            data: totalesDias,
+            backgroundColor: totalesDias.map((v, i) =>
+                i === totalesDias.length - 1 ? '#f59e0b' : 'rgba(245,158,11,0.3)'
+            ),
+            borderColor: '#f59e0b',
+            borderWidth: 1,
+            borderRadius: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ' ' + formatCOP(ctx.parsed.y)
+                }
+            }
+        },
+        scales: {
+            x: { grid: { display: false } },
+            y: {
+                grid: { color: '#1e2d47' },
+                ticks: { callback: v => formatCOP(v) }
+            }
+        }
+    }
+});
+
+// ── 3. Donut — estados ────────────────────────────────────
+const totalEstados = Object.values(estadosData).reduce((a,b) => a+b, 0);
+
+if (totalEstados > 0) {
+    new Chart(document.getElementById('chartEstados'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Emitidas', 'Pagadas', 'Vencidas', 'Borradores'],
+            datasets: [{
+                data: [estadosData.emitida, estadosData.pagada, estadosData.vencida, estadosData.borrador],
+                backgroundColor: ['#3b82f6', '#10b981', '#ef4444', '#475569'],
+                borderColor: '#141c2e',
+                borderWidth: 3,
+                hoverOffset: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' ' + ctx.label + ': ' + ctx.parsed
+                    }
+                }
+            }
+        }
+    });
+} else {
+    document.getElementById('chartEstados').parentElement.innerHTML =
+        '<div class="flex items-center justify-center h-full text-slate-600 text-sm">Sin facturas este mes</div>';
+}
+</script>
+@endpush

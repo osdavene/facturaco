@@ -296,7 +296,7 @@ class FacturaController extends Controller
 
         } catch (\Exception $e) {
             return back()
-                ->with('error', 'Error: ' . $e->getMessage())
+                ->with('error', 'No se pudo enviar el correo. Verifica la configuración de mail.')
                 ->withInput();
         }
     }
