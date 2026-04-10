@@ -4,10 +4,11 @@ namespace App\Models;
 use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Traits\BelongsToEmpresa;
 
 class Categoria extends Model
 {
-    use HasFactory, PertenecerEmpresa;
+    use HasFactory, PertenecerEmpresa, BelongsToEmpresa;
 
     protected $table = 'categorias';
 

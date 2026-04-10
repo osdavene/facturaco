@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\BelongsToEmpresa;
+
 
 class NotaCredito extends Model
 {
-    use PertenecerEmpresa;
+    use PertenecerEmpresa, BelongsToEmpresa;
+
 
     protected $table = 'notas_credito';
 

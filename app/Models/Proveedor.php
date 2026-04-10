@@ -6,10 +6,11 @@ use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Traits\BelongsToEmpresa;
 
 class Proveedor extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerEmpresa;
+    use HasFactory, SoftDeletes, PertenecerEmpresa, BelongsToEmpresa;
 
     protected $table = 'proveedores';
 

@@ -1,14 +1,14 @@
 <?php
 namespace App\Models;
 
-use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Traits\BelongsToEmpresa;
 
 class Factura extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerEmpresa;
+    use HasFactory, SoftDeletes, BelongsToEmpresa;
 
     protected $table = 'facturas';
 
@@ -32,8 +32,6 @@ class Factura extends Model
         'fecha_dian'        => 'datetime',
     ];
 
-    // ── Relaciones ────────────────────────────────────────────
-
     public function cliente()
     {
         return $this->belongsTo(Cliente::class);
@@ -48,8 +46,6 @@ class Factura extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
-    // ── Accessors ─────────────────────────────────────────────
 
     public function getEstadoColorAttribute(): string
     {
@@ -67,15 +63,8 @@ class Factura extends Model
         return max(0, $this->total - $this->total_pagado);
     }
 
-    // ── Consecutivo ───────────────────────────────────────────
-
-    /**
-     * Genera el siguiente consecutivo y número de factura.
-     * Acepta prefijo opcional; si no se pasa usa el de la empresa.
-     */
     public static function siguienteConsecutivo(string $prefijo = ''): array
     {
-        // Si no se pasa prefijo, usar el de la empresa
         if (empty($prefijo)) {
             $prefijo = \App\Models\Empresa::obtener()->prefijo_factura ?? 'FE';
         }
@@ -90,11 +79,8 @@ class Factura extends Model
         return compact('consecutivo', 'numero');
     }
 
-    // ── Booted ────────────────────────────────────────────────
-
     protected static function booted(): void
     {
-        // Marcar automáticamente como vencida al recuperar
         static::retrieved(function ($factura) {
             if ($factura->estado === 'emitida' &&
                 $factura->fecha_vencimiento < now()->startOfDay()) {
