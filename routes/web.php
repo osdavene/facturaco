@@ -19,6 +19,7 @@ use App\Http\Controllers\BusquedaController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\UnidadMedidaController;
+use App\Http\Controllers\SesionController;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -173,6 +174,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/categorias/{categoria}/editar',  [CategoriaController::class, 'edit'])   ->name('categorias.edit')   ->middleware('can:ver usuarios');
     Route::put('/categorias/{categoria}',         [CategoriaController::class, 'update']) ->name('categorias.update') ->middleware('can:ver usuarios');
     Route::delete('/categorias/{categoria}',      [CategoriaController::class, 'destroy'])->name('categorias.destroy')->middleware('can:ver usuarios');
+    
+    // ── Sesiones activas (solo admin) ────────────────────────
+    Route::get('/sesiones',          [SesionController::class, 'index'])     ->name('sesiones.index')      ->middleware('can:ver usuarios');
+    Route::delete('/sesiones/{id}',  [SesionController::class, 'destroy'])   ->name('sesiones.destroy')    ->middleware('can:ver usuarios');
+    Route::delete('/sesiones',       [SesionController::class, 'destroyAll'])->name('sesiones.destroyAll') ->middleware('can:ver usuarios');
 
     // ── Unidades de Medida (solo admin) ──────────────────────
     Route::get('/unidades',                   [UnidadMedidaController::class, 'index'])  ->name('unidades.index')  ->middleware('can:ver usuarios');

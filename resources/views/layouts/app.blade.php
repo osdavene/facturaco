@@ -158,6 +158,11 @@
                                 :active="request()->routeIs('unidades.*')">
                         Unidades de Medida
                     </x-nav-item>
+                    <x-nav-item href="{{ route('sesiones.index') }}"
+                                icon="fas fa-users"
+                                :active="request()->routeIs('sesiones.*')">
+                        Sesiones
+                    </x-nav-item>
                 </x-nav-section>
                 @endcan
 
