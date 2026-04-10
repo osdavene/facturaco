@@ -20,7 +20,7 @@ class Proveedor extends Model
         'regimen', 'gran_contribuyente', 'autoretenedor',
         'retefuente_pct', 'reteiva_pct', 'reteica_pct',
         'plazo_pago', 'cuenta_bancaria', 'banco', 'tipo_cuenta',
-        'cupo_credito', 'activo', 'observaciones',
+        'cupo_credito', 'activo', 'observaciones', 'created_by', 'updated_by',
     ];
 
     protected $casts = [
@@ -48,5 +48,14 @@ class Proveedor extends Model
         });
     }
 
-    
+    public function creadoPor()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+
+    public function actualizadoPor()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'updated_by');
+    }
+
 }

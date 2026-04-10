@@ -17,7 +17,7 @@ class Producto extends Model
         'precio_compra', 'precio_venta', 'precio_venta2', 'precio_venta3',
         'iva_pct', 'incluye_iva',
         'stock_actual', 'stock_minimo', 'stock_maximo', 'ubicacion',
-        'activo', 'es_servicio', 'imagen', 'observaciones',
+        'activo', 'es_servicio', 'imagen', 'observaciones', 'created_by', 'updated_by',
     ];
 
     protected $casts = [
@@ -54,4 +54,15 @@ class Producto extends Model
               ->orWhere('codigo_barras', 'like', "%{$texto}%");
         });
     }
+
+    public function creadoPor()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+
+    public function actualizadoPor()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'updated_by');
+    }
+
 }

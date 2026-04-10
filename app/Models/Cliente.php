@@ -21,7 +21,7 @@ class Cliente extends Model
         'email', 'telefono', 'celular',
         'departamento', 'municipio', 'direccion', 'pais',
         'plazo_pago', 'cupo_credito', 'lista_precio',
-        'activo', 'observaciones',
+        'activo', 'observaciones', 'created_by', 'updated_by',
     ];
 
     protected $casts = [
@@ -66,4 +66,15 @@ class Cliente extends Model
     {
         return $query->where('activo', true);
     }
+
+    public function creadoPor()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+
+    public function actualizadoPor()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'updated_by');
+    }
+
 }
