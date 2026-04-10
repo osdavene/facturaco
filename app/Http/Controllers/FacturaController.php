@@ -80,7 +80,6 @@ class FacturaController extends Controller
             $prefijo     = $empresa->prefijo_factura ?? 'FE';
             $consecutivo = Factura::siguienteConsecutivo($prefijo);
 
-            // ── Calcular totales ──────────────────────────────
             $subtotal  = 0;
             $totalIva  = 0;
             $totalDesc = 0;
@@ -106,7 +105,6 @@ class FacturaController extends Controller
             $reteica    = $subtotal  * ($cliente->reteica_pct    / 100);
             $total      = $subtotal + $totalIva - $retefuente - $reteiva - $reteica;
 
-            // ── Crear factura ─────────────────────────────────
             $factura = Factura::create([
                 'numero'            => $consecutivo['numero'],
                 'prefijo'           => $prefijo,
@@ -135,7 +133,6 @@ class FacturaController extends Controller
                 'user_id'           => $userId,
             ]);
 
-            // ── Crear ítems ───────────────────────────────────
             foreach ($request->items as $i => $item) {
                 $cant    = floatval($item['cantidad']);
                 $precio  = floatval($item['precio_unitario']);
@@ -165,7 +162,6 @@ class FacturaController extends Controller
                     'orden'           => $i,
                 ]);
 
-                // Descontar stock si aplica
                 if (!empty($item['producto_id'])) {
                     $producto = Producto::find($item['producto_id']);
                     if ($producto && !$producto->es_servicio) {
@@ -184,7 +180,8 @@ class FacturaController extends Controller
     public function show(Factura $factura)
     {
         $factura->load(['items.producto', 'cliente', 'usuario']);
-        return view('facturas.show', compact('factura'));
+        $empresa = Empresa::obtener();
+        return view('facturas.show', compact('factura', 'empresa'));
     }
 
     // ── EDIT ──────────────────────────────────────────────────
@@ -261,6 +258,7 @@ class FacturaController extends Controller
     }
 
     // ── FORMULARIO ENVIAR EMAIL ───────────────────────────────
+
     public function formEnviar(Factura $factura)
     {
         $factura->load(['items', 'cliente']);
@@ -269,6 +267,7 @@ class FacturaController extends Controller
     }
 
     // ── ENVIAR EMAIL ──────────────────────────────────────────
+
     public function enviar(Request $request, Factura $factura)
     {
         $request->validate([
@@ -286,7 +285,6 @@ class FacturaController extends Controller
             Mail::to($request->email)
                 ->send(new FacturaMail($factura, $empresa, $request->mensaje ?? ''));
 
-            // Registrar que fue enviada
             if ($factura->estado === 'borrador') {
                 $factura->update(['estado' => 'emitida']);
             }
@@ -300,5 +298,4 @@ class FacturaController extends Controller
                 ->withInput();
         }
     }
-
 }

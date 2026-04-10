@@ -232,7 +232,7 @@
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">5</span>
                 Condiciones Comerciales
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Plazo de Pago (días)</label>
                     <input type="text" inputmode="decimal" name="plazo_pago"
@@ -250,9 +250,29 @@
                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
                 </div>
                 <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        Lista de Precios
+                    </label>
+                    <select name="lista_precio"
+                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
+                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="general"   {{ old('lista_precio', 'general')   === 'general'   ? 'selected' : '' }}>
+                            Lista General (Precio 1)
+                        </option>
+                        <option value="mayorista" {{ old('lista_precio', 'general')   === 'mayorista' ? 'selected' : '' }}>
+                            Mayorista (Precio 2)
+                        </option>
+                        <option value="especial"  {{ old('lista_precio', 'general')   === 'especial'  ? 'selected' : '' }}>
+                            Especial (Precio 3)
+                        </option>
+                    </select>
+                    <p class="text-xs text-slate-600 mt-1">
+                        Se aplica automáticamente al facturar a este cliente.
+                    </p>
+                </div>
+                <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Observaciones</label>
-                    <textarea name="observaciones" rows="1"
-                              placeholder="NOTAS ADICIONALES..."
+                    <textarea name="observaciones" rows="1"                              placeholder="NOTAS ADICIONALES..."
                               data-uppercase
                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
                                      text-sm text-slate-200 placeholder-slate-600

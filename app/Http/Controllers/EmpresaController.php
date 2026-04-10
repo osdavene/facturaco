@@ -48,7 +48,6 @@ class EmpresaController extends Controller
             'retefuente_defecto'     => 'numeric|min:0|max:100',
             'reteica_defecto'        => 'numeric|min:0|max:100',
             'logo'                   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            // Mail
             'mail_mailer'            => 'nullable|string|max:20',
             'mail_host'              => 'nullable|string|max:255',
             'mail_port'              => 'nullable|integer',
@@ -57,6 +56,8 @@ class EmpresaController extends Controller
             'mail_encryption'        => 'nullable|string|max:10',
             'mail_from_address'      => 'nullable|email',
             'mail_from_name'         => 'nullable|string|max:255',
+            'wompi_public_key'       => 'nullable|string|max:255',
+            'wompi_currency'         => 'nullable|string|max:10',
         ], [
             'logo.image'             => 'El archivo del logo debe ser una imagen.',
             'logo.mimes'             => 'El logo debe estar en formato JPG, PNG o WEBP.',
@@ -74,9 +75,14 @@ class EmpresaController extends Controller
             unset($data['logo']);
         }
 
-        // Si no se ingresó nueva contraseña, conservar la actual
+        // Conservar contraseña mail si no se ingresó nueva
         if (empty($data['mail_password'])) {
             unset($data['mail_password']);
+        }
+
+        // Conservar wompi key si no se ingresó nueva
+        if (empty($data['wompi_public_key'])) {
+            unset($data['wompi_public_key']);
         }
 
         $data['factura_electronica'] = $request->boolean('factura_electronica');
@@ -97,7 +103,6 @@ class EmpresaController extends Controller
         return back()->with('success', 'Logo eliminado.');
     }
 
-    // ── Probar configuración de correo ────────────────────────
     public function probarMail(Request $request)
     {
         $request->validate([
@@ -113,7 +118,6 @@ class EmpresaController extends Controller
             return back()->with('error', 'Primero guarda la configuración de correo antes de probar.');
         }
 
-        // Aplicar configuración dinámica en tiempo de ejecución
         Config::set('mail.mailers.smtp.host',       $empresa->mail_host);
         Config::set('mail.mailers.smtp.port',       $empresa->mail_port);
         Config::set('mail.mailers.smtp.username',   $empresa->mail_username);

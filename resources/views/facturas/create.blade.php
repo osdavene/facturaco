@@ -64,11 +64,14 @@
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        <div class="flex gap-3 mt-2">
+                        <div class="flex gap-3 mt-2 flex-wrap">
                             <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full"
                                   id="cli-rete"></span>
                             <span class="text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full"
                                   id="cli-reteica"></span>
+                            {{-- Badge lista de precios --}}
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full"
+                                  id="cli-lista"></span>
                         </div>
                     </div>
                 </div>
@@ -252,17 +255,22 @@
 @push('scripts')
 <script>
 // ── Estado global ─────────────────────────────
-let items       = [];
-let clienteData = null;
-let itemCounter = 0;
+let items        = [];
+let clienteData  = null;
+let itemCounter  = 0;
+let listaPrecios = 'general'; // ← lista activa según el cliente
 
 // ── Formato moneda ────────────────────────────
 const fmt = n => '$' + Number(n||0).toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0});
 
-// ── Mayúsculas automáticas en todos los inputs ─
+// ── Texto legible de lista ────────────────────
+function textoLista(lista) {
+    return { general: 'Lista General', mayorista: 'Lista Mayorista', especial: 'Lista Especial' }[lista] || 'Lista General';
+}
+
+// ── Mayúsculas automáticas ────────────────────
 document.addEventListener('input', function(e) {
     if (e.target.matches('input[type="text"], textarea')) {
-        // No aplicar a búsquedas de autocompletado de fecha
         if (['fecha_emision','fecha_vencimiento'].includes(e.target.name)) return;
         const pos = e.target.selectionStart;
         e.target.value = e.target.value.toUpperCase();
@@ -297,7 +305,9 @@ document.getElementById('buscar-cliente').addEventListener('input', function() {
 });
 
 function seleccionarCliente(c) {
-    clienteData = c;
+    clienteData  = c;
+    listaPrecios = c.lista_precio || 'general'; // ← guardar lista del cliente
+
     document.getElementById('cliente_id').value = c.id;
     document.getElementById('buscar-cliente').value = '';
     document.getElementById('resultados-cliente').classList.add('hidden');
@@ -308,6 +318,7 @@ function seleccionarCliente(c) {
     document.getElementById('cli-dir').textContent     = (c.direccion || '').toUpperCase();
     document.getElementById('cli-rete').textContent    = 'RETEFUENTE: ' + c.retefuente_pct + '%';
     document.getElementById('cli-reteica').textContent = 'RETEICA: ' + c.reteica_pct + '%';
+    document.getElementById('cli-lista').textContent   = textoLista(listaPrecios); // ← mostrar lista
     document.getElementById('cliente-info').classList.remove('hidden');
 
     if (c.plazo_pago > 0) {
@@ -319,7 +330,8 @@ function seleccionarCliente(c) {
 }
 
 function limpiarCliente() {
-    clienteData = null;
+    clienteData  = null;
+    listaPrecios = 'general'; // ← resetear lista
     document.getElementById('cliente_id').value = '';
     document.getElementById('cliente-info').classList.add('hidden');
     calcularTotales();
@@ -335,7 +347,8 @@ document.getElementById('buscar-producto').addEventListener('input', function() 
         return;
     }
     timerProducto = setTimeout(async () => {
-        const res  = await fetch(`/api/productos/buscar?q=${encodeURIComponent(q)}`);
+        // ← Enviar lista_precio activa en la petición
+        const res  = await fetch(`/api/productos/buscar?q=${encodeURIComponent(q)}&lista_precio=${listaPrecios}`);
         const data = await res.json();
         const div  = document.getElementById('resultados-producto');
         if (!data.length) { div.classList.add('hidden'); return; }
@@ -347,7 +360,15 @@ document.getElementById('buscar-producto').addEventListener('input', function() 
                         <div class="text-sm font-medium text-slate-200">${p.nombre}</div>
                         <div class="text-xs text-slate-500">${p.codigo}</div>
                     </div>
-                    <div class="text-sm font-semibold text-amber-500 ml-4">${fmt(p.precio_venta)}</div>
+                    <div class="flex flex-col items-end">
+                        <div class="text-sm font-semibold text-amber-500 ml-4">
+                            ${fmt(p.precio_aplicado || p.precio_venta)}
+                        </div>
+                        ${listaPrecios !== 'general'
+                            ? `<div class="text-[10px] text-emerald-400">${textoLista(listaPrecios)}</div>`
+                            : ''
+                        }
+                    </div>
                 </div>
             </div>`).join('');
         div.classList.remove('hidden');
@@ -362,7 +383,7 @@ function agregarProducto(p) {
         codigo:          p.codigo,
         descripcion:     p.nombre,
         cantidad:        1,
-        precio_unitario: p.precio_venta,
+        precio_unitario: p.precio_aplicado || p.precio_venta, // ← usar precio según lista
         iva_pct:         p.iva_pct,
         descuento_pct:   0,
     });
@@ -391,15 +412,12 @@ function eliminarItem(id) {
     calcularTotales();
 }
 
-// ── ✅ FIX PRINCIPAL: updateItem NO llama renderItems ─
-// Solo actualiza el dato y recalcula totales
 function updateItem(id, campo, valor) {
     const item = items.find(i => i.id === id);
     if (!item) return;
     item[campo] = ['cantidad','precio_unitario','descuento_pct','iva_pct'].includes(campo)
         ? parseFloat(valor) || 0
         : valor;
-    // Solo actualizar el total de esa fila sin re-renderizar todo
     actualizarFilaTotales(id);
     calcularTotales();
 }
@@ -416,7 +434,7 @@ function actualizarFilaTotales(id) {
     if (span) span.textContent = fmt(tot);
 }
 
-// ── Render items (solo al agregar/eliminar) ───
+// ── Render items ──────────────────────────────
 function renderItems() {
     const tbody    = document.getElementById('items-body');
     const sinItems = document.getElementById('sin-items');
@@ -429,7 +447,7 @@ function renderItems() {
     sinItems.classList.add('hidden');
 
     tbody.innerHTML = items.map((item, idx) => {
-        const sub = item.cantidad * item.precio_unitario;
+        const sub  = item.cantidad * item.precio_unitario;
         const desc = sub * (item.descuento_pct / 100);
         const base = sub - desc;
         const iva  = base * (item.iva_pct / 100);

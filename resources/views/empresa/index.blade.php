@@ -719,6 +719,93 @@
 
             </div>
 
+            {{-- SECCIÓN: Pagos en Línea (Wompi) --}}
+            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+                <h2 class="font-display font-bold text-base mb-1 flex items-center gap-2">
+                    <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
+                                text-black text-xs font-black">
+                        <i class="fas fa-credit-card text-xs"></i>
+                    </span>
+                    Pagos en Línea — Wompi
+                </h2>
+                <p class="text-xs text-slate-500 mb-5">
+                    Permite a tus clientes pagar facturas en línea con tarjeta, PSE o Nequi.
+                    Obtén tu llave pública en
+                    <a href="https://comercios.wompi.co" target="_blank"
+                    class="text-amber-400 hover:underline">comercios.wompi.co</a>
+                </p>
+
+                @if($empresa->wompi_configurado)
+                <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
+                            rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm">
+                    <i class="fas fa-check-circle"></i>
+                    Wompi configurado · El botón de pago aparece en las facturas emitidas.
+                </div>
+                @else
+                <div class="bg-amber-500/10 border border-amber-500/30 text-amber-400
+                            rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Sin configurar · Los clientes no podrán pagar en línea desde las facturas.
+                </div>
+                @endif
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                            Llave Pública Wompi
+                        </label>
+                        <div class="relative">
+                            <input type="password" name="wompi_public_key" id="wompi_key"
+                                placeholder="{{ $empresa->wompi_public_key ? '••••••••••••••• (guardada)' : 'pub_prod_xxxxxxxxxx' }}"
+                                autocomplete="new-password"
+                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 pr-10
+                                        text-sm text-slate-200 placeholder-slate-600
+                                        focus:outline-none focus:border-amber-500 transition-colors">
+                            <button type="button" onclick="toggleWompiKey()"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+                                <i class="fas fa-eye text-xs" id="eye-wompi"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Empieza con <code class="bg-[#1a2235] px-1 rounded text-amber-400">pub_prod_</code>
+                            para producción o
+                            <code class="bg-[#1a2235] px-1 rounded text-blue-400">pub_test_</code>
+                            para pruebas.
+                            Déjalo vacío para conservar la key guardada.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                            Moneda
+                        </label>
+                        <select name="wompi_currency"
+                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
+                                    text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                            <option value="COP" {{ ($empresa->wompi_currency ?? 'COP') === 'COP' ? 'selected' : '' }}>
+                                COP — Peso Colombiano
+                            </option>
+                            <option value="USD" {{ ($empresa->wompi_currency ?? 'COP') === 'USD' ? 'selected' : '' }}>
+                                USD — Dólar
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                {{-- Cómo obtener la llave --}}
+                <div class="mt-4 bg-[#1a2235] border border-[#1e2d47] rounded-xl p-4">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        Cómo obtener tu llave pública
+                    </p>
+                    <ol class="text-xs text-slate-500 space-y-1 list-none">
+                        <li><span class="text-amber-500 font-bold mr-2">1.</span>Ve a <span class="text-slate-300">comercios.wompi.co</span> y crea tu cuenta</li>
+                        <li><span class="text-amber-500 font-bold mr-2">2.</span>Entra a <span class="text-slate-300">Desarrolladores → Llaves de API</span></li>
+                        <li><span class="text-amber-500 font-bold mr-2">3.</span>Copia la <span class="text-slate-300">Llave pública</span> (empieza con pub_prod_)</li>
+                        <li><span class="text-amber-500 font-bold mr-2">4.</span>Pégala aquí y guarda la configuración</li>
+                    </ol>
+                </div>
+            </div>
+
             {{-- Botón guardar --}}
             <button type="submit"
                     class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-black
@@ -766,6 +853,19 @@ function togglePassword() {
         icon.classList.replace('fa-eye-slash', 'fa-eye');
     }
 }
+
+function toggleWompiKey() {
+    const input = document.getElementById('wompi_key');
+    const icon  = document.getElementById('eye-wompi');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
 </script>
 @endpush
 

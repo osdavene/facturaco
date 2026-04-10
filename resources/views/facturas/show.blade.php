@@ -19,13 +19,58 @@
                 <p class="text-slate-500 text-sm">{{ $factura->fecha_emision->format('d/m/Y') }}</p>
             </div>
         </div>
-        <div class="flex items-center gap-3">
+
+        <div class="flex items-center gap-3 flex-wrap justify-end">
+
+            {{-- PDF --}}
             <a href="{{ route('facturas.pdf', $factura) }}" target="_blank"
                class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
                       hover:border-red-500/50 text-slate-400 hover:text-red-400
                       px-4 py-2.5 rounded-xl transition-colors text-sm">
                 <i class="fas fa-file-pdf"></i> PDF
             </a>
+
+            {{-- Enviar email --}}
+            <a href="{{ route('facturas.formEnviar', $factura) }}"
+               class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                      hover:border-amber-500/50 text-slate-400 hover:text-amber-400
+                      px-4 py-2.5 rounded-xl transition-colors text-sm">
+                <i class="fas fa-envelope"></i> Enviar
+            </a>
+
+            {{-- Nota de crédito --}}
+            @if(in_array($factura->estado, ['emitida', 'pagada', 'vencida']))
+            <a href="{{ route('notas_credito.create', ['factura_id' => $factura->id]) }}"
+               class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                      hover:border-violet-500/50 text-slate-400 hover:text-violet-400
+                      px-4 py-2.5 rounded-xl transition-colors text-sm">
+                <i class="fas fa-undo-alt"></i> Nota de Crédito
+            </a>
+            @endif
+
+            {{-- Pagar con Wompi --}}
+            @if($empresa->wompi_configurado && in_array($factura->estado, ['emitida', 'vencida']) && $factura->saldo_pendiente > 0)
+            @php
+                $wompiRef    = 'FCO-' . $factura->id . '-' . now()->timestamp;
+                $wompiAmount = intval($factura->saldo_pendiente * 100);
+                $wompiUrl    = 'https://checkout.wompi.co/p/'
+                    . '?public-key='      . urlencode($empresa->wompi_public_key)
+                    . '&currency='        . urlencode($empresa->wompi_currency ?? 'COP')
+                    . '&amount-in-cents=' . $wompiAmount
+                    . '&reference='       . urlencode($wompiRef)
+                    . '&redirect-url='    . urlencode(route('facturas.show', $factura));
+            @endphp
+            <a href="{{ $wompiUrl }}" target="_blank"
+               class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600
+                      text-white font-bold px-4 py-2.5 rounded-xl transition-colors text-sm">
+                <i class="fas fa-credit-card"></i> Pagar en línea
+                <span class="bg-white/20 text-xs px-1.5 py-0.5 rounded-lg font-mono">
+                    ${{ number_format($factura->saldo_pendiente, 0, ',', '.') }}
+                </span>
+            </a>
+            @endif
+
+            {{-- Editar (solo borrador) --}}
             @if($factura->estado == 'borrador')
             <a href="{{ route('facturas.edit', $factura) }}"
                class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600
@@ -34,31 +79,20 @@
             </a>
             @endif
 
-            @if(in_array($factura->estado, ['emitida', 'pagada', 'vencida']))
-            <a href="{{ route('notas_credito.create', ['factura_id' => $factura->id]) }}"
-            class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
-                    hover:border-violet-500/50 text-slate-400 hover:text-violet-400
-                    px-4 py-2.5 rounded-xl transition-colors text-sm">
-                <i class="fas fa-undo-alt"></i> Nota de Crédito
-            </a>
-            @endif
-
         </div>
-
-        <a href="{{ route('facturas.formEnviar', $factura) }}"
-        class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
-                hover:border-amber-500/50 text-slate-400 hover:text-amber-400
-                px-4 py-2.5 rounded-xl transition-colors text-sm">
-            <i class="fas fa-envelope"></i> Enviar
-        </a>
-
-        
     </div>
 
     @if(session('success'))
     <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
                 rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
         <i class="fas fa-check-circle"></i> {{ session('success') }}
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="bg-red-500/10 border border-red-500/30 text-red-400
+                rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
+        <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
     </div>
     @endif
 
@@ -204,6 +238,21 @@
                         ${{ number_format($factura->total, 0, ',', '.') }}
                     </span>
                 </div>
+                {{-- Saldo pendiente si hay pagos parciales --}}
+                @if($factura->total_pagado > 0 && $factura->saldo_pendiente > 0)
+                <div class="flex justify-between pt-1">
+                    <span class="text-slate-500 text-xs">Pagado</span>
+                    <span class="text-emerald-400 text-xs">
+                        ${{ number_format($factura->total_pagado, 0, ',', '.') }}
+                    </span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500 text-xs font-semibold">Saldo pendiente</span>
+                    <span class="text-red-400 text-xs font-semibold">
+                        ${{ number_format($factura->saldo_pendiente, 0, ',', '.') }}
+                    </span>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -214,5 +263,6 @@
         <p class="text-sm text-slate-300">{{ $factura->observaciones }}</p>
     </div>
     @endif
+
 </div>
 @endsection

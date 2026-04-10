@@ -17,9 +17,9 @@ class Empresa extends Model
         'consecutivo_actual', 'clave_tecnica', 'factura_electronica',
         'logo', 'moneda', 'decimales', 'pie_factura', 'terminos_condiciones',
         'iva_defecto', 'retefuente_defecto', 'reteica_defecto',
-        // Configuración de correo
         'mail_mailer', 'mail_host', 'mail_port', 'mail_username',
         'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
+        'wompi_public_key', 'wompi_currency',
     ];
 
     protected $casts = [
@@ -29,7 +29,8 @@ class Empresa extends Model
     ];
 
     protected $hidden = [
-        'mail_password', // No exponer la contraseña en JSON
+        'mail_password',
+        'wompi_public_key',
     ];
 
     public function getNitFormateadoAttribute(): string
@@ -55,6 +56,11 @@ class Empresa extends Model
     public function getMailConfiguradoAttribute(): bool
     {
         return !empty($this->mail_host) && !empty($this->mail_username) && !empty($this->mail_password);
+    }
+
+    public function getWompiConfiguradoAttribute(): bool
+    {
+        return !empty($this->wompi_public_key);
     }
 
     public static function obtener(): static
