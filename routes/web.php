@@ -30,40 +30,6 @@ RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
 });
 
-// ── Remisiones ────────────────────────────────────────────────
-Route::get('/remisiones',                        [RemisionController::class, 'index'])        ->name('remisiones.index');
-Route::get('/remisiones/crear',                  [RemisionController::class, 'create'])       ->name('remisiones.create');
-Route::post('/remisiones',                       [RemisionController::class, 'store'])        ->name('remisiones.store');
-Route::get('/remisiones/{remision}',             [RemisionController::class, 'show'])         ->name('remisiones.show');
-Route::delete('/remisiones/{remision}',          [RemisionController::class, 'destroy'])      ->name('remisiones.destroy');
-Route::patch('/remisiones/{remision}/estado',    [RemisionController::class, 'cambiarEstado'])->name('remisiones.estado');
-Route::post('/remisiones/{remision}/convertir',  [RemisionController::class, 'convertir'])    ->name('remisiones.convertir');
-Route::get('/remisiones/{remision}/pdf',         [RemisionController::class, 'pdf'])          ->name('remisiones.pdf');
-
-Route::get('/impuestos',     [ImpuestosController::class, 'index'])->name('impuestos.index')->middleware('auth');
-Route::get('/impuestos/pdf', [ImpuestosController::class, 'pdf'])  ->name('impuestos.pdf')  ->middleware('auth');
-
-Route::get('/busqueda', [BusquedaController::class, 'buscar'])->name('busqueda')->middleware('auth');
-
-// ── Perfil ────────────────────────────────────────────────────
-Route::get('/perfil',           [PerfilController::class, 'index'])         ->name('perfil.index')         ->middleware('auth');
-Route::put('/perfil',           [PerfilController::class, 'update'])        ->name('perfil.update')        ->middleware('auth');
-Route::put('/perfil/password',  [PerfilController::class, 'updatePassword'])->name('perfil.password')      ->middleware('auth');
-Route::post('/perfil/avatar',   [PerfilController::class, 'updateAvatar'])  ->name('perfil.avatar')        ->middleware('auth');
-Route::delete('/perfil/avatar', [PerfilController::class, 'deleteAvatar'])  ->name('perfil.avatar.delete') ->middleware('auth');
-
-// ── Excel exports ─────────────────────────────────────────────
-Route::get('/reportes/ventas/excel',     [ReporteController::class, 'ventasExcel'])    ->name('reportes.ventas.excel')    ->middleware('auth');
-Route::get('/reportes/inventario/excel', [ReporteController::class, 'inventarioExcel'])->name('reportes.inventario.excel')->middleware('auth');
-Route::get('/reportes/cartera/excel',    [ReporteController::class, 'carteraExcel'])   ->name('reportes.cartera.excel')   ->middleware('auth');
-Route::get('/impuestos/excel',           [ImpuestosController::class, 'excel'])        ->name('impuestos.excel')          ->middleware('auth');
-
-Route::post('/tema', function(\Illuminate\Http\Request $request) {
-    $tema = $request->tema === 'light' ? 'light' : 'dark';
-    auth()->user()->update(['tema' => $tema]);
-    return back();
-})->name('tema.cambiar')->middleware('auth');
-
 // ── Webhooks (sin CSRF, sin auth) ────────────────────────────
 Route::post('/webhooks/wompi', [WompiController::class, 'webhook'])->name('wompi.webhook');
 
@@ -85,6 +51,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile',    [ProfileController::class, 'edit'])   ->name('profile.edit');
     Route::patch('/profile',  [ProfileController::class, 'update']) ->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // ── Perfil (PerfilController) ─────────────────────────────
+    Route::get('/perfil',           [PerfilController::class, 'index'])         ->name('perfil.index');
+    Route::put('/perfil',           [PerfilController::class, 'update'])        ->name('perfil.update');
+    Route::put('/perfil/password',  [PerfilController::class, 'updatePassword'])->name('perfil.password');
+    Route::post('/perfil/avatar',   [PerfilController::class, 'updateAvatar'])  ->name('perfil.avatar');
+    Route::delete('/perfil/avatar', [PerfilController::class, 'deleteAvatar'])  ->name('perfil.avatar.delete');
+
+    // ── Tema ──────────────────────────────────────────────────
+    Route::post('/tema', function(\Illuminate\Http\Request $request) {
+        $tema = $request->tema === 'light' ? 'light' : 'dark';
+        auth()->user()->update(['tema' => $tema]);
+        return back();
+    })->name('tema.cambiar');
 
     // ═══════════════════════════════════════════════════════════
     // Rutas que requieren empresa activa en sesión
@@ -318,6 +298,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/backup/json', [BackupController::class, 'descargarJson']) ->name('backup.json')  ->middleware('can:ver usuarios');
     Route::post('/backup/csv', [BackupController::class, 'descargarCsv'])  ->name('backup.csv')   ->middleware('can:ver usuarios');
     Route::get('/backup/sql',  [BackupController::class, 'descargarSql'])  ->name('backup.sql')   ->middleware('can:ver usuarios');
+
+    // ── Remisiones ────────────────────────────────────────────
+    Route::get('/remisiones',                        [RemisionController::class, 'index'])        ->name('remisiones.index');
+    Route::get('/remisiones/crear',                  [RemisionController::class, 'create'])       ->name('remisiones.create');
+    Route::post('/remisiones',                       [RemisionController::class, 'store'])        ->name('remisiones.store');
+    Route::get('/remisiones/{remision}',             [RemisionController::class, 'show'])         ->name('remisiones.show');
+    Route::delete('/remisiones/{remision}',          [RemisionController::class, 'destroy'])      ->name('remisiones.destroy');
+    Route::patch('/remisiones/{remision}/estado',    [RemisionController::class, 'cambiarEstado'])->name('remisiones.estado');
+    Route::post('/remisiones/{remision}/convertir',  [RemisionController::class, 'convertir'])    ->name('remisiones.convertir');
+    Route::get('/remisiones/{remision}/pdf',         [RemisionController::class, 'pdf'])          ->name('remisiones.pdf');
+
+    // ── Impuestos ─────────────────────────────────────────────
+    Route::get('/impuestos',         [ImpuestosController::class, 'index'])->name('impuestos.index');
+    Route::get('/impuestos/pdf',     [ImpuestosController::class, 'pdf'])  ->name('impuestos.pdf');
+    Route::get('/impuestos/excel',   [ImpuestosController::class, 'excel'])->name('impuestos.excel');
+
+    // ── Búsqueda ──────────────────────────────────────────────
+    Route::get('/busqueda', [BusquedaController::class, 'buscar'])->name('busqueda');
+
+    // ── Excel exports ─────────────────────────────────────────
+    Route::get('/reportes/ventas/excel',     [ReporteController::class, 'ventasExcel'])    ->name('reportes.ventas.excel');
+    Route::get('/reportes/inventario/excel', [ReporteController::class, 'inventarioExcel'])->name('reportes.inventario.excel');
+    Route::get('/reportes/cartera/excel',    [ReporteController::class, 'carteraExcel'])   ->name('reportes.cartera.excel');
 
     // ── APIs internas ─────────────────────────────────────────
 
