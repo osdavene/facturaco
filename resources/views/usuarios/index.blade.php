@@ -215,23 +215,81 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach([
-                    ['Facturación — Ver',    [1,1,1,0,1,1]],
-                    ['Facturación — Crear',  [1,1,1,0,0,0]],
-                    ['Facturación — Anular', [1,1,0,0,1,0]],
-                    ['Clientes — Ver',       [1,1,1,0,1,1]],
-                    ['Clientes — Crear',     [1,1,1,0,0,0]],
-                    ['Inventario — Ver',     [1,1,1,1,0,1]],
-                    ['Inventario — Editar',  [1,1,0,1,0,0]],
-                    ['Compras — Ver',        [1,1,0,1,1,0]],
-                    ['Compras — Aprobar',    [1,1,0,0,0,0]],
-                    ['Reportes — Ver',       [1,1,1,0,1,1]],
-                    ['Reportes — Exportar',  [1,1,0,0,1,0]],
-                    ['Usuarios — Gestionar', [1,1,0,0,0,0]],
-                    ['Configuración',        [1,0,0,0,0,0]],
-                ] as [$modulo, $perms])
+                @php
+                $grupos = [
+                    'FACTURACIÓN' => [
+                        ['Facturación — Ver',       [1,1,1,0,1,1]],
+                        ['Facturación — Crear',     [1,1,1,0,0,0]],
+                        ['Facturación — Anular',    [1,1,0,0,1,0]],
+                    ],
+                    'COTIZACIONES' => [
+                        ['Cotizaciones — Ver',      [1,1,1,0,1,1]],
+                        ['Cotizaciones — Crear',    [1,1,1,0,0,0]],
+                        ['Cotizaciones — Convertir',[1,1,1,0,0,0]],
+                    ],
+                    'REMISIONES' => [
+                        ['Remisiones — Ver',        [1,1,1,0,1,1]],
+                        ['Remisiones — Crear',      [1,1,1,0,0,0]],
+                    ],
+                    'CLIENTES' => [
+                        ['Clientes — Ver',          [1,1,1,0,1,1]],
+                        ['Clientes — Crear',        [1,1,1,0,0,0]],
+                        ['Clientes — Editar',       [1,1,1,0,0,0]],
+                        ['Clientes — Eliminar',     [1,1,0,0,0,0]],
+                    ],
+                    'PROVEEDORES' => [
+                        ['Proveedores — Ver',       [1,1,0,1,1,0]],
+                        ['Proveedores — Crear',     [1,1,0,1,0,0]],
+                        ['Proveedores — Editar',    [1,1,0,1,0,0]],
+                    ],
+                    'INVENTARIO' => [
+                        ['Inventario — Ver',        [1,1,1,1,0,1]],
+                        ['Inventario — Crear',      [1,1,0,1,0,0]],
+                        ['Inventario — Editar',     [1,1,0,1,0,0]],
+                        ['Inventario — Ajustar Stock',[1,1,0,1,0,0]],
+                    ],
+                    'COMPRAS' => [
+                        ['Compras — Ver',           [1,1,0,1,1,0]],
+                        ['Compras — Crear',         [1,1,0,1,0,0]],
+                        ['Compras — Aprobar',       [1,1,0,0,0,0]],
+                        ['Compras — Recibir',       [1,1,0,1,0,0]],
+                    ],
+                    'RECIBOS DE CAJA' => [
+                        ['Recibos — Ver',           [1,1,1,0,1,1]],
+                        ['Recibos — Crear',         [1,1,1,0,0,0]],
+                    ],
+                    'REPORTES' => [
+                        ['Reportes — Ver',          [1,1,1,0,1,1]],
+                        ['Reportes — Exportar',     [1,1,0,0,1,0]],
+                        ['Impuestos / DIAN',        [1,1,0,0,1,0]],
+                    ],
+                    'CONFIGURACIÓN' => [
+                        ['Categorías',              [1,1,0,0,0,0]],
+                        ['Unidades de Medida',      [1,1,0,0,0,0]],
+                        ['Empresa',                 [1,1,0,0,0,0]],
+                        ['Usuarios — Gestionar',    [1,1,0,0,0,0]],
+                    ],
+                    'ADMINISTRACIÓN' => [
+                        ['Sesiones Activas',        [1,1,0,0,0,0]],
+                        ['Auditoría',               [1,1,0,0,0,0]],
+                        ['Backup',                  [1,0,0,0,0,0]],
+                    ],
+                ];
+                @endphp
+
+                @foreach($grupos as $grupo => $filas)
+                {{-- Encabezado de grupo --}}
+                <tr class="bg-[#1a2235]/50">
+                    <td colspan="7" class="px-5 py-2">
+                        <span class="text-xs font-bold text-amber-500/70 uppercase tracking-widest">
+                            {{ $grupo }}
+                        </span>
+                    </td>
+                </tr>
+                {{-- Filas del grupo --}}
+                @foreach($filas as [$modulo, $perms])
                 <tr class="border-b border-[#1e2d47]/40 hover:bg-[#1a2235]/30">
-                    <td class="px-5 py-2.5 text-slate-400">{{ $modulo }}</td>
+                    <td class="px-5 py-2.5 text-slate-400 pl-8">{{ $modulo }}</td>
                     @foreach($perms as $p)
                     <td class="px-3 py-2.5 text-center">
                         @if($p)
@@ -243,6 +301,8 @@
                     @endforeach
                 </tr>
                 @endforeach
+                @endforeach
+
             </tbody>
         </table>
     </div>
