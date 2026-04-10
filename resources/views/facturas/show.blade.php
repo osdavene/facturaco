@@ -51,7 +51,7 @@
             {{-- Pagar con Wompi --}}
             @if($empresa->wompi_configurado && in_array($factura->estado, ['emitida', 'vencida']) && $factura->saldo_pendiente > 0)
             @php
-                $wompiRef    = 'FCO-' . $factura->numero;
+                $wompiRef    = 'FCO-' . $factura->empresa_id . '-' . $factura->numero;
                 $wompiAmount = intval($factura->saldo_pendiente * 100);
                 $wompiUrl    = 'https://checkout.wompi.co/p/'
                     . '?public-key='      . urlencode($empresa->wompi_public_key)

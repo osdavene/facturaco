@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Proveedor extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, PertenecerEmpresa;
 
-     protected $table = 'proveedores';
-    
+    protected $table = 'proveedores';
+
     protected $fillable = [
+        'empresa_id',
         'tipo_documento', 'numero_documento', 'digito_verificacion',
         'razon_social', 'nombre_contacto', 'cargo_contacto',
         'email', 'telefono', 'celular',
@@ -41,21 +43,20 @@ class Proveedor extends Model
     public function scopeBuscar($query, $texto)
     {
         return $query->where(function($q) use ($texto) {
-            $q->where('razon_social',       'like', "%{$texto}%")
-              ->orWhere('numero_documento',  'like', "%{$texto}%")
-              ->orWhere('nombre_contacto',   'like', "%{$texto}%")
-              ->orWhere('email',             'like', "%{$texto}%");
+            $q->where('razon_social',      'like', "%{$texto}%")
+              ->orWhere('numero_documento', 'like', "%{$texto}%")
+              ->orWhere('nombre_contacto',  'like', "%{$texto}%")
+              ->orWhere('email',            'like', "%{$texto}%");
         });
     }
 
     public function creadoPor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function actualizadoPor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by');
     }
-
 }

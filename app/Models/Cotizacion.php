@@ -1,17 +1,19 @@
 <?php
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Cotizacion extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, PertenecerEmpresa;
 
     protected $table = 'cotizaciones';
 
     protected $fillable = [
+        'empresa_id',
         'numero', 'consecutivo',
         'cliente_id', 'cliente_nombre', 'cliente_documento',
         'cliente_email', 'cliente_telefono', 'cliente_direccion',
@@ -22,29 +24,14 @@ class Cotizacion extends Model
     ];
 
     protected $casts = [
-        'fecha_emision'    => 'date',
-        'fecha_vencimiento'=> 'date',
+        'fecha_emision'     => 'date',
+        'fecha_vencimiento' => 'date',
     ];
 
-    public function cliente()
-    {
-        return $this->belongsTo(Cliente::class);
-    }
-
-    public function items()
-    {
-        return $this->hasMany(CotizacionItem::class)->orderBy('orden');
-    }
-
-    public function factura()
-    {
-        return $this->belongsTo(Factura::class);
-    }
-
-    public function usuario()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+    public function cliente()  { return $this->belongsTo(Cliente::class); }
+    public function items()    { return $this->hasMany(CotizacionItem::class)->orderBy('orden'); }
+    public function factura()  { return $this->belongsTo(Factura::class); }
+    public function usuario()  { return $this->belongsTo(User::class, 'user_id'); }
 
     public function getEstadoColorAttribute(): string
     {
@@ -61,7 +48,7 @@ class Cotizacion extends Model
     public function getVencidaAttribute(): bool
     {
         return $this->fecha_vencimiento < now() &&
-               !in_array($this->estado, ['aceptada','rechazada','convertida']);
+               !in_array($this->estado, ['aceptada', 'rechazada', 'convertida']);
     }
 
     public static function siguienteConsecutivo(): array

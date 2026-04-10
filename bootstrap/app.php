@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'webhooks/wompi',
         ]);
+        $middleware->alias([
+            'empresa' => \App\Http\Middleware\EnsureEmpresaSeleccionada::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

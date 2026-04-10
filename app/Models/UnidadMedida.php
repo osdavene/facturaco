@@ -1,14 +1,20 @@
 <?php
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class UnidadMedida extends Model
 {
-    use HasFactory;
+    use HasFactory, PertenecerEmpresa;
+
     protected $table = 'unidades_medida';
-    protected $fillable = ['nombre', 'abreviatura', 'activo', 'created_by', 'updated_by'];
+
+    protected $fillable = [
+        'empresa_id', 'nombre', 'abreviatura', 'activo', 'created_by', 'updated_by',
+    ];
+
     protected $casts = ['activo' => 'boolean'];
 
     public function productos()
@@ -18,12 +24,11 @@ class UnidadMedida extends Model
 
     public function creadoPor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function actualizadoPor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by');
     }
-
 }

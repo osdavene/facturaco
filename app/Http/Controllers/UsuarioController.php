@@ -11,11 +11,16 @@ class UsuarioController extends Controller
 {
     public function index()
     {
-        $usuarios = User::with('roles')
-            ->orderBy('name')
-            ->paginate(15);
+        $empresaId = session('empresa_activa_id');
 
-        $totalUsuarios = User::count();
+        $usuarios = User::whereHas('empresas', fn($q) =>
+                        $q->where('empresa_id', $empresaId)
+                    )
+                    ->with('roles')
+                    ->orderBy('name')
+                    ->paginate(15);
+
+        $totalUsuarios = $usuarios->total();
         $roles         = Role::withCount('users')->get();
 
         return view('usuarios.index', compact('usuarios', 'totalUsuarios', 'roles'));
@@ -44,6 +49,12 @@ class UsuarioController extends Controller
 
         $usuario->assignRole($request->rol);
 
+        // Vincular a la empresa activa como operador
+        $usuario->empresas()->attach(session('empresa_activa_id'), [
+            'rol'    => 'operador',
+            'activo' => true,
+        ]);
+
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario creado correctamente.');
     }
@@ -58,7 +69,7 @@ class UsuarioController extends Controller
     {
         $request->validate([
             'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:users,email,'.$usuario->id,
+            'email'    => 'required|email|unique:users,email,' . $usuario->id,
             'password' => 'nullable|string|min:8|confirmed',
             'rol'      => 'required|exists:roles,name',
         ]);
@@ -84,10 +95,16 @@ class UsuarioController extends Controller
             return back()->with('error', 'No puedes eliminar tu propio usuario.');
         }
 
-        $usuario->delete();
+        // Desvincular de la empresa activa en lugar de eliminar globalmente
+        $usuario->empresas()->detach(session('empresa_activa_id'));
+
+        // Solo eliminar el usuario si no pertenece a ninguna otra empresa
+        if ($usuario->empresas()->count() === 0) {
+            $usuario->delete();
+        }
 
         return redirect()->route('usuarios.index')
-            ->with('success', 'Usuario eliminado correctamente.');
+            ->with('success', 'Usuario removido de la empresa.');
     }
 
     public function toggleActivo(User $usuario)
@@ -96,7 +113,14 @@ class UsuarioController extends Controller
             return back()->with('error', 'No puedes desactivar tu propio usuario.');
         }
 
-        $usuario->update(['activo' => !($usuario->activo ?? true)]);
+        $empresaId = session('empresa_activa_id');
+        $pivot     = $usuario->empresas()->where('empresa_id', $empresaId)->first()?->pivot;
+
+        if ($pivot) {
+            $usuario->empresas()->updateExistingPivot($empresaId, [
+                'activo' => !$pivot->activo,
+            ]);
+        }
 
         return back()->with('success', 'Estado del usuario actualizado.');
     }

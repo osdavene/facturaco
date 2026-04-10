@@ -27,21 +27,98 @@
                       flex flex-col z-[100]
                       -translate-x-full lg:translate-x-0 transition-transform duration-300">
 
-            {{-- Logo --}}
+            {{-- Logo + Selector de empresa --}}
             @php $emp = \App\Models\Empresa::obtener(); @endphp
-            <div class="px-6 py-5 border-b border-[#1e2d47]">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center
-                                font-display font-black text-black text-lg flex-shrink-0 overflow-hidden">
+            @php $todasEmpresas = auth()->user()->empresas()->wherePivot('activo', true)->get(); @endphp
+            <div class="px-4 py-4 border-b border-[#1e2d47]">
+                {{-- Si tiene varias empresas: dropdown selector --}}
+                @if($todasEmpresas->count() > 1)
+                <div class="relative group/empsel">
+                    <button type="button"
+                            class="w-full flex items-center gap-3 rounded-xl px-2 py-1.5
+                                   hover:bg-[#1a2235] transition-colors text-left">
+                        <div class="w-9 h-9 bg-amber-500/10 border border-amber-500/20 rounded-xl
+                                    flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            @if($emp->logo)
+                                <img src="{{ Storage::url($emp->logo) }}" class="w-9 h-9 object-contain" alt="">
+                            @else
+                                <span class="font-display font-black text-amber-500 text-sm">
+                                    {{ strtoupper(substr($emp->razon_social, 0, 2)) }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs font-bold text-white truncate leading-tight">
+                                {{ $emp->nombre_comercial ?: $emp->razon_social }}
+                            </div>
+                            <div class="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                <span>Factura<span class="text-amber-500">CO</span></span>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-slate-600 text-[10px] flex-shrink-0
+                                  group-hover/empsel:text-amber-500 transition-colors"></i>
+                    </button>
+                    {{-- Dropdown de empresas --}}
+                    <div class="absolute left-0 right-0 top-full mt-1 bg-[#1a2235] border border-[#1e2d47]
+                                rounded-xl shadow-xl z-[200] hidden group-hover/empsel:block overflow-hidden">
+                        <div class="px-3 py-2 border-b border-[#1e2d47]">
+                            <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                                Cambiar empresa
+                            </div>
+                        </div>
+                        @foreach($todasEmpresas as $e)
+                        <form method="POST" action="{{ route('empresas.elegir', $e->id) }}">
+                            @csrf
+                            <button type="submit"
+                                    class="w-full flex items-center gap-2.5 px-3 py-2.5
+                                           hover:bg-[#141c2e] transition-colors text-left
+                                           {{ $e->id === $emp->id ? 'bg-amber-500/5' : '' }}">
+                                <div class="w-7 h-7 rounded-lg bg-[#141c2e] flex items-center
+                                            justify-center flex-shrink-0 overflow-hidden">
+                                    @if($e->logo)
+                                        <img src="{{ Storage::url($e->logo) }}" class="w-7 h-7 object-contain" alt="">
+                                    @else
+                                        <span class="font-bold text-amber-500 text-xs">
+                                            {{ strtoupper(substr($e->razon_social, 0, 2)) }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-semibold truncate
+                                                {{ $e->id === $emp->id ? 'text-amber-400' : 'text-slate-200' }}">
+                                        {{ $e->nombre_comercial ?: $e->razon_social }}
+                                    </div>
+                                    <div class="text-[10px] text-slate-600 truncate">
+                                        NIT: {{ $e->nit }}
+                                    </div>
+                                </div>
+                                @if($e->id === $emp->id)
+                                <i class="fas fa-check text-amber-500 text-[10px] flex-shrink-0"></i>
+                                @endif
+                            </button>
+                        </form>
+                        @endforeach
+                        <div class="border-t border-[#1e2d47] px-3 py-2">
+                            <a href="{{ route('empresas.crear') }}"
+                               class="flex items-center gap-2 text-xs text-slate-500 hover:text-amber-400 transition-colors">
+                                <i class="fas fa-plus text-[10px]"></i> Agregar empresa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @else
+                {{-- Solo una empresa: mostrar estático --}}
+                <div class="flex items-center gap-3 px-2">
+                    <div class="w-9 h-9 bg-amber-500 rounded-xl flex items-center justify-center
+                                font-display font-black text-black text-sm flex-shrink-0 overflow-hidden">
                         @if($emp->logo)
-                            <img src="{{ Storage::url($emp->logo) }}"
-                                 class="w-10 h-10 object-contain" alt="Logo">
+                            <img src="{{ Storage::url($emp->logo) }}" class="w-9 h-9 object-contain" alt="Logo">
                         @else
                             FC
                         @endif
                     </div>
                     <div class="min-w-0">
-                        <div class="font-display font-black text-xl text-white leading-tight">
+                        <div class="font-display font-black text-lg text-white leading-tight">
                             Factura<span class="text-amber-500">CO</span>
                         </div>
                         <div class="text-[10px] text-slate-500 tracking-wide truncate">
@@ -49,6 +126,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
 
             {{-- Búsqueda rápida móvil (solo visible en móvil) --}}

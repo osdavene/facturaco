@@ -62,9 +62,21 @@ class WompiController extends Controller
             return response()->json(['ok' => true, 'ignorado' => 'no aprobado']);
         }
 
-        // La referencia tiene formato "FCO-{factura_numero}"
-        $facturaNumero = str_replace('FCO-', '', $reference);
-        $factura       = Factura::where('numero', $facturaNumero)->first();
+        // La referencia tiene formato "FCO-{empresa_id}-{factura_numero}"
+        // Ejemplo: "FCO-1-FE-2026-00001"
+        if (!preg_match('/^FCO-(\d+)-(.+)$/', $reference, $m)) {
+            Log::warning("Wompi webhook: referencia malformada: {$reference}");
+            return response()->json(['ok' => true, 'ignorado' => 'referencia no reconocida']);
+        }
+
+        $empresaId     = (int) $m[1];
+        $facturaNumero = $m[2];
+
+        // Buscar sin el global scope de empresa (contexto de webhook)
+        $factura = Factura::sinFiltroEmpresa()
+                          ->where('empresa_id', $empresaId)
+                          ->where('numero', $facturaNumero)
+                          ->first();
 
         if (!$factura) {
             Log::warning("Wompi webhook: factura no encontrada para referencia {$reference}");

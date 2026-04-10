@@ -1,17 +1,19 @@
 <?php
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Remision extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, PertenecerEmpresa;
 
     protected $table = 'remisiones';
 
     protected $fillable = [
+        'empresa_id',
         'numero', 'consecutivo',
         'cliente_id', 'cliente_nombre', 'cliente_documento',
         'cliente_email', 'cliente_direccion', 'cliente_telefono',
@@ -26,10 +28,10 @@ class Remision extends Model
         'fecha_entrega' => 'date',
     ];
 
-    public function cliente()   { return $this->belongsTo(Cliente::class); }
-    public function items()     { return $this->hasMany(RemisionItem::class)->orderBy('orden'); }
-    public function factura()   { return $this->belongsTo(Factura::class); }
-    public function usuario()   { return $this->belongsTo(User::class, 'user_id'); }
+    public function cliente()  { return $this->belongsTo(Cliente::class); }
+    public function items()    { return $this->hasMany(RemisionItem::class)->orderBy('orden'); }
+    public function factura()  { return $this->belongsTo(Factura::class); }
+    public function usuario()  { return $this->belongsTo(User::class, 'user_id'); }
 
     public function getEstadoColorAttribute(): string
     {

@@ -13,14 +13,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'activo',
-        'avatar', 
-        'telefono', 
-        'cargo',
-        'tema',
+        'name', 'email', 'password',
+        'activo', 'avatar', 'telefono', 'cargo', 'tema',
     ];
 
     protected $hidden = [
@@ -32,8 +26,56 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
+    }
+
+    // ── Relaciones ────────────────────────────────────────────────
+
+    public function empresas()
+    {
+        return $this->belongsToMany(Empresa::class, 'empresa_user')
+                    ->withPivot('rol', 'activo')
+                    ->withTimestamps();
+    }
+
+    public function loginLogs()
+    {
+        return $this->hasMany(LoginLog::class);
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────
+
+    /** Empresa activa en la sesión actual */
+    public function empresaActiva(): ?Empresa
+    {
+        $id = session('empresa_activa_id');
+        if (!$id) return null;
+
+        return $this->empresas()
+                    ->wherePivot('activo', true)
+                    ->where('empresa_id', $id)
+                    ->first();
+    }
+
+    /** Rol del usuario en la empresa activa */
+    public function rolEnEmpresaActiva(): ?string
+    {
+        $id = session('empresa_activa_id');
+        if (!$id) return null;
+
+        $pivot = $this->empresas()
+                      ->wherePivot('activo', true)
+                      ->where('empresa_id', $id)
+                      ->first()?->pivot;
+
+        return $pivot?->rol;
+    }
+
+    /** Verifica si el usuario es admin de la empresa activa */
+    public function esAdminEmpresa(): bool
+    {
+        return $this->rolEnEmpresaActiva() === 'admin';
     }
 
     public function getAvatarUrlAttribute(): string
@@ -41,8 +83,8 @@ class User extends Authenticatable
         if ($this->avatar) {
             return Storage::url($this->avatar);
         }
-        return 'https://ui-avatars.com/api/?name='.urlencode($this->name)
-            .'&background=f59e0b&color=000&bold=true&size=128';
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name)
+             . '&background=f59e0b&color=000&bold=true&size=128';
     }
 
     public function getIniciales(): string

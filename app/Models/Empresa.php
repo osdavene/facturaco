@@ -33,6 +33,17 @@ class Empresa extends Model
         'wompi_events_key',
     ];
 
+    // ── Relaciones ────────────────────────────────────────────────
+
+    public function usuarios()
+    {
+        return $this->belongsToMany(User::class, 'empresa_user')
+                    ->withPivot('rol', 'activo')
+                    ->withTimestamps();
+    }
+
+    // ── Accessors ─────────────────────────────────────────────────
+
     public function getNitFormateadoAttribute(): string
     {
         if ($this->digito_verificacion) {
@@ -68,8 +79,20 @@ class Empresa extends Model
         return !empty($this->wompi_events_key);
     }
 
+    // ── Helpers estáticos ─────────────────────────────────────────
+
+    /**
+     * Devuelve la empresa activa en la sesión actual.
+     * Retrocompatible: todos los controladores que usan Empresa::obtener()
+     * seguirán funcionando sin cambios.
+     */
     public static function obtener(): static
     {
+        if ($id = session('empresa_activa_id')) {
+            return static::findOrFail($id);
+        }
+
+        // Fallback para contextos sin sesión (webhooks, consola, tests)
         return static::firstOrCreate(
             ['id' => 1],
             [

@@ -1,17 +1,19 @@
 <?php
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Producto extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, PertenecerEmpresa;
 
     protected $table = 'productos';
 
     protected $fillable = [
+        'empresa_id',
         'codigo', 'codigo_barras', 'nombre', 'descripcion',
         'categoria_id', 'unidad_medida_id',
         'precio_compra', 'precio_venta', 'precio_venta2', 'precio_venta3',
@@ -57,12 +59,11 @@ class Producto extends Model
 
     public function creadoPor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function actualizadoPor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by');
     }
-
 }

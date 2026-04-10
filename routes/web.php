@@ -24,6 +24,7 @@ use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\NotaCreditoController;
 use App\Http\Controllers\WompiController;
+use App\Http\Controllers\EmpresaSelectorController;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -74,10 +75,21 @@ Route::get('/', function () {
 // ── Rutas autenticadas ────────────────────────────────────────
 Route::middleware('auth')->group(function () {
 
-    // Perfil de usuario (Laravel default)
+    // ── Selección / creación de empresa (sin requerir empresa activa) ──
+    Route::get('/seleccionar-empresa',       [EmpresaSelectorController::class, 'index'])  ->name('empresas.seleccionar');
+    Route::post('/seleccionar-empresa/{id}', [EmpresaSelectorController::class, 'elegir']) ->name('empresas.elegir');
+    Route::get('/empresas/crear',            [EmpresaSelectorController::class, 'crear'])  ->name('empresas.crear');
+    Route::post('/empresas',                 [EmpresaSelectorController::class, 'store'])  ->name('empresas.store');
+
+    // ── Perfil de usuario ─────────────────────────────────────
     Route::get('/profile',    [ProfileController::class, 'edit'])   ->name('profile.edit');
     Route::patch('/profile',  [ProfileController::class, 'update']) ->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // ═══════════════════════════════════════════════════════════
+    // Rutas que requieren empresa activa en sesión
+    // ═══════════════════════════════════════════════════════════
+    Route::middleware('empresa')->group(function () {
 
     // ── Dashboard ─────────────────────────────────────────────
     Route::get('/dashboard', function () {
@@ -359,7 +371,7 @@ Route::middleware('auth')->group(function () {
         return response()->json($facturas);
     })->middleware('auth');
 
-    Route::get('/api/clientes/buscar', function(\Illuminate\Http\Request $req) {
+    Route::get('/api/clientes/buscar', function (\Illuminate\Http\Request $req) {
         $clientes = \App\Models\Cliente::where('activo', true)
             ->where(function($q) use ($req) {
                 $q->where('nombres',           'like', '%'.$req->q.'%')
@@ -373,6 +385,8 @@ Route::middleware('auth')->group(function () {
                    'plazo_pago','email','direccion','lista_precio']); // ← lista_precio agregado
         return response()->json($clientes);
     })->middleware('auth');
+
+    }); // fin grupo middleware('empresa')
 
 });
 

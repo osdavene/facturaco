@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Cliente extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, PertenecerEmpresa;
 
     protected $table = 'clientes';
 
     protected $fillable = [
+        'empresa_id',
         'tipo_persona', 'tipo_documento', 'numero_documento',
         'digito_verificacion', 'razon_social', 'nombres', 'apellidos',
         'regimen', 'responsable_iva', 'gran_contribuyente',
@@ -32,7 +34,6 @@ class Cliente extends Model
         'cupo_credito'       => 'decimal:2',
     ];
 
-    // Nombre completo para mostrar
     public function getNombreCompletoAttribute(): string
     {
         if ($this->tipo_persona === 'juridica') {
@@ -41,7 +42,6 @@ class Cliente extends Model
         return trim("{$this->nombres} {$this->apellidos}");
     }
 
-    // Documento formateado con DV si es NIT
     public function getDocumentoFormateadoAttribute(): string
     {
         if ($this->tipo_documento === 'NIT' && $this->digito_verificacion) {
@@ -50,7 +50,6 @@ class Cliente extends Model
         return $this->numero_documento;
     }
 
-    // Scope para búsqueda rápida
     public function scopeBuscar($query, $texto)
     {
         return $query->where(function($q) use ($texto) {
@@ -69,12 +68,11 @@ class Cliente extends Model
 
     public function creadoPor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function actualizadoPor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by');
     }
-
 }

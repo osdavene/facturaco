@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class NotaCredito extends Model
 {
+    use PertenecerEmpresa;
+
     protected $table = 'notas_credito';
 
     protected $fillable = [
+        'empresa_id',
         'numero', 'prefijo', 'consecutivo',
         'factura_id', 'factura_numero',
         'cliente_id', 'cliente_nombre', 'cliente_documento',
@@ -41,14 +45,14 @@ class NotaCredito extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public static function siguienteConsecutivo(): array
     {
-        $ultimo = self::max('consecutivo') ?? 0;
+        $ultimo      = self::max('consecutivo') ?? 0;
         $consecutivo = $ultimo + 1;
-        $numero = 'NC-' . str_pad($consecutivo, 5, '0', STR_PAD_LEFT);
+        $numero      = 'NC-' . str_pad($consecutivo, 5, '0', STR_PAD_LEFT);
 
         return compact('consecutivo', 'numero');
     }

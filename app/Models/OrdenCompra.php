@@ -1,17 +1,19 @@
 <?php
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OrdenCompra extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, PertenecerEmpresa;
 
     protected $table = 'ordenes_compra';
 
     protected $fillable = [
+        'empresa_id',
         'numero', 'consecutivo',
         'proveedor_id', 'proveedor_nombre', 'proveedor_documento',
         'fecha_emision', 'fecha_esperada', 'fecha_recepcion',
@@ -26,29 +28,18 @@ class OrdenCompra extends Model
         'fecha_recepcion' => 'date',
     ];
 
-    public function proveedor()
-    {
-        return $this->belongsTo(Proveedor::class);
-    }
-
-    public function items()
-    {
-        return $this->hasMany(OrdenCompraItem::class)->orderBy('orden');
-    }
-
-    public function usuario()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+    public function proveedor() { return $this->belongsTo(Proveedor::class); }
+    public function items()     { return $this->hasMany(OrdenCompraItem::class)->orderBy('orden'); }
+    public function usuario()   { return $this->belongsTo(User::class, 'user_id'); }
 
     public function getEstadoColorAttribute(): string
     {
         return match($this->estado) {
-            'aprobada'  => 'blue',
-            'recibida'  => 'emerald',
-            'enviada'   => 'cyan',
-            'anulada'   => 'slate',
-            default     => 'amber',
+            'aprobada' => 'blue',
+            'recibida' => 'emerald',
+            'enviada'  => 'cyan',
+            'anulada'  => 'slate',
+            default    => 'amber',
         };
     }
 

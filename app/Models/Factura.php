@@ -1,17 +1,19 @@
 <?php
 namespace App\Models;
 
+use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Factura extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, PertenecerEmpresa;
 
     protected $table = 'facturas';
 
     protected $fillable = [
+        'empresa_id',
         'numero', 'prefijo', 'consecutivo', 'tipo',
         'cliente_id', 'cliente_nombre', 'cliente_documento',
         'cliente_direccion', 'cliente_email',
