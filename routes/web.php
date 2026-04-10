@@ -17,6 +17,8 @@ use App\Http\Controllers\RemisionController;
 use App\Http\Controllers\ImpuestosController;
 use App\Http\Controllers\BusquedaController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\UnidadMedidaController;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -62,9 +64,6 @@ Route::get('/', function () {
 });
 
 // ── Dashboard ─────────────────────────────────────────────────
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');// ── Dashboard ─────────────────────────────────────────────────
 Route::get('/dashboard', function () {
     $empresa = \App\Models\Empresa::obtener();
 
@@ -120,26 +119,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // ── Clientes ──────────────────────────────────────────────
-    Route::get('/clientes',
-        [ClienteController::class, 'index'])  ->name('clientes.index');
-
-    Route::get('/clientes/crear',
-        [ClienteController::class, 'create']) ->name('clientes.create');
-
-    Route::post('/clientes',
-        [ClienteController::class, 'store'])  ->name('clientes.store');
-
-    Route::get('/clientes/{cliente}',
-        [ClienteController::class, 'show'])   ->name('clientes.show');
-
-    Route::get('/clientes/{cliente}/editar',
-        [ClienteController::class, 'edit'])   ->name('clientes.edit');
-
-    Route::put('/clientes/{cliente}',
-        [ClienteController::class, 'update']) ->name('clientes.update');
-
-    Route::delete('/clientes/{cliente}',
-        [ClienteController::class, 'destroy'])->name('clientes.destroy');
+    Route::get('/clientes',                    [ClienteController::class, 'index'])  ->name('clientes.index');
+    Route::get('/clientes/crear',              [ClienteController::class, 'create']) ->name('clientes.create');
+    Route::post('/clientes',                   [ClienteController::class, 'store'])  ->name('clientes.store');
+    Route::get('/clientes/{cliente}',          [ClienteController::class, 'show'])   ->name('clientes.show');
+    Route::get('/clientes/{cliente}/editar',   [ClienteController::class, 'edit'])   ->name('clientes.edit');
+    Route::put('/clientes/{cliente}',          [ClienteController::class, 'update']) ->name('clientes.update');
+    Route::delete('/clientes/{cliente}',       [ClienteController::class, 'destroy'])->name('clientes.destroy');
 
     // Proveedores
     Route::get('/proveedores',                    [ProveedorController::class, 'index'])  ->name('proveedores.index');
@@ -180,6 +166,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('/usuarios/{usuario}',       [UsuarioController::class, 'destroy'])     ->name('usuarios.destroy');
     Route::patch('/usuarios/{usuario}/activo', [UsuarioController::class, 'toggleActivo'])->name('usuarios.activo');
 
+    // ── Categorías (solo admin) ───────────────────────────────
+    Route::get('/categorias',                     [CategoriaController::class, 'index'])  ->name('categorias.index')  ->middleware('can:ver usuarios');
+    Route::get('/categorias/crear',               [CategoriaController::class, 'create']) ->name('categorias.create') ->middleware('can:ver usuarios');
+    Route::post('/categorias',                    [CategoriaController::class, 'store'])  ->name('categorias.store')  ->middleware('can:ver usuarios');
+    Route::get('/categorias/{categoria}/editar',  [CategoriaController::class, 'edit'])   ->name('categorias.edit')   ->middleware('can:ver usuarios');
+    Route::put('/categorias/{categoria}',         [CategoriaController::class, 'update']) ->name('categorias.update') ->middleware('can:ver usuarios');
+    Route::delete('/categorias/{categoria}',      [CategoriaController::class, 'destroy'])->name('categorias.destroy')->middleware('can:ver usuarios');
+
+    // ── Unidades de Medida (solo admin) ──────────────────────
+    Route::get('/unidades',                   [UnidadMedidaController::class, 'index'])  ->name('unidades.index')  ->middleware('can:ver usuarios');
+    Route::get('/unidades/crear',             [UnidadMedidaController::class, 'create']) ->name('unidades.create') ->middleware('can:ver usuarios');
+    Route::post('/unidades',                  [UnidadMedidaController::class, 'store'])  ->name('unidades.store')  ->middleware('can:ver usuarios');
+    Route::get('/unidades/{unidad}/editar',   [UnidadMedidaController::class, 'edit'])   ->name('unidades.edit')   ->middleware('can:ver usuarios');
+    Route::put('/unidades/{unidad}',          [UnidadMedidaController::class, 'update']) ->name('unidades.update') ->middleware('can:ver usuarios');
+    Route::delete('/unidades/{unidad}',       [UnidadMedidaController::class, 'destroy'])->name('unidades.destroy')->middleware('can:ver usuarios');
+
     // Órdenes de Compra
     Route::get('/ordenes',                      [OrdenCompraController::class, 'index'])        ->name('ordenes.index');
     Route::get('/ordenes/crear',                [OrdenCompraController::class, 'create'])       ->name('ordenes.create');
@@ -193,14 +195,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/ordenes/{orden}/pdf',          [OrdenCompraController::class, 'pdf'])          ->name('ordenes.pdf');
 
     // Cotizaciones
-    Route::get('/cotizaciones',                      [CotizacionController::class, 'index'])       ->name('cotizaciones.index');
-    Route::get('/cotizaciones/crear',                [CotizacionController::class, 'create'])      ->name('cotizaciones.create');
-    Route::post('/cotizaciones',                     [CotizacionController::class, 'store'])       ->name('cotizaciones.store');
-    Route::get('/cotizaciones/{cotizacion}',         [CotizacionController::class, 'show'])        ->name('cotizaciones.show');
-    Route::delete('/cotizaciones/{cotizacion}',      [CotizacionController::class, 'destroy'])     ->name('cotizaciones.destroy');
-    Route::patch('/cotizaciones/{cotizacion}/estado',[CotizacionController::class, 'cambiarEstado'])->name('cotizaciones.estado');
-    Route::post('/cotizaciones/{cotizacion}/convertir',[CotizacionController::class, 'convertir'])->name('cotizaciones.convertir');
-    Route::get('/cotizaciones/{cotizacion}/pdf',     [CotizacionController::class, 'pdf'])         ->name('cotizaciones.pdf');
+    Route::get('/cotizaciones',                       [CotizacionController::class, 'index'])        ->name('cotizaciones.index');
+    Route::get('/cotizaciones/crear',                 [CotizacionController::class, 'create'])       ->name('cotizaciones.create');
+    Route::post('/cotizaciones',                      [CotizacionController::class, 'store'])        ->name('cotizaciones.store');
+    Route::get('/cotizaciones/{cotizacion}',          [CotizacionController::class, 'show'])         ->name('cotizaciones.show');
+    Route::delete('/cotizaciones/{cotizacion}',       [CotizacionController::class, 'destroy'])      ->name('cotizaciones.destroy');
+    Route::patch('/cotizaciones/{cotizacion}/estado', [CotizacionController::class, 'cambiarEstado'])->name('cotizaciones.estado');
+    Route::post('/cotizaciones/{cotizacion}/convertir',[CotizacionController::class, 'convertir'])   ->name('cotizaciones.convertir');
+    Route::get('/cotizaciones/{cotizacion}/pdf',      [CotizacionController::class, 'pdf'])          ->name('cotizaciones.pdf');
 
     // API buscar proveedores
     Route::get('/api/proveedores/buscar', function(\Illuminate\Http\Request $req) {
@@ -214,7 +216,7 @@ Route::middleware('auth')->group(function () {
                 'digito_verificacion','plazo_pago','retefuente_pct']);
         return response()->json($proveedores);
     })->middleware('auth');
-    
+
     // API para buscar productos al facturar
     Route::get('/api/productos/buscar', function(\Illuminate\Http\Request $req) {
         $productos = \App\Models\Producto::where('activo', true)
@@ -226,26 +228,26 @@ Route::middleware('auth')->group(function () {
     })->middleware('auth');
 
     // Reportes
-    Route::get('/reportes',                    [ReporteController::class, 'index'])     ->name('reportes.index');
-    Route::get('/reportes/ventas',             [ReporteController::class, 'ventas'])    ->name('reportes.ventas');
-    Route::get('/reportes/inventario',         [ReporteController::class, 'inventario'])->name('reportes.inventario');
-    Route::get('/reportes/cartera',            [ReporteController::class, 'cartera'])   ->name('reportes.cartera');
-    Route::get('/reportes/ventas/pdf',         [ReporteController::class, 'ventasPdf']) ->name('reportes.ventas.pdf');
-    Route::get('/reportes/inventario/pdf',     [ReporteController::class, 'inventarioPdf'])->name('reportes.inventario.pdf');
-    Route::get('/reportes/cartera/pdf',        [ReporteController::class, 'carteraPdf'])->name('reportes.cartera.pdf');
+    Route::get('/reportes',                [ReporteController::class, 'index'])        ->name('reportes.index');
+    Route::get('/reportes/ventas',         [ReporteController::class, 'ventas'])       ->name('reportes.ventas');
+    Route::get('/reportes/inventario',     [ReporteController::class, 'inventario'])   ->name('reportes.inventario');
+    Route::get('/reportes/cartera',        [ReporteController::class, 'cartera'])      ->name('reportes.cartera');
+    Route::get('/reportes/ventas/pdf',     [ReporteController::class, 'ventasPdf'])    ->name('reportes.ventas.pdf');
+    Route::get('/reportes/inventario/pdf', [ReporteController::class, 'inventarioPdf'])->name('reportes.inventario.pdf');
+    Route::get('/reportes/cartera/pdf',    [ReporteController::class, 'carteraPdf'])   ->name('reportes.cartera.pdf');
 
     // Empresa
-    Route::get('/empresa',              [EmpresaController::class, 'index'])      ->name('empresa.index');
-    Route::put('/empresa',              [EmpresaController::class, 'update'])     ->name('empresa.update');
-    Route::delete('/empresa/logo',      [EmpresaController::class, 'deleteLogo'])->name('empresa.logo.delete');
+    Route::get('/empresa',         [EmpresaController::class, 'index'])     ->name('empresa.index');
+    Route::put('/empresa',         [EmpresaController::class, 'update'])    ->name('empresa.update');
+    Route::delete('/empresa/logo', [EmpresaController::class, 'deleteLogo'])->name('empresa.logo.delete');
 
     // Recibos de Caja
-    Route::get('/recibos',                  [ReciboCajaController::class, 'index'])  ->name('recibos.index');
-    Route::get('/recibos/crear',            [ReciboCajaController::class, 'create']) ->name('recibos.create');
-    Route::post('/recibos',                 [ReciboCajaController::class, 'store'])  ->name('recibos.store');
-    Route::get('/recibos/{recibo}',         [ReciboCajaController::class, 'show'])   ->name('recibos.show');
-    Route::delete('/recibos/{recibo}',      [ReciboCajaController::class, 'destroy'])->name('recibos.destroy');
-    Route::get('/recibos/{recibo}/pdf',     [ReciboCajaController::class, 'pdf'])    ->name('recibos.pdf');
+    Route::get('/recibos',              [ReciboCajaController::class, 'index'])  ->name('recibos.index');
+    Route::get('/recibos/crear',        [ReciboCajaController::class, 'create']) ->name('recibos.create');
+    Route::post('/recibos',             [ReciboCajaController::class, 'store'])  ->name('recibos.store');
+    Route::get('/recibos/{recibo}',     [ReciboCajaController::class, 'show'])   ->name('recibos.show');
+    Route::delete('/recibos/{recibo}',  [ReciboCajaController::class, 'destroy'])->name('recibos.destroy');
+    Route::get('/recibos/{recibo}/pdf', [ReciboCajaController::class, 'pdf'])    ->name('recibos.pdf');
 
     // API buscar facturas para recibo
     Route::get('/api/facturas/buscar', function(\Illuminate\Http\Request $req) {

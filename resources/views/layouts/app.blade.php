@@ -148,6 +148,16 @@
                                 :active="request()->routeIs('empresa.*')">
                         Empresa
                     </x-nav-item>
+                    <x-nav-item href="{{ route('categorias.index') }}"
+                                icon="fa-tags"
+                                :active="request()->routeIs('categorias.*')">
+                        Categorías
+                    </x-nav-item>
+                    <x-nav-item href="{{ route('unidades.index') }}"
+                                icon="fa-ruler"
+                                :active="request()->routeIs('unidades.*')">
+                        Unidades de Medida
+                    </x-nav-item>
                 </x-nav-section>
                 @endcan
 
