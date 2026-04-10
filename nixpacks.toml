@@ -6,6 +6,24 @@ cmds = [
     "php artisan config:clear",
     "php artisan cache:clear"
 ]
+[phases.setup]
+aptPkgs = ["php8.3-pgsql", "php8.3-gd", "php8.3-zip", "php8.3-xml", "php8.3-mbstring", "php8.3-curl", "php8.3-bcmath", "php8.3-intl"]
+
+[phases.install]
+cmds = [
+    "composer install --no-dev --optimize-autoloader",
+    "npm install"
+]
+
+[phases.build]
+cmds = [
+    "npm run build",
+    "php artisan config:clear",
+    "php artisan cache:clear"
+]
+
+[start]
+cmd = "php artisan config:clear && php artisan cache:clear && php artisan migrate --force && php artisan storage:link && php -S 0.0.0.0:$PORT -t public"
 
 [start]
 cmd = "php artisan config:clear && php artisan cache:clear && php artisan migrate --force && php artisan storage:link && php -S 0.0.0.0:$PORT -t public"
