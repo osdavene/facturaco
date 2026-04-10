@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\LoginLog;
+use App\Models\User;
 
 class SesionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // ── Sesiones activas ──────────────────────────────────
         $sesiones = DB::table('sessions')
             ->join('users', 'sessions.user_id', '=', 'users.id')
             ->select(
@@ -36,7 +39,35 @@ class SesionController extends Controller
 
         $totalEnLinea = $sesiones->where('en_linea', true)->count();
 
-        return view('sesiones.index', compact('sesiones', 'totalEnLinea'));
+        // ── Historial con filtros ─────────────────────────────
+        $query = LoginLog::with('user')->orderByDesc('fecha_hora');
+
+        if ($request->filled('usuario')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->usuario . '%')
+                  ->orWhere('email', 'like', '%' . $request->usuario . '%');
+            });
+        }
+
+        if ($request->filled('accion')) {
+            $query->where('accion', $request->accion);
+        }
+
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_hora', '>=', $request->fecha_desde);
+        }
+
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+
+        $historial = $query->paginate(25)->withQueryString();
+
+        $usuarios = User::orderBy('name')->get(['id', 'name', 'email']);
+
+        return view('sesiones.index', compact(
+            'sesiones', 'totalEnLinea', 'historial', 'usuarios'
+        ));
     }
 
     public function destroy(Request $request, string $id)
@@ -69,7 +100,6 @@ class SesionController extends Controller
         if (str_contains($ua, 'Chrome'))  return 'Chrome';
         if (str_contains($ua, 'Firefox')) return 'Firefox';
         if (str_contains($ua, 'Safari'))  return 'Safari';
-        if (str_contains($ua, 'MSIE') || str_contains($ua, 'Trident')) return 'Internet Explorer';
         return 'Desconocido';
     }
 
