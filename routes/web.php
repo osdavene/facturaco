@@ -159,6 +159,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/facturas/{factura}',        [FacturaController::class, 'destroy'])->name('facturas.destroy');
     Route::patch('/facturas/{factura}/estado',  [FacturaController::class, 'cambiarEstado'])->name('facturas.estado');
     Route::get('/facturas/{factura}/pdf',       [FacturaController::class, 'pdf'])    ->name('facturas.pdf');
+    Route::get('/facturas/{factura}/enviar',    [FacturaController::class, 'formEnviar'])->name('facturas.formEnviar');
+    Route::post('/facturas/{factura}/enviar',   [FacturaController::class, 'enviar'])    ->name('facturas.enviar');
 
     // Usuarios
     Route::get('/usuarios',                    [UsuarioController::class, 'index'])       ->name('usuarios.index');

@@ -9,6 +9,8 @@ use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\FacturaMail;
+use Illuminate\Support\Facades\Mail;
 
 class FacturaController extends Controller
 {
@@ -257,4 +259,46 @@ class FacturaController extends Controller
 
         return $pdf->stream('factura-'.$factura->numero.'.pdf');
     }
+
+    // ── FORMULARIO ENVIAR EMAIL ───────────────────────────────
+    public function formEnviar(Factura $factura)
+    {
+        $factura->load(['items', 'cliente']);
+        $empresa = Empresa::obtener();
+        return view('facturas.enviar', compact('factura', 'empresa'));
+    }
+
+    // ── ENVIAR EMAIL ──────────────────────────────────────────
+    public function enviar(Request $request, Factura $factura)
+    {
+        $request->validate([
+            'email'   => 'required|email',
+            'mensaje' => 'nullable|string|max:500',
+        ], [
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email'    => 'El correo electrónico no es válido.',
+        ]);
+
+        $empresa = Empresa::obtener();
+        $factura->load(['items', 'cliente']);
+
+        try {
+            Mail::to($request->email)
+                ->send(new FacturaMail($factura, $empresa, $request->mensaje ?? ''));
+
+            // Registrar que fue enviada
+            if ($factura->estado === 'borrador') {
+                $factura->update(['estado' => 'emitida']);
+            }
+
+            return redirect()->route('facturas.show', $factura)
+                ->with('success', 'Factura enviada correctamente a ' . $request->email);
+
+        } catch (\Exception $e) {
+            return back()
+                ->with('error', 'No se pudo enviar el correo. Verifica la configuración de mail.')
+                ->withInput();
+        }
+    }
+
 }

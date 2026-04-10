@@ -34,6 +34,14 @@
             </a>
             @endif
         </div>
+
+        <a href="{{ route('facturas.formEnviar', $factura) }}"
+        class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                hover:border-amber-500/50 text-slate-400 hover:text-amber-400
+                px-4 py-2.5 rounded-xl transition-colors text-sm">
+            <i class="fas fa-envelope"></i> Enviar
+        </a>
+
     </div>
 
     @if(session('success'))
