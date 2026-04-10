@@ -13,11 +13,15 @@ class NotaCredito extends Model
         'factura_id', 'factura_numero',
         'cliente_id', 'cliente_nombre', 'cliente_documento',
         'tipo', 'motivo', 'observaciones', 'fecha',
-        'subtotal', 'iva', 'total', 'estado', 'user_id',
+        'subtotal', 'iva', 'total',
+        'estado', 'user_id',
     ];
 
     protected $casts = [
-        'fecha' => 'date',
+        'fecha'    => 'date',
+        'subtotal' => 'decimal:2',
+        'iva'      => 'decimal:2',
+        'total'    => 'decimal:2',
     ];
 
     public function factura()
@@ -37,26 +41,15 @@ class NotaCredito extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function getMotivoTextoAttribute(): string
-    {
-        return match($this->motivo) {
-            'devolucion_mercancia' => 'Devolución de mercancía',
-            'descuento_posterior'  => 'Descuento posterior',
-            'error_facturacion'    => 'Error en facturación',
-            'anulacion'            => 'Anulación',
-            'otro'                 => 'Otro',
-            default                => $this->motivo,
-        };
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     public static function siguienteConsecutivo(): array
     {
-        $ultimo      = static::max('consecutivo') ?? 0;
+        $ultimo = self::max('consecutivo') ?? 0;
         $consecutivo = $ultimo + 1;
-        $numero      = 'NC-' . date('Y') . '-' . str_pad($consecutivo, 4, '0', STR_PAD_LEFT);
+        $numero = 'NC-' . str_pad($consecutivo, 5, '0', STR_PAD_LEFT);
+
         return compact('consecutivo', 'numero');
     }
 }

@@ -792,16 +792,62 @@
                     </div>
                 </div>
 
-                {{-- Cómo obtener la llave --}}
+                {{-- Events Key para verificación de webhooks --}}
+                <div class="mt-4">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        Llave de Eventos (Webhook)
+                        <span class="ml-1 text-slate-600 font-normal normal-case tracking-normal">— opcional, para verificar firmas</span>
+                    </label>
+                    <div class="relative">
+                        <input type="password" name="wompi_events_key" id="wompi_events_key"
+                            placeholder="{{ $empresa->wompi_webhook_configurado ? '••••••••••••••• (guardada)' : 'test_events_xxx / prod_events_xxx' }}"
+                            autocomplete="new-password"
+                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 pr-10
+                                    text-sm text-slate-200 placeholder-slate-600
+                                    focus:outline-none focus:border-amber-500 transition-colors">
+                        <button type="button" onclick="toggleEventsKey()"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+                            <i class="fas fa-eye text-xs" id="eye-events"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-1">
+                        Encuéntrala en <span class="text-slate-400">Desarrolladores → Llaves de API → Llave de eventos</span>.
+                        Permite verificar que los webhooks provienen realmente de Wompi.
+                    </p>
+                </div>
+
+                {{-- Webhook URL --}}
                 <div class="mt-4 bg-[#1a2235] border border-[#1e2d47] rounded-xl p-4">
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                        Cómo obtener tu llave pública
+                        URL del Webhook (configúrala en Wompi)
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <code class="flex-1 text-xs text-emerald-400 bg-[#141c2e] px-3 py-2 rounded-lg font-mono break-all">
+                            {{ route('wompi.webhook') }}
+                        </code>
+                        <button type="button"
+                                onclick="navigator.clipboard.writeText('{{ route('wompi.webhook') }}').then(() => this.textContent='¡Copiado!')"
+                                class="text-xs text-slate-500 hover:text-slate-300 whitespace-nowrap px-2 py-1">
+                            Copiar
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-2">
+                        Ve a <span class="text-slate-400">comercios.wompi.co → Desarrolladores → Webhooks</span> y registra esta URL
+                        para que los pagos se confirmen automáticamente.
+                    </p>
+                </div>
+
+                {{-- Cómo obtener las llaves --}}
+                <div class="mt-4 bg-[#1a2235] border border-[#1e2d47] rounded-xl p-4">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        Cómo configurar Wompi paso a paso
                     </p>
                     <ol class="text-xs text-slate-500 space-y-1 list-none">
                         <li><span class="text-amber-500 font-bold mr-2">1.</span>Ve a <span class="text-slate-300">comercios.wompi.co</span> y crea tu cuenta</li>
                         <li><span class="text-amber-500 font-bold mr-2">2.</span>Entra a <span class="text-slate-300">Desarrolladores → Llaves de API</span></li>
-                        <li><span class="text-amber-500 font-bold mr-2">3.</span>Copia la <span class="text-slate-300">Llave pública</span> (empieza con pub_prod_)</li>
-                        <li><span class="text-amber-500 font-bold mr-2">4.</span>Pégala aquí y guarda la configuración</li>
+                        <li><span class="text-amber-500 font-bold mr-2">3.</span>Copia la <span class="text-slate-300">Llave pública</span> (pub_prod_...) y la <span class="text-slate-300">Llave de eventos</span></li>
+                        <li><span class="text-amber-500 font-bold mr-2">4.</span>En <span class="text-slate-300">Desarrolladores → Webhooks</span>, registra la URL de webhook de arriba</li>
+                        <li><span class="text-amber-500 font-bold mr-2">5.</span>Pega las llaves aquí y guarda la configuración</li>
                     </ol>
                 </div>
             </div>
@@ -857,6 +903,18 @@ function togglePassword() {
 function toggleWompiKey() {
     const input = document.getElementById('wompi_key');
     const icon  = document.getElementById('eye-wompi');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+function toggleEventsKey() {
+    const input = document.getElementById('wompi_events_key');
+    const icon  = document.getElementById('eye-events');
     if (input.type === 'password') {
         input.type = 'text';
         icon.classList.replace('fa-eye', 'fa-eye-slash');

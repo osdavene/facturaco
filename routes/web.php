@@ -23,6 +23,7 @@ use App\Http\Controllers\SesionController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\NotaCreditoController;
+use App\Http\Controllers\WompiController;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -61,6 +62,9 @@ Route::post('/tema', function(\Illuminate\Http\Request $request) {
     auth()->user()->update(['tema' => $tema]);
     return back();
 })->name('tema.cambiar')->middleware('auth');
+
+// ── Webhooks (sin CSRF, sin auth) ────────────────────────────
+Route::post('/webhooks/wompi', [WompiController::class, 'webhook'])->name('wompi.webhook');
 
 // ── Página de inicio ──────────────────────────────────────────
 Route::get('/', function () {
@@ -206,6 +210,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/facturas/{factura}/pdf',      [FacturaController::class, 'pdf'])         ->name('facturas.pdf');
     Route::get('/facturas/{factura}/enviar',   [FacturaController::class, 'formEnviar'])  ->name('facturas.formEnviar');
     Route::post('/facturas/{factura}/enviar',  [FacturaController::class, 'enviar'])      ->name('facturas.enviar');
+
+    // ── Wompi retorno ─────────────────────────────────────────
+    Route::get('/facturas/{factura}/wompi/retorno', [WompiController::class, 'retorno'])->name('wompi.retorno');
 
     // ── Notas de Crédito ──────────────────────────────────────
     Route::get('/notas-credito',             [NotaCreditoController::class, 'index'])  ->name('notas_credito.index');

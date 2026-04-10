@@ -51,14 +51,14 @@
             {{-- Pagar con Wompi --}}
             @if($empresa->wompi_configurado && in_array($factura->estado, ['emitida', 'vencida']) && $factura->saldo_pendiente > 0)
             @php
-                $wompiRef    = 'FCO-' . $factura->id . '-' . now()->timestamp;
+                $wompiRef    = 'FCO-' . $factura->numero;
                 $wompiAmount = intval($factura->saldo_pendiente * 100);
                 $wompiUrl    = 'https://checkout.wompi.co/p/'
                     . '?public-key='      . urlencode($empresa->wompi_public_key)
                     . '&currency='        . urlencode($empresa->wompi_currency ?? 'COP')
                     . '&amount-in-cents=' . $wompiAmount
                     . '&reference='       . urlencode($wompiRef)
-                    . '&redirect-url='    . urlencode(route('facturas.show', $factura));
+                    . '&redirect-url='    . urlencode(route('wompi.retorno', $factura));
             @endphp
             <a href="{{ $wompiUrl }}" target="_blank"
                class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600
@@ -93,6 +93,13 @@
     <div class="bg-red-500/10 border border-red-500/30 text-red-400
                 rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
         <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+    </div>
+    @endif
+
+    @if(session('info'))
+    <div class="bg-blue-500/10 border border-blue-500/30 text-blue-400
+                rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
+        <i class="fas fa-clock"></i> {{ session('info') }}
     </div>
     @endif
 

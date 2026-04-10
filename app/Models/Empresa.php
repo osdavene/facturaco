@@ -19,7 +19,7 @@ class Empresa extends Model
         'iva_defecto', 'retefuente_defecto', 'reteica_defecto',
         'mail_mailer', 'mail_host', 'mail_port', 'mail_username',
         'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
-        'wompi_public_key', 'wompi_currency',
+        'wompi_public_key', 'wompi_currency', 'wompi_events_key',
     ];
 
     protected $casts = [
@@ -30,7 +30,7 @@ class Empresa extends Model
 
     protected $hidden = [
         'mail_password',
-        'wompi_public_key',
+        'wompi_events_key',
     ];
 
     public function getNitFormateadoAttribute(): string
@@ -61,6 +61,11 @@ class Empresa extends Model
     public function getWompiConfiguradoAttribute(): bool
     {
         return !empty($this->wompi_public_key);
+    }
+
+    public function getWompiWebhookConfiguradoAttribute(): bool
+    {
+        return !empty($this->wompi_events_key);
     }
 
     public static function obtener(): static

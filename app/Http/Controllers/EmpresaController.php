@@ -58,6 +58,7 @@ class EmpresaController extends Controller
             'mail_from_name'         => 'nullable|string|max:255',
             'wompi_public_key'       => 'nullable|string|max:255',
             'wompi_currency'         => 'nullable|string|max:10',
+            'wompi_events_key'       => 'nullable|string|max:255',
         ], [
             'logo.image'             => 'El archivo del logo debe ser una imagen.',
             'logo.mimes'             => 'El logo debe estar en formato JPG, PNG o WEBP.',
@@ -80,9 +81,12 @@ class EmpresaController extends Controller
             unset($data['mail_password']);
         }
 
-        // Conservar wompi key si no se ingresó nueva
+        // Conservar wompi keys si no se ingresaron nuevas
         if (empty($data['wompi_public_key'])) {
             unset($data['wompi_public_key']);
+        }
+        if (empty($data['wompi_events_key'])) {
+            unset($data['wompi_events_key']);
         }
 
         $data['factura_electronica'] = $request->boolean('factura_electronica');
