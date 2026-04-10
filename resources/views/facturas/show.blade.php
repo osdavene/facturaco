@@ -33,6 +33,16 @@
                 <i class="fas fa-pen"></i> Editar
             </a>
             @endif
+
+            @if(in_array($factura->estado, ['emitida', 'pagada', 'vencida']))
+            <a href="{{ route('notas_credito.create', ['factura_id' => $factura->id]) }}"
+            class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                    hover:border-violet-500/50 text-slate-400 hover:text-violet-400
+                    px-4 py-2.5 rounded-xl transition-colors text-sm">
+                <i class="fas fa-undo-alt"></i> Nota de Crédito
+            </a>
+            @endif
+
         </div>
 
         <a href="{{ route('facturas.formEnviar', $factura) }}"
@@ -42,6 +52,7 @@
             <i class="fas fa-envelope"></i> Enviar
         </a>
 
+        
     </div>
 
     @if(session('success'))

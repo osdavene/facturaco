@@ -22,6 +22,7 @@ use App\Http\Controllers\UnidadMedidaController;
 use App\Http\Controllers\SesionController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\NotaCreditoController;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -171,6 +172,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/usuarios/{usuario}',       [UsuarioController::class, 'destroy'])     ->name('usuarios.destroy');
     Route::patch('/usuarios/{usuario}/activo', [UsuarioController::class, 'toggleActivo'])->name('usuarios.activo');
 
+    // ── Notas de Crédito ──────────────────────────────────
+    Route::get('/notas-credito',              [NotaCreditoController::class, 'index'])  ->name('notas_credito.index');
+    Route::get('/notas-credito/crear',        [NotaCreditoController::class, 'create']) ->name('notas_credito.create');
+    Route::post('/notas-credito',             [NotaCreditoController::class, 'store'])  ->name('notas_credito.store');
+    Route::get('/notas-credito/{nota}',       [NotaCreditoController::class, 'show'])   ->name('notas_credito.show');
+    Route::get('/notas-credito/{nota}/pdf',   [NotaCreditoController::class, 'pdf'])    ->name('notas_credito.pdf');
+    
     // ── Categorías (solo admin) ───────────────────────────────
     Route::get('/categorias',                     [CategoriaController::class, 'index'])  ->name('categorias.index')  ->middleware('can:ver usuarios');
     Route::get('/categorias/crear',               [CategoriaController::class, 'create']) ->name('categorias.create') ->middleware('can:ver usuarios');

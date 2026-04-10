@@ -85,6 +85,13 @@
                                 :active="request()->routeIs('cotizaciones.*')">
                         Cotizaciones
                     </x-nav-item>
+
+                    <x-nav-item href="{{ route('notas_credito.index') }}"
+                                icon="fas fa-undo-alt"
+                                :active="request()->routeIs('notas_credito.*')">
+                        Notas de Crédito
+                    </x-nav-item>
+
                     <x-nav-item href="{{ route('remisiones.index') }}"
                                 icon="fa-receipt"
                                 :active="request()->routeIs('remisiones.*')">
