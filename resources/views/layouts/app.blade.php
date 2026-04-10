@@ -163,6 +163,11 @@
                                 :active="request()->routeIs('sesiones.*')">
                         Sesiones
                     </x-nav-item>
+                    <x-nav-item href="{{ route('auditoria.index') }}"
+                                icon="fas fa-clipboard-list"
+                                :active="request()->routeIs('auditoria.*')">
+                        Auditoría
+                    </x-nav-item>
                 </x-nav-section>
                 @endcan
 

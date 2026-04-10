@@ -20,6 +20,7 @@ use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\UnidadMedidaController;
 use App\Http\Controllers\SesionController;
+use App\Http\Controllers\AuditoriaController;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -179,6 +180,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/sesiones',          [SesionController::class, 'index'])     ->name('sesiones.index')      ->middleware('can:ver usuarios');
     Route::delete('/sesiones/{id}',  [SesionController::class, 'destroy'])   ->name('sesiones.destroy')    ->middleware('can:ver usuarios');
     Route::delete('/sesiones',       [SesionController::class, 'destroyAll'])->name('sesiones.destroyAll') ->middleware('can:ver usuarios');
+
+    // ── Auditoría (solo admin) ────────────────────────────
+    Route::get('/auditoria', [AuditoriaController::class, 'index'])
+        ->name('auditoria.index')
+        ->middleware('can:ver usuarios');
 
     // ── Unidades de Medida (solo admin) ──────────────────────
     Route::get('/unidades',                   [UnidadMedidaController::class, 'index'])  ->name('unidades.index')  ->middleware('can:ver usuarios');
