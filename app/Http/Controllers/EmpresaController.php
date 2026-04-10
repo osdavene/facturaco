@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Config;
 
 class EmpresaController extends Controller
 {
@@ -18,10 +20,6 @@ class EmpresaController extends Controller
     {
         $empresa = Empresa::obtener();
 
-        // ── Validación unificada (logo incluido) ───────────────────────────────
-        // IMPORTANTE: el logo se valida aquí junto con todo lo demás para que
-        // si excede el límite, Laravel devuelva el error al formulario en lugar
-        // de arrojar una excepción que causa la página de error 500.
         $data = $request->validate([
             'razon_social'           => 'required|string|max:255',
             'nombre_comercial'       => 'nullable|string|max:255',
@@ -49,25 +47,36 @@ class EmpresaController extends Controller
             'iva_defecto'            => 'numeric|min:0|max:100',
             'retefuente_defecto'     => 'numeric|min:0|max:100',
             'reteica_defecto'        => 'numeric|min:0|max:100',
-            // Logo: nullable para que no sea obligatorio, max:2048 = 2 MB
             'logo'                   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            // Mail
+            'mail_mailer'            => 'nullable|string|max:20',
+            'mail_host'              => 'nullable|string|max:255',
+            'mail_port'              => 'nullable|integer',
+            'mail_username'          => 'nullable|string|max:255',
+            'mail_password'          => 'nullable|string|max:255',
+            'mail_encryption'        => 'nullable|string|max:10',
+            'mail_from_address'      => 'nullable|email',
+            'mail_from_name'         => 'nullable|string|max:255',
         ], [
-            // Mensajes personalizados para el logo
-            'logo.image'  => 'El archivo del logo debe ser una imagen.',
-            'logo.mimes'  => 'El logo debe estar en formato JPG, PNG o WEBP.',
-            'logo.max'    => 'El logo no puede superar los 2 MB. Comprime la imagen antes de subirla.',
+            'logo.image'             => 'El archivo del logo debe ser una imagen.',
+            'logo.mimes'             => 'El logo debe estar en formato JPG, PNG o WEBP.',
+            'logo.max'               => 'El logo no puede superar los 2 MB.',
+            'mail_from_address.email'=> 'El correo remitente no es válido.',
         ]);
 
-        // ── Procesar logo ──────────────────────────────────────────────────────
+        // Logo
         if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
-            // Borrar logo anterior si existe
             if ($empresa->logo) {
                 Storage::disk('public')->delete($empresa->logo);
             }
             $data['logo'] = $request->file('logo')->store('empresa', 'public');
         } else {
-            // No se subió logo nuevo: quitar el campo para no borrar el actual
             unset($data['logo']);
+        }
+
+        // Si no se ingresó nueva contraseña, conservar la actual
+        if (empty($data['mail_password'])) {
+            unset($data['mail_password']);
         }
 
         $data['factura_electronica'] = $request->boolean('factura_electronica');
@@ -86,5 +95,46 @@ class EmpresaController extends Controller
             $empresa->update(['logo' => null]);
         }
         return back()->with('success', 'Logo eliminado.');
+    }
+
+    // ── Probar configuración de correo ────────────────────────
+    public function probarMail(Request $request)
+    {
+        $request->validate([
+            'email_prueba' => 'required|email',
+        ], [
+            'email_prueba.required' => 'Ingresa un correo para la prueba.',
+            'email_prueba.email'    => 'El correo no es válido.',
+        ]);
+
+        $empresa = Empresa::obtener();
+
+        if (!$empresa->mail_configurado) {
+            return back()->with('error', 'Primero guarda la configuración de correo antes de probar.');
+        }
+
+        // Aplicar configuración dinámica en tiempo de ejecución
+        Config::set('mail.mailers.smtp.host',       $empresa->mail_host);
+        Config::set('mail.mailers.smtp.port',       $empresa->mail_port);
+        Config::set('mail.mailers.smtp.username',   $empresa->mail_username);
+        Config::set('mail.mailers.smtp.password',   $empresa->mail_password);
+        Config::set('mail.mailers.smtp.encryption', $empresa->mail_encryption);
+        Config::set('mail.from.address',            $empresa->mail_from_address ?? $empresa->email);
+        Config::set('mail.from.name',               $empresa->mail_from_name    ?? $empresa->razon_social);
+
+        try {
+            Mail::raw(
+                "Correo de prueba de FacturaCO.\n\nSi recibes este mensaje, la configuración de correo de {$empresa->razon_social} está funcionando correctamente.",
+                function ($message) use ($request, $empresa) {
+                    $message->to($request->email_prueba)
+                            ->subject('Prueba de correo — ' . $empresa->razon_social);
+                }
+            );
+
+            return back()->with('success', '¡Correo de prueba enviado correctamente a ' . $request->email_prueba . '!');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al enviar: ' . $e->getMessage());
+        }
     }
 }

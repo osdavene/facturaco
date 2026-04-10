@@ -261,6 +261,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/empresa',         [EmpresaController::class, 'index'])     ->name('empresa.index');
     Route::put('/empresa',         [EmpresaController::class, 'update'])    ->name('empresa.update');
     Route::delete('/empresa/logo', [EmpresaController::class, 'deleteLogo'])->name('empresa.logo.delete');
+    Route::post('/empresa/probar-mail', [EmpresaController::class, 'probarMail'])->name('empresa.probarMail');
 
     // Recibos de Caja
     Route::get('/recibos',              [ReciboCajaController::class, 'index'])  ->name('recibos.index');

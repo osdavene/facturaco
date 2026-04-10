@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Config;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class FacturaMail extends Mailable
@@ -20,7 +21,19 @@ class FacturaMail extends Mailable
         public Factura $factura,
         public Empresa $empresa,
         public string  $mensaje = '',
-    ) {}
+    ) {
+        // Aplicar configuración de correo de la empresa dinámicamente
+        if ($empresa->mail_host && $empresa->mail_username && $empresa->mail_password) {
+            Config::set('mail.mailers.smtp.host',       $empresa->mail_host);
+            Config::set('mail.mailers.smtp.port',       $empresa->mail_port ?? 587);
+            Config::set('mail.mailers.smtp.username',   $empresa->mail_username);
+            Config::set('mail.mailers.smtp.password',   $empresa->mail_password);
+            Config::set('mail.mailers.smtp.encryption', $empresa->mail_encryption ?? 'tls');
+            Config::set('mail.from.address',            $empresa->mail_from_address ?? $empresa->email);
+            Config::set('mail.from.name',               $empresa->mail_from_name    ?? $empresa->razon_social);
+            Config::set('mail.default', 'smtp');
+        }
+    }
 
     public function envelope(): Envelope
     {
@@ -31,14 +44,11 @@ class FacturaMail extends Mailable
 
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.factura',
-        );
+        return new Content(view: 'emails.factura');
     }
 
     public function attachments(): array
     {
-        // Generar PDF en memoria y adjuntarlo
         $this->factura->load(['items', 'cliente']);
 
         $qrData = implode("\n", [
@@ -52,8 +62,8 @@ class FacturaMail extends Mailable
         $writer   = new \Endroid\QrCode\Writer\PngWriter();
         $qrBase64 = base64_encode($writer->write($qr)->getString());
 
-        $factura  = $this->factura;
-        $empresa  = $this->empresa;
+        $factura = $this->factura;
+        $empresa = $this->empresa;
 
         $pdf = Pdf::loadView('facturas.pdf', compact('factura', 'empresa', 'qrBase64'))
                   ->setPaper('a4', 'portrait');

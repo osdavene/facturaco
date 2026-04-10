@@ -17,12 +17,19 @@ class Empresa extends Model
         'consecutivo_actual', 'clave_tecnica', 'factura_electronica',
         'logo', 'moneda', 'decimales', 'pie_factura', 'terminos_condiciones',
         'iva_defecto', 'retefuente_defecto', 'reteica_defecto',
+        // Configuración de correo
+        'mail_mailer', 'mail_host', 'mail_port', 'mail_username',
+        'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
     ];
 
     protected $casts = [
         'resolucion_fecha'       => 'date',
         'resolucion_vencimiento' => 'date',
         'factura_electronica'    => 'boolean',
+    ];
+
+    protected $hidden = [
+        'mail_password', // No exponer la contraseña en JSON
     ];
 
     public function getNitFormateadoAttribute(): string
@@ -45,17 +52,21 @@ class Empresa extends Model
         return max(0, now()->startOfDay()->diffInDays($this->resolucion_vencimiento, false));
     }
 
-    // Obtener o crear la empresa (singleton)
+    public function getMailConfiguradoAttribute(): bool
+    {
+        return !empty($this->mail_host) && !empty($this->mail_username) && !empty($this->mail_password);
+    }
+
     public static function obtener(): static
     {
         return static::firstOrCreate(
             ['id' => 1],
             [
-                'razon_social'   => 'MI EMPRESA S.A.S',
-                'nit'            => '900000000',
-                'prefijo_factura'=> 'FE',
-                'moneda'         => 'COP',
-                'iva_defecto'    => 19,
+                'razon_social'    => 'MI EMPRESA S.A.S',
+                'nit'             => '900000000',
+                'prefijo_factura' => 'FE',
+                'moneda'          => 'COP',
+                'iva_defecto'     => 19,
             ]
         );
     }
