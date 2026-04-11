@@ -113,18 +113,17 @@ EOF
 
 echo "=== .env generado ==="
 
-# Ejecutar migraciones (|| true para que un fallo no mate el servidor)
-echo "=== Ejecutando migraciones ==="
-php artisan migrate --force || echo "=== ADVERTENCIA: migración falló, el servidor igual arrancará ==="
-
-# Storage link
+# Storage link y cache de vistas (rápidos, antes de arrancar)
 php artisan storage:link 2>/dev/null || true
-
-# Limpiar cache de vistas
 php artisan view:clear 2>/dev/null || true
 
 echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
+
+# Migraciones en BACKGROUND para no bloquear el arranque del servidor
+echo "=== Migraciones iniciando en background ==="
+(php artisan migrate --force 2>&1 && echo "=== Migraciones completadas ===") \
+    || echo "=== ADVERTENCIA: migración falló ===" &
 
 echo "=== Nginx iniciando en puerto ${APP_PORT} ==="
 exec nginx -g 'daemon off;'
