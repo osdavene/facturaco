@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Mail\FacturaMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
 class FacturaController extends Controller
@@ -72,7 +73,7 @@ class FacturaController extends Controller
             'items.*.precio_unitario' => 'required|numeric|min:0',
         ]);
 
-        $userId  = auth()->id();
+        $userId  = Auth::id();
         $empresa = Empresa::obtener();
 
         DB::transaction(function() use ($request, $userId, $empresa) {

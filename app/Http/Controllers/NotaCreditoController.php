@@ -8,6 +8,7 @@ use App\Models\Factura;
 use App\Models\Empresa;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -61,7 +62,7 @@ class NotaCreditoController extends Controller
         ]);
 
         $factura = Factura::with('items.producto')->findOrFail($request->factura_id);
-        $userId  = auth()->id();
+        $userId  = Auth::id();
 
         DB::transaction(function () use ($request, $factura, $userId) {
             $consec = NotaCredito::siguienteConsecutivo();

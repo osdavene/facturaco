@@ -26,6 +26,10 @@ use App\Http\Controllers\NotaCreditoController;
 use App\Http\Controllers\WompiController;
 use App\Http\Controllers\EmpresaSelectorController;
 use App\Http\Controllers\BackofficeController;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -61,9 +65,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/perfil/avatar', [PerfilController::class, 'deleteAvatar'])  ->name('perfil.avatar.delete');
 
     // ── Tema ──────────────────────────────────────────────────
-    Route::post('/tema', function(\Illuminate\Http\Request $request) {
+    Route::post('/tema', function(Request $request) {
         $tema = $request->tema === 'light' ? 'light' : 'dark';
-        auth()->user()->update(['tema' => $tema]);
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->update(['tema' => $tema]);
         return back();
     })->name('tema.cambiar');
 
