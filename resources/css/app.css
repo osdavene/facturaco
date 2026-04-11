@@ -464,15 +464,21 @@ html:not(.dark) .text-slate-400 {
     color: #374151 !important;
 }
 
-/* ── FIX: Select — apariencia personalizada (todos los temas) ── */
+/* ── FIX: Select — apariencia completamente personalizada ── */
 /*
- * Sin appearance:none el navegador pinta el fondo blanco nativo
- * ignorando el bg-[#1a2235] / .form-input.
- * Se aplica a TODOS los selects del proyecto.
+ * appearance:none elimina el estilo nativo del SO.
+ * background-color se fija aquí mismo (oscuro por defecto)
+ * para que no dependa de clases Tailwind que pueden perder la
+ * batalla de cascada contra los estilos nativos del navegador.
  */
 select {
     -webkit-appearance: none;
     appearance: none;
+    /* FONDO OSCURO por defecto — se sobreescribe en tema claro */
+    background-color: #1a2235 !important;
+    color: #e2e8f0 !important;
+    -webkit-text-fill-color: #e2e8f0 !important;
+    border-color: #1e2d47;
     /* Flecha visible en tema oscuro (gris claro) */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
@@ -482,13 +488,13 @@ select {
 }
 
 /* Opciones del dropdown en tema oscuro */
-.dark select option,
-.dark select optgroup {
+select option,
+select optgroup {
     background-color: #1a2235;
     color: #e2e8f0;
 }
 
-/* ── FIX: Select + inputs en tema claro ─────── */
+/* ── FIX: Select en tema claro — sobreescribe el fondo oscuro por defecto ─── */
 html:not(.dark) select {
     background-color: #ffffff !important;
     color: #1a202c !important;
