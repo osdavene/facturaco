@@ -4,89 +4,108 @@
 @section('content')
 
 <div class="mb-8">
-    <a href="{{ route('backoffice.empresas') }}" class="text-slate-500 hover:text-slate-300 text-sm transition-colors">
-        <i class="fas fa-arrow-left mr-2"></i>Volver a empresas
+    <a href="{{ route('backoffice.empresas') }}"
+       class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-200 text-sm transition-colors mb-4">
+        <i class="fas fa-arrow-left text-xs"></i>Volver a empresas
     </a>
-    <h1 class="font-display font-black text-2xl text-white mt-3">Nueva empresa</h1>
+    <h1 class="font-display font-black text-2xl">Nueva empresa</h1>
+    <p class="text-slate-500 text-sm mt-1">Crea una empresa cliente o filial de un grupo existente</p>
 </div>
 
 <div class="max-w-2xl">
-    <form method="POST" action="{{ route('backoffice.empresas.store') }}" class="space-y-5">
+    <form method="POST" action="{{ route('backoffice.empresas.store') }}">
         @csrf
 
-        <div class="bg-[#0d1117] border border-white/5 rounded-2xl p-6 space-y-5">
+        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 space-y-5 mb-4">
+
+            <h2 class="font-display font-bold text-base flex items-center gap-2">
+                <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
+                Datos de la empresa
+            </h2>
 
             <div>
-                <label class="block text-xs text-slate-400 mb-1.5">Razón social *</label>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Razón social *</label>
                 <input type="text" name="razon_social" value="{{ old('razon_social') }}" required
-                       class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white
-                              focus:outline-none focus:border-violet-500 transition-colors"
-                       placeholder="Empresa S.A.S.">
+                       placeholder="Empresa S.A.S."
+                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
+                              focus:outline-none focus:border-amber-500 transition-colors
+                              @error('razon_social') border-red-500 @enderror">
+                @error('razon_social')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1.5">NIT *</label>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">NIT *</label>
                     <input type="text" name="nit" value="{{ old('nit') }}" required
-                           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white
-                                  focus:outline-none focus:border-violet-500 transition-colors"
-                           placeholder="900000000">
+                           placeholder="900000000"
+                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
+                                  focus:outline-none focus:border-amber-500 transition-colors
+                                  @error('nit') border-red-500 @enderror">
+                    @error('nit')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1.5">Teléfono</label>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Teléfono</label>
                     <input type="text" name="telefono" value="{{ old('telefono') }}"
-                           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white
-                                  focus:outline-none focus:border-violet-500 transition-colors"
-                           placeholder="601 000 0000">
+                           placeholder="601 000 0000"
+                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
+                                  focus:outline-none focus:border-amber-500 transition-colors">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1.5">Email</label>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
                     <input type="email" name="email" value="{{ old('email') }}"
-                           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white
-                                  focus:outline-none focus:border-violet-500 transition-colors"
-                           placeholder="contacto@empresa.com">
+                           placeholder="contacto@empresa.com"
+                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
+                                  focus:outline-none focus:border-amber-500 transition-colors">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1.5">Municipio</label>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Municipio</label>
                     <input type="text" name="municipio" value="{{ old('municipio') }}"
-                           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white
-                                  focus:outline-none focus:border-violet-500 transition-colors"
-                           placeholder="Bogotá D.C.">
+                           placeholder="Bogotá D.C."
+                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
+                                  focus:outline-none focus:border-amber-500 transition-colors">
                 </div>
             </div>
+        </div>
 
-            {{-- Empresa padre --}}
-            <div>
-                <label class="block text-xs text-slate-400 mb-1.5">¿Es filial de otra empresa?</label>
-                <select name="empresa_padre_id"
-                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white
-                               focus:outline-none focus:border-violet-500 transition-colors">
-                    <option value="">— No, es una empresa matriz independiente —</option>
-                    @foreach($matrices as $m)
-                        <option value="{{ $m->id }}"
-                            {{ (old('empresa_padre_id', request('padre')) == $m->id) ? 'selected' : '' }}>
-                            {{ $m->razon_social }}
-                        </option>
-                    @endforeach
-                </select>
-                <p class="text-xs text-slate-600 mt-1.5">
-                    Si seleccionas una matriz, los admins de esa empresa tendrán acceso automático a esta filial.
-                </p>
-            </div>
+        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-5">
 
+            <h2 class="font-display font-bold text-base flex items-center gap-2 mb-4">
+                <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
+                Jerarquía del grupo
+            </h2>
+
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                ¿Es filial de otra empresa?
+            </label>
+            <select name="empresa_padre_id"
+                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
+                           focus:outline-none focus:border-amber-500 transition-colors">
+                <option value="">— No, es empresa matriz independiente —</option>
+                @foreach($matrices as $m)
+                    <option value="{{ $m->id }}"
+                        {{ old('empresa_padre_id', request('padre')) == $m->id ? 'selected' : '' }}>
+                        {{ $m->razon_social }}
+                    </option>
+                @endforeach
+            </select>
+            <p class="text-xs text-slate-600 mt-2">
+                Si seleccionas una matriz, los admins de esa empresa tendrán acceso automático a esta filial.
+            </p>
         </div>
 
         <div class="flex items-center justify-end gap-3">
             <a href="{{ route('backoffice.empresas') }}"
-               class="px-5 py-2.5 rounded-xl text-sm text-slate-400 hover:text-white transition-colors">
+               class="px-6 py-2.5 bg-[#1a2235] border border-[#1e2d47] rounded-xl
+                      text-slate-400 hover:text-slate-200 text-sm transition-colors">
                 Cancelar
             </a>
             <button type="submit"
-                    class="bg-violet-600 hover:bg-violet-500 text-white text-sm px-6 py-2.5 rounded-xl transition-colors">
-                <i class="fas fa-check mr-2"></i>Crear empresa
+                    class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600
+                           text-black font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors">
+                <i class="fas fa-check text-xs"></i>Crear empresa
             </button>
         </div>
     </form>
