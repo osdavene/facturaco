@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 
 class BackofficeController extends Controller
 {
-    // ── Dashboard ─────────────────────────────────────────────────────────
+    // ── Super Panel (dashboard unificado) ────────────────────────────────
 
     public function dashboard()
     {
@@ -20,13 +20,25 @@ class BackofficeController extends Controller
         $totalFiliales  = Empresa::whereNotNull('empresa_padre_id')->count();
         $totalUsuarios  = User::where('is_superadmin', false)->count();
 
+        // Todas las empresas con sus filiales y conteo de usuarios
         $empresas = Empresa::whereNull('empresa_padre_id')
+            ->with(['filiales.usuarios', 'filiales'])
             ->withCount(['filiales', 'usuarios'])
             ->orderBy('razon_social')
             ->get();
 
-        return view('backoffice.dashboard', compact(
-            'totalEmpresas', 'totalMatrices', 'totalFiliales', 'totalUsuarios', 'empresas'
+        // Todas las filiales sueltas también (por si se usa en tab empresas)
+        $todasEmpresas = Empresa::orderBy('razon_social')->get();
+
+        // Usuarios con sus empresas
+        $usuarios = User::where('is_superadmin', false)
+            ->with(['empresas', 'roles'])
+            ->orderBy('name')
+            ->paginate(20, ['*'], 'usuarios_page');
+
+        return view('backoffice.panel', compact(
+            'totalEmpresas', 'totalMatrices', 'totalFiliales', 'totalUsuarios',
+            'empresas', 'todasEmpresas', 'usuarios'
         ));
     }
 
