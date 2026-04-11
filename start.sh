@@ -114,6 +114,36 @@ EOF
 
 echo "=== .env generado ==="
 
+# ── Fix empresa_id directamente con PDO (sin depender de migraciones) ──────
+echo "=== Verificando columnas empresa_id ==="
+php -r "
+try {
+    \$url = getenv('DATABASE_URL');
+    \$pdo = new PDO(\$url, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+    \$empresa_id = \$pdo->query('SELECT id FROM empresa ORDER BY id LIMIT 1')->fetchColumn();
+    if (!\$empresa_id) \$empresa_id = 1;
+
+    \$tablas = ['clientes','proveedores','productos','categorias','unidades_medida',
+               'facturas','cotizaciones','remisiones','ordenes_compra',
+               'recibos_caja','notas_credito','movimientos_inventario'];
+
+    foreach (\$tablas as \$t) {
+        \$existe = \$pdo->query(\"SELECT COUNT(*) FROM information_schema.columns WHERE table_name='\$t' AND column_name='empresa_id'\")->fetchColumn();
+        if (!\$existe) {
+            \$pdo->exec(\"ALTER TABLE \\\"\$t\\\" ADD COLUMN empresa_id BIGINT NOT NULL DEFAULT \$empresa_id REFERENCES empresa(id) ON DELETE CASCADE\");
+            \$pdo->exec(\"ALTER TABLE \\\"\$t\\\" ALTER COLUMN empresa_id DROP DEFAULT\");
+            echo \"  empresa_id agregado a: \$t\n\";
+        } else {
+            echo \"  empresa_id ya existe en: \$t\n\";
+        }
+    }
+    echo 'OK\n';
+} catch (Exception \$e) {
+    echo 'ERROR fix empresa_id: ' . \$e->getMessage() . \"\n\";
+}
+" 2>&1 || echo "=== Script empresa_id falló ==="
+
 # ── Preparación rápida ──────────────────────────────────────────────────────
 php artisan storage:link 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
