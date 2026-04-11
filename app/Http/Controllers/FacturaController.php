@@ -9,9 +9,8 @@ use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Mail\FacturaMail;
+use App\Jobs\EnviarFacturaJob;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 
 class FacturaController extends Controller
 {
@@ -292,23 +291,14 @@ class FacturaController extends Controller
         ]);
 
         $empresa = Empresa::obtener();
-        $factura->load(['items', 'cliente']);
 
-        try {
-            Mail::to($request->email)
-                ->send(new FacturaMail($factura, $empresa, $request->mensaje ?? ''));
+        EnviarFacturaJob::dispatch($factura, $empresa, $request->email, $request->mensaje ?? '');
 
-            if ($factura->estado === 'borrador') {
-                $factura->update(['estado' => 'emitida']);
-            }
-
-            return redirect()->route('facturas.show', $factura)
-                ->with('success', 'Factura enviada correctamente a ' . $request->email);
-
-        } catch (\Exception $e) {
-            return back()
-                ->with('error', 'No se pudo enviar el correo. Verifica la configuración de mail.')
-                ->withInput();
+        if ($factura->estado === 'borrador') {
+            $factura->update(['estado' => 'emitida']);
         }
+
+        return redirect()->route('facturas.show', $factura)
+            ->with('success', 'Factura en cola de envío a ' . $request->email . '. Llegará en unos momentos.');
     }
 }
