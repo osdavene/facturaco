@@ -15,7 +15,8 @@
 <div class="flex min-h-screen">
 
     {{-- ── Sidebar ────────────────────────────────────────────── --}}
-    <aside class="fixed top-0 left-0 h-full w-60 bg-[#111827] border-r border-[#1e2d47] flex flex-col z-50">
+    <aside class="w-60 flex-shrink-0 bg-[#111827] border-r border-[#1e2d47]">
+    <div class="sticky top-0 h-screen flex flex-col overflow-y-auto">
 
         {{-- Logo --}}
         <div class="px-5 py-5 border-b border-[#1e2d47]">
@@ -98,10 +99,11 @@
                 </button>
             </form>
         </div>
+    </div>
     </aside>
 
     {{-- ── Contenido principal ─────────────────────────────────── --}}
-    <main class="ml-60 flex-1 p-8 min-w-0">
+    <main class="flex-1 p-8 min-w-0 overflow-x-hidden">
 
         {{-- Banner impersonando --}}
         @if(session('backoffice_impersonando'))
