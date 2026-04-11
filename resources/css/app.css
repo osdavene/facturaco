@@ -137,6 +137,14 @@ nav[role="navigation"] a:hover {
     }
 }
 
+/* ══ COLOR-SCHEME ════════════════════════════
+   Le dice al navegador cómo colorear controles
+   nativos (select, input, scrollbars, etc.).
+   Sin esto Chrome ignora el background-color
+   y pinta los selects con colores del sistema. */
+.dark            { color-scheme: dark; }
+html:not(.dark)  { color-scheme: light; }
+
 /* ══ TEMA CLARO (próxima sección) ════════════ */
 .light-mode body { background: #f1f5f9; color: #1e293b; }
 
