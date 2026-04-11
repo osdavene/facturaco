@@ -15,6 +15,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'email', 'password',
         'activo', 'avatar', 'telefono', 'cargo', 'tema',
+        'is_superadmin',
     ];
 
     protected $hidden = [
@@ -27,6 +28,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
+            'is_superadmin'     => 'boolean',
         ];
     }
 
@@ -76,6 +78,12 @@ class User extends Authenticatable
     public function esAdminEmpresa(): bool
     {
         return $this->rolEnEmpresaActiva() === 'admin';
+    }
+
+    /** Superadmin de la plataforma (acceso a todas las empresas) */
+    public function esSuperadmin(): bool
+    {
+        return (bool) $this->is_superadmin;
     }
 
     public function getAvatarUrlAttribute(): string

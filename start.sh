@@ -114,8 +114,8 @@ EOF
 
 echo "=== .env generado ==="
 
-# ── Fix empresa_id directamente con PDO (sin depender de migraciones) ──────
-echo "=== Verificando columnas empresa_id ==="
+# ── Fix columnas directamente con PDO (sin depender de migraciones) ────────
+echo "=== Verificando columnas ==="
 php -r "
 try {
     // DATABASE_URL = postgresql://user:pass@host:port/dbname
@@ -125,6 +125,7 @@ try {
     \$dsn = 'pgsql:host=' . \$u['host'] . ';port=' . (\$u['port'] ?? 5432) . ';dbname=' . ltrim(\$u['path'], '/');
     \$pdo = new PDO(\$dsn, \$u['user'], \$u['pass'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
+    // ── empresa_id en tablas transaccionales y catálogos ─────────────────
     \$empresa_id = \$pdo->query('SELECT id FROM empresa ORDER BY id LIMIT 1')->fetchColumn();
     if (!\$empresa_id) \$empresa_id = 1;
 
@@ -142,11 +143,31 @@ try {
             echo \"  empresa_id ya existe en: \$t\n\";
         }
     }
-    echo 'OK\n';
+
+    // ── empresa_padre_id en tabla empresa (jerarquía matriz/filial) ───────
+    \$existe = \$pdo->query(\"SELECT COUNT(*) FROM information_schema.columns WHERE table_name='empresa' AND column_name='empresa_padre_id'\")->fetchColumn();
+    if (!\$existe) {
+        \$pdo->exec(\"ALTER TABLE \\\"empresa\\\" ADD COLUMN empresa_padre_id BIGINT NULL REFERENCES empresa(id) ON DELETE SET NULL\");
+        \$pdo->exec(\"CREATE INDEX IF NOT EXISTS empresa_empresa_padre_id_index ON \\\"empresa\\\" (empresa_padre_id)\");
+        echo \"  empresa_padre_id agregado a: empresa\n\";
+    } else {
+        echo \"  empresa_padre_id ya existe en: empresa\n\";
+    }
+
+    // ── is_superadmin en tabla users ──────────────────────────────────────
+    \$existe = \$pdo->query(\"SELECT COUNT(*) FROM information_schema.columns WHERE table_name='users' AND column_name='is_superadmin'\")->fetchColumn();
+    if (!\$existe) {
+        \$pdo->exec(\"ALTER TABLE \\\"users\\\" ADD COLUMN is_superadmin BOOLEAN NOT NULL DEFAULT FALSE\");
+        echo \"  is_superadmin agregado a: users\n\";
+    } else {
+        echo \"  is_superadmin ya existe en: users\n\";
+    }
+
+    echo \"OK\n\";
 } catch (Exception \$e) {
-    echo 'ERROR fix empresa_id: ' . \$e->getMessage() . \"\n\";
+    echo 'ERROR fix columnas: ' . \$e->getMessage() . \"\n\";
 }
-" 2>&1 || echo "=== Script empresa_id falló ==="
+" 2>&1 || echo "=== Script columnas falló ==="
 
 # ── Preparación rápida ──────────────────────────────────────────────────────
 php artisan storage:link 2>/dev/null || true

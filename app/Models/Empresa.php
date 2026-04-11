@@ -20,6 +20,7 @@ class Empresa extends Model
         'mail_mailer', 'mail_host', 'mail_port', 'mail_username',
         'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
         'wompi_public_key', 'wompi_currency', 'wompi_events_key',
+        'empresa_padre_id',
     ];
 
     protected $casts = [
@@ -40,6 +41,55 @@ class Empresa extends Model
         return $this->belongsToMany(User::class, 'empresa_user')
                     ->withPivot('rol', 'activo')
                     ->withTimestamps();
+    }
+
+    /** Empresa padre (null si es matriz raíz) */
+    public function padre(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_padre_id');
+    }
+
+    /** Filiales directas de esta empresa */
+    public function filiales(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Empresa::class, 'empresa_padre_id');
+    }
+
+    /** ¿Esta empresa es una filial? */
+    public function esFilial(): bool
+    {
+        return !is_null($this->empresa_padre_id);
+    }
+
+    /**
+     * Devuelve la empresa raíz (matriz) del grupo.
+     * Si ya es raíz, se devuelve a sí misma.
+     */
+    public function raiz(): static
+    {
+        if (is_null($this->empresa_padre_id)) {
+            return $this;
+        }
+        return $this->padre->raiz();
+    }
+
+    /**
+     * Devuelve todos los IDs del grupo (raíz + filiales recursivas).
+     * Útil para filtrar catálogos compartidos.
+     */
+    public function idsGrupo(): array
+    {
+        $raiz = $this->raiz();
+        return $raiz->idsDescendientes([$raiz->id]);
+    }
+
+    private function idsDescendientes(array $ids): array
+    {
+        foreach ($this->filiales as $filial) {
+            $ids[] = $filial->id;
+            $ids = $filial->idsDescendientes($ids);
+        }
+        return $ids;
     }
 
     // ── Accessors ─────────────────────────────────────────────────
