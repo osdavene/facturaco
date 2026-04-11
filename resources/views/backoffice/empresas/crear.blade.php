@@ -12,7 +12,7 @@
     <p class="text-slate-500 text-sm mt-1">Crea una empresa cliente o filial de un grupo existente</p>
 </div>
 
-<div class="max-w-2xl">
+<div class="max-w-2xl mx-auto">
     <form method="POST" action="{{ route('backoffice.empresas.store') }}">
         @csrf
 

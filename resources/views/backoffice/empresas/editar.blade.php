@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<div class="max-w-2xl space-y-5">
+<div class="max-w-2xl mx-auto space-y-5">
 
     {{-- Datos básicos --}}
     <form method="POST" action="{{ route('backoffice.empresas.update', $empresa) }}">

@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<div class="max-w-2xl space-y-5">
+<div class="max-w-2xl mx-auto space-y-5">
     <form method="POST" action="{{ route('backoffice.usuarios.update', $usuario) }}">
         @csrf @method('PUT')
 

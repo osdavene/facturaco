@@ -14,7 +14,7 @@
     </p>
 </div>
 
-<div class="max-w-md">
+<div class="max-w-md mx-auto">
     <form method="POST" action="{{ route('backoffice.empresas.admin.store', $empresa) }}">
         @csrf
 
