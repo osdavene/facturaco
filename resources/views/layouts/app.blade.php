@@ -596,6 +596,7 @@
             emerald: '#10b981', purple:  '#8b5cf6',
             cyan:    '#06b6d4', orange:  '#f97316',
             green:   '#22c55e', slate:   '#64748b',
+            violet:  '#7c3aed', red:     '#ef4444',
         };
 
         input.addEventListener('input', function() {

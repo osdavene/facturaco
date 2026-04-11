@@ -9,6 +9,7 @@ use App\Models\Cotizacion;
 use App\Models\Remision;
 use App\Models\ReciboCaja;
 use App\Models\OrdenCompra;
+use App\Models\NotaCredito;
 use Illuminate\Http\Request;
 
 class BusquedaController extends Controller
@@ -159,6 +160,23 @@ class BusquedaController extends Controller
                     'subtitulo'  => $o->proveedor_nombre,
                     'detalle'    => '$'.number_format($o->total,0,',','.').' · '.ucfirst($o->estado),
                     'url'        => route('ordenes.show', $o),
+                ];
+            });
+
+        // ── Notas de Crédito ──────────────────────────
+        NotaCredito::where('numero', 'like', "%$q%")
+            ->orWhere('cliente_nombre', 'like', "%$q%")
+            ->orWhere('factura_numero', 'like', "%$q%")
+            ->limit(2)->get()
+            ->each(function($n) use (&$resultados) {
+                $resultados[] = [
+                    'tipo'       => 'Nota Crédito',
+                    'icono'      => 'fa-file-invoice',
+                    'color'      => 'violet',
+                    'titulo'     => $n->numero,
+                    'subtitulo'  => $n->cliente_nombre,
+                    'detalle'    => 'Factura: '.$n->factura_numero.' · $'.number_format($n->total,0,',','.'),
+                    'url'        => route('notas_credito.show', $n),
                 ];
             });
 
