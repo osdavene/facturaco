@@ -58,6 +58,13 @@
                 <i class="fas fa-users w-4 text-center"></i>
                 <span>Usuarios</span>
             </a>
+
+            <a href="{{ route('backoffice.backup') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors
+                      {{ request()->routeIs('backoffice.backup*') ? 'bg-amber-500/10 text-amber-500' : 'text-slate-500 hover:bg-[#1a2235] hover:text-slate-200' }}">
+                <i class="fas fa-database w-4 text-center"></i>
+                <span>Backup</span>
+            </a>
         </nav>
 
         {{-- Footer sidebar --}}

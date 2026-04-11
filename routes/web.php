@@ -314,11 +314,10 @@ Route::middleware('auth')->group(function () {
         ->name('auditoria.index')
         ->middleware('can:ver usuarios');
 
-    // ── Backup (solo admin) ───────────────────────────────────
+    // ── Backup de empresa (filtrado por empresa_grupo_ids) ───────────────
     Route::get('/backup',      [BackupController::class, 'index'])         ->name('backup.index') ->middleware('can:ver usuarios');
     Route::get('/backup/json', [BackupController::class, 'descargarJson']) ->name('backup.json')  ->middleware('can:ver usuarios');
     Route::post('/backup/csv', [BackupController::class, 'descargarCsv'])  ->name('backup.csv')   ->middleware('can:ver usuarios');
-    Route::get('/backup/sql',  [BackupController::class, 'descargarSql'])  ->name('backup.sql')   ->middleware('can:ver usuarios');
 
     // ── Remisiones ────────────────────────────────────────────
     Route::get('/remisiones',                        [RemisionController::class, 'index'])        ->name('remisiones.index');
@@ -431,6 +430,8 @@ Route::middleware(['auth', 'backoffice'])->prefix('backoffice')->name('backoffic
     Route::get('/usuarios/{usuario}/editar',        [BackofficeController::class, 'usuarioEditar']) ->name('usuarios.editar');
     Route::put('/usuarios/{usuario}',               [BackofficeController::class, 'usuarioUpdate']) ->name('usuarios.update');
     Route::delete('/usuarios/{usuario}',            [BackofficeController::class, 'usuarioDestroy'])->name('usuarios.destroy');
+    Route::get('/backup',                           [BackofficeController::class, 'backupIndex'])    ->name('backup');
+    Route::get('/backup/descargar',                 [BackofficeController::class, 'backupDescargar'])->name('backup.descargar');
 });
 
 require __DIR__.'/auth.php';

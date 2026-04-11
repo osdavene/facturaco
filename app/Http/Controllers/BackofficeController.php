@@ -253,6 +253,109 @@ class BackofficeController extends Controller
         return redirect()->route('backoffice.dashboard');
     }
 
+    // ── Backup general de la plataforma (solo superadmin) ────────────────
+
+    public function backupIndex()
+    {
+        // Conteo total por tabla (sin filtro de empresa)
+        $tablas = [
+            'empresa'                => 'Empresas',
+            'users'                  => 'Usuarios',
+            'clientes'               => 'Clientes',
+            'proveedores'            => 'Proveedores',
+            'productos'              => 'Productos',
+            'categorias'             => 'Categorías',
+            'unidades_medida'        => 'Unidades de Medida',
+            'facturas'               => 'Facturas',
+            'factura_items'          => 'Ítems de Facturas',
+            'cotizaciones'           => 'Cotizaciones',
+            'cotizacion_items'       => 'Ítems de Cotizaciones',
+            'ordenes_compra'         => 'Órdenes de Compra',
+            'orden_compra_items'     => 'Ítems de Órdenes',
+            'recibos_caja'           => 'Recibos de Caja',
+            'remisiones'             => 'Remisiones',
+            'remision_items'         => 'Ítems de Remisiones',
+            'movimientos_inventario' => 'Movimientos de Inventario',
+            'login_logs'             => 'Accesos',
+        ];
+
+        $conteos = [];
+        foreach (array_keys($tablas) as $tabla) {
+            try {
+                $conteos[$tabla] = DB::table($tabla)->count();
+            } catch (\Exception) {
+                $conteos[$tabla] = 0;
+            }
+        }
+
+        $totalRegistros = array_sum($conteos);
+
+        return view('backoffice.backup.index', compact('tablas', 'conteos', 'totalRegistros'));
+    }
+
+    public function backupDescargar()
+    {
+        $tablas = [
+            'empresa', 'empresa_user', 'users',
+            'clientes', 'proveedores', 'productos', 'categorias', 'unidades_medida',
+            'facturas', 'factura_items',
+            'cotizaciones', 'cotizacion_items',
+            'ordenes_compra', 'orden_compra_items',
+            'recibos_caja', 'remisiones', 'remision_items',
+            'movimientos_inventario', 'login_logs',
+        ];
+
+        $sql  = "-- ================================================\n";
+        $sql .= "-- BACKUP COMPLETO — FacturaCO (BackOffice)\n";
+        $sql .= "-- Fecha:        " . now()->format('d/m/Y H:i:s') . "\n";
+        $sql .= "-- Generado por: " . auth()->user()->name . "\n";
+        $sql .= "-- Base de datos: PostgreSQL\n";
+        $sql .= "-- ADVERTENCIA: restaurar este archivo reemplaza todos los datos.\n";
+        $sql .= "-- ================================================\n\n";
+        $sql .= "SET client_encoding = 'UTF8';\n";
+        $sql .= "SET standard_conforming_strings = on;\n\n";
+
+        foreach ($tablas as $tabla) {
+            try {
+                $filas = DB::table($tabla)->get();
+
+                $sql .= "-- ────────────────────────────────────────\n";
+                $sql .= "-- Tabla: {$tabla} ({$filas->count()} registros)\n";
+                $sql .= "-- ────────────────────────────────────────\n";
+
+                if ($filas->isEmpty()) {
+                    $sql .= "-- (sin datos)\n\n";
+                    continue;
+                }
+
+                foreach ($filas as $fila) {
+                    $cols    = array_keys((array) $fila);
+                    $colsSql = implode(', ', array_map(fn($c) => '"' . $c . '"', $cols));
+                    $vals    = array_map(function ($v) {
+                        if (is_null($v))                    return 'NULL';
+                        if (is_bool($v))                    return $v ? 'TRUE' : 'FALSE';
+                        if (is_int($v) || is_float($v))     return $v;
+                        $v = str_replace("'", "''", (string) $v);
+                        return "'" . $v . "'";
+                    }, (array) $fila);
+                    $valsSql = implode(', ', $vals);
+                    $sql .= "INSERT INTO \"{$tabla}\" ({$colsSql}) VALUES ({$valsSql});\n";
+                }
+
+                $sql .= "\n";
+            } catch (\Exception $e) {
+                $sql .= "-- ERROR en {$tabla}: " . $e->getMessage() . "\n\n";
+            }
+        }
+
+        $nombre = 'backoffice_backup_completo_' . now()->format('Y-m-d_His') . '.sql';
+
+        return response($sql, 200, [
+            'Content-Type'        => 'text/plain; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $nombre . '"',
+        ]);
+    }
+
     // ── Helpers privados ──────────────────────────────────────────────────
 
     private function copiarAdminsDeMatriz(Empresa $filial): void

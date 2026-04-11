@@ -15,8 +15,9 @@
     <div>
         <h1 class="font-display font-bold text-2xl">Backup de Base de Datos</h1>
         <p class="text-slate-500 text-sm mt-0.5">
-            Exporta y respalda la información de <strong class="text-slate-400">{{ $empresa->razon_social ?? 'FacturaCO' }}</strong>.
-            Última generación disponible al instante.
+            Exporta y respalda la información de
+            <strong class="text-amber-500">{{ $empresa->razon_social ?? 'tu empresa' }}</strong>
+            y sus filiales. Solo tus datos, sin información de otras empresas.
         </p>
     </div>
 
@@ -132,47 +133,6 @@
                 <i class="fas fa-file-archive text-xs"></i> Generar y Descargar ZIP
             </button>
         </form>
-    </div>
-
-    {{-- ═══════════════════════════════════════════
-         OPCIÓN C — SQL TÉCNICO
-    ════════════════════════════════════════════ --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
-        <div class="px-6 py-4 border-b border-[#1e2d47] flex items-center justify-between gap-4 flex-wrap">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-violet-500/10 border border-violet-500/20 rounded-xl
-                            flex items-center justify-center text-violet-400">
-                    <i class="fas fa-code"></i>
-                </div>
-                <div>
-                    <div class="font-semibold text-slate-200">Backup Técnico — SQL</div>
-                    <div class="text-xs text-slate-500">Sentencias INSERT · Compatible PostgreSQL · Para migración de servidor</div>
-                </div>
-            </div>
-            <a href="{{ route('backup.sql') }}"
-               class="flex items-center gap-2 bg-violet-500/20 hover:bg-violet-500/30
-                      border border-violet-500/30 text-violet-300 font-bold text-sm
-                      px-4 py-2.5 rounded-xl transition-colors">
-                <i class="fas fa-download text-xs"></i> Descargar SQL
-            </a>
-        </div>
-        <div class="px-6 py-4">
-            <div class="bg-[#1a2235] rounded-xl px-4 py-3 font-mono text-xs text-slate-500 leading-relaxed">
-                <span class="text-slate-600">-- Ejemplo del archivo generado</span><br>
-                <span class="text-violet-400">DELETE FROM</span> <span class="text-amber-400">"clientes"</span>;<br>
-                <span class="text-violet-400">INSERT INTO</span> <span class="text-amber-400">"clientes"</span>
-                <span class="text-slate-400">("id", "nombres", "apellidos", ...)</span><br>
-                <span class="text-violet-400">VALUES</span> <span class="text-slate-400">(1, 'JUAN', 'PÉREZ', ...);</span><br>
-                <span class="text-slate-600 mt-1 block">-- ... (todos los registros de todas las tablas)</span>
-            </div>
-            <div class="mt-3 flex items-start gap-2 text-xs text-slate-500">
-                <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5 flex-shrink-0"></i>
-                <span>
-                    El archivo SQL usa sentencias <code class="bg-[#1a2235] px-1.5 py-0.5 rounded text-violet-300">DELETE + INSERT</code>.
-                    Al restaurar, reemplaza todos los datos existentes. Úsalo solo para migrar a un servidor nuevo.
-                </span>
-            </div>
-        </div>
     </div>
 
 </div>
