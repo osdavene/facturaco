@@ -11,7 +11,9 @@
       "Bash(grep -n \"buscar\\\\|search\\\\|q=\" C:\\\\\\\\Proyectos\\\\\\\\facturaco\\\\\\\\resources\\\\\\\\views\\\\\\\\layouts\\\\\\\\app.blade.php)",
       "Bash(node:*)",
       "Bash(composer require:*)",
-      "Bash(composer show:*)"
+      "Bash(composer show:*)",
+      "Bash(cat phpunit.xml)",
+      "Bash(cat phpunit.xml.dist)"
     ]
   }
 }

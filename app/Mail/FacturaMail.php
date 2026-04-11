@@ -2,16 +2,16 @@
 
 namespace App\Mail;
 
-use App\Models\Factura;
 use App\Models\Empresa;
+use App\Models\Factura;
+use App\Services\PdfService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Config;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class FacturaMail extends Mailable
 {
@@ -22,7 +22,6 @@ class FacturaMail extends Mailable
         public Empresa $empresa,
         public string  $mensaje = '',
     ) {
-        // Aplicar configuración de correo de la empresa dinámicamente
         if ($empresa->mail_host && $empresa->mail_username && $empresa->mail_password) {
             Config::set('mail.mailers.smtp.host',       $empresa->mail_host);
             Config::set('mail.mailers.smtp.port',       $empresa->mail_port ?? 587);
@@ -38,7 +37,7 @@ class FacturaMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Factura ' . $this->factura->numero . ' — ' . $this->empresa->razon_social,
+            subject: 'Factura '.$this->factura->numero.' — '.$this->empresa->razon_social,
         );
     }
 
@@ -51,27 +50,21 @@ class FacturaMail extends Mailable
     {
         $this->factura->load(['items', 'cliente']);
 
-        $qrData = implode("\n", [
-            'Factura: ' . $this->factura->numero,
-            'NIT: '     . $this->empresa->nit_formateado,
-            'Cliente: ' . $this->factura->cliente_nombre,
-            'Total: $'  . number_format($this->factura->total, 0, ',', '.'),
+        $pdf      = app(PdfService::class);
+        $factura  = $this->factura;
+        $empresa  = $this->empresa;
+
+        $qrBase64 = $pdf->qrBase64([
+            'Factura: ' . $factura->numero,
+            'NIT: '     . $empresa->nit_formateado,
+            'Cliente: ' . $factura->cliente_nombre,
+            'Total: $'  . number_format($factura->total, 0, ',', '.'),
         ]);
-
-        $qr       = \Endroid\QrCode\QrCode::create($qrData)->setSize(120)->setMargin(4);
-        $writer   = new \Endroid\QrCode\Writer\PngWriter();
-        $qrBase64 = base64_encode($writer->write($qr)->getString());
-
-        $factura = $this->factura;
-        $empresa = $this->empresa;
-
-        $pdf = Pdf::loadView('facturas.pdf', compact('factura', 'empresa', 'qrBase64'))
-                  ->setPaper('a4', 'portrait');
 
         return [
             Attachment::fromData(
-                fn () => $pdf->output(),
-                'Factura-' . $this->factura->numero . '.pdf'
+                fn () => $pdf->output('facturas.pdf', compact('factura', 'empresa', 'qrBase64')),
+                'Factura-'.$factura->numero.'.pdf',
             )->withMime('application/pdf'),
         ];
     }

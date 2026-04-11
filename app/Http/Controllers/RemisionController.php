@@ -1,35 +1,39 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\Remision;
-use App\Models\RemisionItem;
+use App\Models\Empresa;
 use App\Models\Factura;
 use App\Models\FacturaItem;
-use App\Models\Cliente;
-use App\Models\Empresa;
+use App\Models\Remision;
+use App\Models\RemisionItem;
+use App\Services\PdfService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class RemisionController extends Controller
 {
+    public function __construct(
+        private PdfService $pdf,
+    ) {}
+
     public function index(Request $request)
     {
         $remisiones = Remision::with('cliente')
-            ->when($request->buscar, fn($q) =>
-                $q->where('numero', 'like', '%'.$request->buscar.'%')
+            ->when($request->buscar, fn ($q) =>
+                $q->where('numero',          'like', '%'.$request->buscar.'%')
                   ->orWhere('cliente_nombre', 'like', '%'.$request->buscar.'%'))
-            ->when($request->estado, fn($q) => $q->where('estado', $request->estado))
+            ->when($request->estado, fn ($q) => $q->where('estado', $request->estado))
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
 
         $totales = [
             'total'     => Remision::count(),
-            'borrador'  => Remision::where('estado','borrador')->count(),
-            'enviada'   => Remision::where('estado','enviada')->count(),
-            'entregada' => Remision::where('estado','entregada')->count(),
-            'facturada' => Remision::where('estado','facturada')->count(),
+            'borrador'  => Remision::where('estado', 'borrador')->count(),
+            'enviada'   => Remision::where('estado', 'enviada')->count(),
+            'entregada' => Remision::where('estado', 'entregada')->count(),
+            'facturada' => Remision::where('estado', 'facturada')->count(),
         ];
 
         return view('remisiones.index', compact('remisiones', 'totales'));
@@ -39,28 +43,28 @@ class RemisionController extends Controller
     {
         $consecutivo = Remision::siguienteConsecutivo();
         $empresa     = Empresa::obtener();
+
         return view('remisiones.create', compact('consecutivo', 'empresa'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'cliente_nombre'  => 'required|string|max:255',
-            'fecha_emision'   => 'required|date',
-            'items'           => 'required|array|min:1',
+            'cliente_nombre'      => 'required|string|max:255',
+            'fecha_emision'       => 'required|date',
+            'items'               => 'required|array|min:1',
             'items.*.descripcion' => 'required|string',
             'items.*.cantidad'    => 'required|numeric|min:0.001',
         ]);
 
         $userId = auth()->id();
 
-        DB::transaction(function() use ($request, $userId) {
+        DB::transaction(function () use ($request, $userId) {
             $consecutivo = Remision::siguienteConsecutivo();
-            $subtotal    = 0;
 
-            foreach ($request->items as $item) {
-                $subtotal += floatval($item['cantidad']) * floatval($item['precio_unitario'] ?? 0);
-            }
+            $subtotal = collect($request->items)->sum(
+                fn ($i) => (float) $i['cantidad'] * (float) ($i['precio_unitario'] ?? 0)
+            );
 
             $remision = Remision::create([
                 'numero'            => $consecutivo['numero'],
@@ -88,14 +92,15 @@ class RemisionController extends Controller
             ]);
 
             foreach ($request->items as $i => $item) {
-                $cant    = floatval($item['cantidad']);
-                $precio  = floatval($item['precio_unitario'] ?? 0);
+                $cant   = (float) $item['cantidad'];
+                $precio = (float) ($item['precio_unitario'] ?? 0);
+
                 RemisionItem::create([
                     'remision_id'     => $remision->id,
                     'producto_id'     => $item['producto_id'] ?? null,
-                    'codigo'          => $item['codigo'] ?? null,
+                    'codigo'          => $item['codigo']      ?? null,
                     'descripcion'     => strtoupper($item['descripcion']),
-                    'unidad'          => $item['unidad'] ?? 'UN',
+                    'unidad'          => $item['unidad']      ?? 'UN',
                     'cantidad'        => $cant,
                     'precio_unitario' => $precio,
                     'total'           => $cant * $precio,
@@ -111,19 +116,23 @@ class RemisionController extends Controller
     public function show(Remision $remision)
     {
         $remision->load(['items.producto', 'cliente', 'usuario', 'factura']);
+
         return view('remisiones.show', compact('remision'));
     }
 
     public function cambiarEstado(Request $request, Remision $remision)
     {
         $request->validate([
-            'estado' => 'required|in:borrador,enviada,entregada,anulada'
+            'estado' => 'required|in:borrador,enviada,entregada,anulada',
         ]);
+
         $remision->update(['estado' => $request->estado]);
+
         return back()->with('success', 'Estado actualizado.');
     }
 
-    // ⭐ Convertir a Factura
+    // ── CONVERTIR A FACTURA ───────────────────────────────────
+
     public function convertir(Remision $remision)
     {
         if ($remision->estado === 'facturada') {
@@ -135,13 +144,11 @@ class RemisionController extends Controller
 
         $userId = auth()->id();
 
-        DB::transaction(function() use ($remision, $userId) {
+        DB::transaction(function () use ($remision, $userId) {
             $consecutivo = Factura::siguienteConsecutivo();
-            $empresa     = Empresa::obtener();
 
-            $subtotal = $remision->items->sum(fn($i) => $i->cantidad * $i->precio_unitario);
-            $iva      = $remision->items->sum(fn($i) =>
-                            $i->cantidad * $i->precio_unitario * 0.19);
+            $subtotal = $remision->items->sum(fn ($i) => $i->cantidad * $i->precio_unitario);
+            $iva      = $remision->items->sum(fn ($i) => $i->cantidad * $i->precio_unitario * 0.19);
 
             $factura = Factura::create([
                 'numero'            => $consecutivo['numero'],
@@ -171,6 +178,7 @@ class RemisionController extends Controller
             foreach ($remision->items as $item) {
                 $base = $item->cantidad * $item->precio_unitario;
                 $iva  = $base * 0.19;
+
                 FacturaItem::create([
                     'factura_id'      => $factura->id,
                     'producto_id'     => $item->producto_id,
@@ -201,6 +209,7 @@ class RemisionController extends Controller
     {
         $remision->update(['estado' => 'anulada']);
         $remision->delete();
+
         return redirect()->route('remisiones.index')
             ->with('success', 'Remisión anulada.');
     }
@@ -209,8 +218,11 @@ class RemisionController extends Controller
     {
         $remision->load(['items', 'usuario']);
         $empresa = Empresa::obtener();
-        $pdf     = Pdf::loadView('remisiones.pdf', compact('remision', 'empresa'))
-                      ->setPaper('a4', 'portrait');
-        return $pdf->stream('remision-'.$remision->numero.'.pdf');
+
+        return $this->pdf->stream(
+            'remisiones.pdf',
+            compact('remision', 'empresa'),
+            'remision-'.$remision->numero.'.pdf',
+        );
     }
 }
