@@ -170,6 +170,44 @@
             @error('rol') <p class="text-red-400 text-xs mt-2">{{ $message }}</p> @enderror
         </div>
 
+        {{-- SECCIÓN 4: Acceso a empresas (si el grupo tiene más de una) --}}
+        @if($empresasGrupo->count() > 1)
+        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-6">
+            <h2 class="font-display font-bold text-base mb-1 flex items-center gap-2">
+                <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
+                             text-black text-xs font-black">4</span>
+                Acceso a empresas
+            </h2>
+            <p class="text-xs text-slate-500 mb-4">Selecciona en cuál(es) empresa(s) del grupo puede trabajar este usuario.</p>
+
+            <div class="space-y-2">
+                @foreach($empresasGrupo as $emp)
+                <label class="flex items-center gap-3 bg-[#1a2235] border border-[#1e2d47] rounded-xl
+                              px-4 py-3 cursor-pointer hover:border-amber-500/40 transition-colors
+                              has-[:checked]:border-amber-500/50 has-[:checked]:bg-amber-500/5">
+                    <input type="checkbox" name="empresa_ids[]" value="{{ $emp->id }}"
+                           {{ (!old('empresa_ids') || in_array($emp->id, old('empresa_ids', []))) && $emp->id == session('empresa_activa_id') ? 'checked' : '' }}
+                           class="w-4 h-4 accent-amber-500">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-slate-200">{{ $emp->razon_social }}</p>
+                        @if($emp->esFilial())
+                            <p class="text-xs text-slate-600">Filial · NIT: {{ $emp->nit }}</p>
+                        @else
+                            <p class="text-xs text-violet-400/70">Empresa matriz · NIT: {{ $emp->nit }}</p>
+                        @endif
+                    </div>
+                </label>
+                @endforeach
+            </div>
+            @error('empresa_ids')
+                <p class="text-red-400 text-xs mt-2">{{ $message }}</p>
+            @enderror
+        </div>
+        @else
+        {{-- Si solo hay una empresa en el grupo, enviarla oculta --}}
+        <input type="hidden" name="empresa_ids[]" value="{{ $empresasGrupo->first()->id }}">
+        @endif
+
         <div class="flex items-center justify-end gap-3">
             <a href="{{ route('usuarios.index') }}"
                class="px-6 py-2.5 bg-[#1a2235] border border-[#1e2d47] rounded-xl

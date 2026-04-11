@@ -162,6 +162,68 @@ class BackofficeController extends Controller
             ->with('success', 'Usuario admin "' . $user->name . '" creado y vinculado a ' . $empresa->razon_social . '.');
     }
 
+    // ── Usuarios (gestión global) ─────────────────────────────────────────
+
+    public function usuariosIndex()
+    {
+        $usuarios = User::where('is_superadmin', false)
+            ->with(['empresas', 'roles'])
+            ->orderBy('name')
+            ->paginate(25);
+
+        return view('backoffice.usuarios.index', compact('usuarios'));
+    }
+
+    public function usuarioEditar(User $usuario)
+    {
+        $todasEmpresas = Empresa::orderBy('razon_social')->get();
+        $empresasUsuario = $usuario->empresas()->pluck('empresa_id')->toArray();
+
+        return view('backoffice.usuarios.editar', compact('usuario', 'todasEmpresas', 'empresasUsuario'));
+    }
+
+    public function usuarioUpdate(Request $request, User $usuario)
+    {
+        $request->validate([
+            'name'        => 'required|string|max:100',
+            'email'       => 'required|email|unique:users,email,' . $usuario->id,
+            'empresa_ids' => 'nullable|array',
+            'empresa_ids.*' => 'exists:empresa,id',
+            'roles'       => 'nullable|array',
+        ]);
+
+        $usuario->update([
+            'name'  => strtoupper($request->name),
+            'email' => strtolower($request->email),
+        ]);
+
+        if ($request->filled('password')) {
+            $request->validate(['password' => 'min:8|confirmed']);
+            $usuario->update(['password' => Hash::make($request->password)]);
+        }
+
+        // Actualizar empresas asignadas
+        $nuevasEmpresas = [];
+        foreach ($request->empresa_ids ?? [] as $empId) {
+            $rol = in_array($empId, $request->admins ?? []) ? 'admin' : 'operador';
+            $nuevasEmpresas[$empId] = ['rol' => $rol, 'activo' => true];
+        }
+        $usuario->empresas()->sync($nuevasEmpresas);
+
+        return redirect()->route('backoffice.usuarios')
+            ->with('success', 'Usuario "' . $usuario->name . '" actualizado.');
+    }
+
+    public function usuarioDestroy(User $usuario)
+    {
+        $nombre = $usuario->name;
+        $usuario->empresas()->detach();
+        $usuario->delete();
+
+        return redirect()->route('backoffice.usuarios')
+            ->with('success', '"' . $nombre . '" eliminado.');
+    }
+
     // ── Impersonar empresa (entrar como ese cliente) ──────────────────────
 
     public function impersonar(Empresa $empresa)

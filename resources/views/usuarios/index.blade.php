@@ -80,7 +80,7 @@
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Usuario</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Email</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Rol</th>
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden lg:table-cell">Registro</th>
+                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden lg:table-cell">Empresa(s)</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Estado</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Acciones</th>
                 </tr>
@@ -128,8 +128,13 @@
                     </td>
 
                     <td class="px-3 py-4 hidden lg:table-cell">
-                        <div class="text-xs text-slate-500">
-                            {{ $usuario->created_at->format('d/m/Y') }}
+                        <div class="flex flex-wrap gap-1">
+                            @foreach($usuario->empresas as $emp)
+                            <span class="text-[10px] px-2 py-0.5 rounded-full
+                                         {{ $emp->empresa_padre_id ? 'bg-slate-700/60 text-slate-400' : 'bg-violet-600/15 text-violet-400' }}">
+                                {{ $emp->pivot->rol === 'admin' ? '★ ' : '' }}{{ Str::limit($emp->razon_social, 20) }}
+                            </span>
+                            @endforeach
                         </div>
                     </td>
 

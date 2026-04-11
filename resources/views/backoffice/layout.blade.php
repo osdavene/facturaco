@@ -46,6 +46,12 @@
                 <i class="fas fa-building w-4 text-center"></i>
                 <span>Empresas</span>
             </a>
+            <a href="{{ route('backoffice.usuarios') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors
+                      {{ request()->routeIs('backoffice.usuarios*') ? 'bg-violet-600/20 text-violet-300' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                <i class="fas fa-users w-4 text-center"></i>
+                <span>Usuarios</span>
+            </a>
         </nav>
 
         {{-- Usuario + salir --}}

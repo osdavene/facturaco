@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -11,12 +12,17 @@ class UsuarioController extends Controller
 {
     public function index()
     {
-        $empresaId = session('empresa_activa_id');
+        // Mostrar usuarios de todo el grupo (raíz + filiales)
+        $grupoIds = session('empresa_grupo_ids') ?? [session('empresa_activa_id')];
 
-        $usuarios = User::whereHas('empresas', fn($q) =>
-                        $q->where('empresa_id', $empresaId)
+        $usuarios = User::where('is_superadmin', false)
+                    ->whereHas('empresas', fn($q) =>
+                        $q->whereIn('empresa_id', $grupoIds)
                     )
-                    ->with('roles')
+                    ->with([
+                        'roles',
+                        'empresas' => fn($q) => $q->whereIn('empresa_id', $grupoIds),
+                    ])
                     ->orderBy('name')
                     ->paginate(15);
 
@@ -29,17 +35,31 @@ class UsuarioController extends Controller
     public function create()
     {
         $roles = Role::orderBy('name')->get();
-        return view('usuarios.create', compact('roles'));
+
+        // Empresas del grupo a las que se puede asignar el usuario
+        $grupoIds      = session('empresa_grupo_ids') ?? [session('empresa_activa_id')];
+        $empresasGrupo = Empresa::whereIn('id', $grupoIds)->orderBy('razon_social')->get();
+
+        return view('usuarios.create', compact('roles', 'empresasGrupo'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'rol'      => 'required|exists:roles,name',
+            'name'        => 'required|string|max:100',
+            'email'       => 'required|email|unique:users',
+            'password'    => 'required|string|min:8|confirmed',
+            'rol'         => 'required|exists:roles,name',
+            'empresa_ids' => 'required|array|min:1',
+            'empresa_ids.*' => 'exists:empresa,id',
+        ], [
+            'empresa_ids.required' => 'Debes seleccionar al menos una empresa.',
+            'empresa_ids.min'      => 'Debes seleccionar al menos una empresa.',
         ]);
+
+        // Verificar que las empresas elegidas pertenecen al grupo del admin
+        $grupoIds = session('empresa_grupo_ids') ?? [session('empresa_activa_id')];
+        $empresasValidas = array_intersect($request->empresa_ids, $grupoIds);
 
         $usuario = User::create([
             'name'     => strtoupper($request->name),
@@ -49,11 +69,15 @@ class UsuarioController extends Controller
 
         $usuario->assignRole($request->rol);
 
-        // Vincular a la empresa activa como operador
-        $usuario->empresas()->attach(session('empresa_activa_id'), [
-            'rol'    => 'operador',
-            'activo' => true,
-        ]);
+        // Determinar rol en pivot (admin si tiene rol admin o super-admin en Spatie)
+        $rolPivot = in_array($request->rol, ['admin', 'super-admin']) ? 'admin' : 'operador';
+
+        foreach ($empresasValidas as $empId) {
+            $usuario->empresas()->attach($empId, [
+                'rol'    => $rolPivot,
+                'activo' => true,
+            ]);
+        }
 
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario creado correctamente.');

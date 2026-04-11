@@ -427,6 +427,10 @@ Route::middleware(['auth', 'backoffice'])->prefix('backoffice')->name('backoffic
     Route::post('/empresas/{empresa}/crear-admin',  [BackofficeController::class, 'storeAdmin'])   ->name('empresas.admin.store');
     Route::post('/empresas/{empresa}/impersonar',   [BackofficeController::class, 'impersonar'])   ->name('impersonar');
     Route::post('/salir-impersonar',                [BackofficeController::class, 'salirImpersonar'])->name('salir');
+    Route::get('/usuarios',                         [BackofficeController::class, 'usuariosIndex']) ->name('usuarios');
+    Route::get('/usuarios/{usuario}/editar',        [BackofficeController::class, 'usuarioEditar']) ->name('usuarios.editar');
+    Route::put('/usuarios/{usuario}',               [BackofficeController::class, 'usuarioUpdate']) ->name('usuarios.update');
+    Route::delete('/usuarios/{usuario}',            [BackofficeController::class, 'usuarioDestroy'])->name('usuarios.destroy');
 });
 
 require __DIR__.'/auth.php';
