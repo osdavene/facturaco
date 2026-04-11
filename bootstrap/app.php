@@ -6,9 +6,10 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
+        web:      __DIR__.'/../routes/web.php',
+        api:      __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
-        health: '/up',
+        health:   '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
@@ -16,8 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhooks/wompi',
         ]);
         $middleware->alias([
-            'empresa'     => \App\Http\Middleware\EnsureEmpresaSeleccionada::class,
-            'backoffice'  => \App\Http\Middleware\EsBackoffice::class,
+            'empresa'           => \App\Http\Middleware\EnsureEmpresaSeleccionada::class,
+            'backoffice'        => \App\Http\Middleware\EsBackoffice::class,
+            'api.empresa'       => \App\Http\Middleware\SetEmpresaDesdeToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

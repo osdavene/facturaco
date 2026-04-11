@@ -13,7 +13,9 @@
       "Bash(composer require:*)",
       "Bash(composer show:*)",
       "Bash(cat phpunit.xml)",
-      "Bash(cat phpunit.xml.dist)"
+      "Bash(cat phpunit.xml.dist)",
+      "Bash(PGPASSWORD=7420 psql -U postgres -h 127.0.0.1 -c \"SELECT 1 as ok\")",
+      "Bash(composer dump-autoload:*)"
     ]
   }
 }

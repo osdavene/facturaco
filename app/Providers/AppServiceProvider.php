@@ -2,14 +2,16 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
-use App\Models\Cliente;
-use App\Models\Proveedor;
-use App\Models\Producto;
+use App\Models\ApiToken;
 use App\Models\Categoria;
+use App\Models\Cliente;
+use App\Models\Producto;
+use App\Models\Proveedor;
 use App\Models\UnidadMedida;
 use App\Observers\AuditoriaObserver;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Sanctum::usePersonalAccessTokenModel(ApiToken::class);
+
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
