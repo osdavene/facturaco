@@ -181,7 +181,7 @@
                 <td style="font-weight:600;">{{ $item->descripcion }}</td>
                 <td class="text-center">{{ $item->unidad }}</td>
                 <td class="text-center" style="font-weight:bold;font-size:12px;">
-                    {{ number_format($item->cantidad, 0) }}
+                    {{ format_cantidad($item->cantidad) }}
                 </td>
                 <td class="text-right">${{ number_format($item->precio_unitario, 0, ',', '.') }}</td>
             </tr>

@@ -138,7 +138,7 @@
                             <div class="text-xs text-slate-500 font-mono">{{ $item->codigo }}</div>
                         </td>
                         <td class="px-3 py-3 text-center text-sm" style="color:#e2e8f0">
-                            {{ number_format($item->cantidad, 0) }}
+                            {{ format_cantidad($item->cantidad) }}
                         </td>
                         <td class="px-3 py-3 text-right text-sm text-slate-400 hidden sm:table-cell">
                             ${{ number_format($item->precio_unitario, 0, ',', '.') }}
@@ -188,7 +188,7 @@
                 <div class="flex items-center gap-4 bg-[#1a2235] rounded-xl p-3">
                     <div class="flex-1">
                         <div class="text-sm font-medium" style="color:#e2e8f0">{{ $item->descripcion }}</div>
-                        <div class="text-xs text-slate-500">Pedido: {{ number_format($item->cantidad, 0) }}</div>
+                        <div class="text-xs text-slate-500">Pedido: {{ format_cantidad($item->cantidad) }}</div>
                     </div>
                     <div class="w-32">
                         <label class="block text-xs text-slate-500 mb-1">Cant. recibida</label>

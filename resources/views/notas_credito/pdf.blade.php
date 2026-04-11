@@ -91,7 +91,7 @@
                 <strong>{{ $item->descripcion }}</strong><br>
                 <small style="color:#94a3b8">{{ $item->codigo }}</small>
             </td>
-            <td class="text-center">{{ number_format($item->cantidad, 2) }} {{ $item->unidad }}</td>
+            <td class="text-center">{{ format_cantidad($item->cantidad) }} {{ $item->unidad }}</td>
             <td class="text-right">${{ number_format($item->precio_unitario, 0, ',', '.') }}</td>
             <td class="text-center">{{ $item->iva_pct }}%</td>
             <td class="text-right">${{ number_format($item->total, 0, ',', '.') }}</td>

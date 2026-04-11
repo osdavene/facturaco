@@ -5,7 +5,7 @@ namespace App\Services;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Http\Response;
 
 /**
  * Genera PDFs con código QR opcional.
@@ -31,7 +31,7 @@ class PdfService
      *
      * @param  array<string, mixed> $data
      */
-    public function stream(string $view, array $data, string $filename): StreamedResponse
+    public function stream(string $view, array $data, string $filename): Response
     {
         $pdf = Pdf::loadView($view, $data)->setPaper('a4', 'portrait');
 

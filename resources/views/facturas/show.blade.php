@@ -194,7 +194,7 @@
                             <div class="text-sm font-medium">{{ $item->descripcion }}</div>
                             <div class="text-xs text-slate-500 font-mono">{{ $item->codigo }}</div>
                         </td>
-                        <td class="px-3 py-3 text-center text-sm">{{ $item->cantidad }}</td>
+                        <td class="px-3 py-3 text-center text-sm">{{ format_cantidad($item->cantidad) }}</td>
                         <td class="px-3 py-3 text-right text-sm">
                             ${{ number_format($item->precio_unitario, 0, ',', '.') }}
                         </td>

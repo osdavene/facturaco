@@ -90,7 +90,7 @@
                             <div class="text-xs text-slate-600 font-mono">{{ $item->codigo }}</div>
                         </td>
                         <td class="px-3 py-3 text-center text-slate-300">
-                            {{ number_format($item->cantidad, 2) }} {{ $item->unidad }}
+                            {{ format_cantidad($item->cantidad) }} {{ $item->unidad }}
                         </td>
                         <td class="px-3 py-3 text-right text-slate-300">
                             ${{ number_format($item->precio_unitario, 0, ',', '.') }}
