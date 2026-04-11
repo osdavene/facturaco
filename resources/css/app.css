@@ -312,7 +312,38 @@ html:not(.dark) tfoot td {
     border-top-color: #e2e8f0 !important;
 }
 
-/* ── INPUTS ────────────────────────────────── */
+/* ── INPUTS ─────────────────────────────────────────────────── */
+
+/* TEMA OSCURO: texto claro sobre fondo oscuro */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]),
+.dark textarea:not([disabled]),
+.dark select:not([disabled]) {
+    background-color: #1a2235 !important;
+    color: #e2e8f0 !important;
+    -webkit-text-fill-color: #e2e8f0 !important;
+}
+
+.dark input:focus:not([type="checkbox"]):not([type="radio"]),
+.dark textarea:focus,
+.dark select:focus {
+    border-color: #f59e0b !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: #64748b !important;
+    -webkit-text-fill-color: #64748b !important;
+}
+
+.dark input[disabled],
+.dark textarea[disabled],
+.dark select[disabled] {
+    background-color: #0f1623 !important;
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
+}
+
+/* TEMA CLARO: texto oscuro sobre fondo blanco */
 html:not(.dark) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]),
 html:not(.dark) textarea:not([disabled]),
 html:not(.dark) select:not([disabled]) {
