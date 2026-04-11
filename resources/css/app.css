@@ -159,11 +159,11 @@ html:not(.dark)  { color-scheme: light; }
    ══════════════════════════════════════════════════════ */
 
 html:not(.dark) {
-    /* ── Fondos principales ── */
-    --bg-base:   #f0f4f8;
-    --bg-card:   #ffffff;
-    --bg-input:  #f8fafc;
-    --border:    #dde3ec;
+    /* ── Fondos principales — paleta crema cálida ── */
+    --bg-base:   #f5f0e8;   /* fondo general — crema suave */
+    --bg-card:   #faf7f2;   /* cards — crema muy claro */
+    --bg-input:  #f0ece5;   /* inputs — crema más marcado */
+    --border:    #e0d8ce;   /* bordes — beige suave */
     --text-main: #1a202c;
     --text-muted:#4a5568;
 }
@@ -175,7 +175,7 @@ html:not(.dark) body {
 
 /* ── SIDEBAR ───────────────────────────────── */
 html:not(.dark) aside#sidebar {
-    background-color: #ffffff !important;
+    background-color: #faf7f2 !important;
     border-right-color: var(--border) !important;
 }
 
@@ -197,7 +197,7 @@ html:not(.dark) aside#sidebar a.text-slate-500 {
     color: #64748b !important;
 }
 html:not(.dark) aside#sidebar a:hover {
-    background-color: #f1f5f9 !important;
+    background-color: #ede8df !important;
     color: #1a202c !important;
 }
 
@@ -222,7 +222,7 @@ html:not(.dark) aside#sidebar .text-white {
 
 /* ── TOPBAR ────────────────────────────────── */
 html:not(.dark) header {
-    background-color: rgba(255,255,255,0.97) !important;
+    background-color: rgba(250,247,242,0.97) !important;
     border-bottom-color: var(--border) !important;
 }
 
@@ -232,13 +232,13 @@ html:not(.dark) header .font-display {
 
 /* Buscador en topbar */
 html:not(.dark) header #busqueda-global {
-    background-color: #f1f5f9 !important;
-    border-color: #dde3ec !important;
+    background-color: #ede8df !important;
+    border-color: var(--border) !important;
     color: #1a202c !important;
 }
 html:not(.dark) header #busqueda-global:focus {
     border-color: #f59e0b !important;
-    background-color: #ffffff !important;
+    background-color: #faf7f2 !important;
 }
 html:not(.dark) header #busqueda-global::placeholder {
     color: #94a3b8 !important;
@@ -246,40 +246,40 @@ html:not(.dark) header #busqueda-global::placeholder {
 
 /* Botones del topbar */
 html:not(.dark) header .bg-\[\#1a2235\] {
-    background-color: #f1f5f9 !important;
-    border-color: #dde3ec !important;
+    background-color: #ede8df !important;
+    border-color: var(--border) !important;
     color: #4a5568 !important;
 }
 html:not(.dark) header .bg-\[\#1a2235\]:hover {
     color: #1a202c !important;
-    border-color: #94a3b8 !important;
+    border-color: #c4b8a8 !important;
 }
 
 /* ── CARDS / PANELES ───────────────────────── */
 html:not(.dark) .bg-\[\#141c2e\] {
-    background-color: #ffffff !important;
+    background-color: #faf7f2 !important;
     border-color: var(--border) !important;
 }
 html:not(.dark) .bg-\[\#1a2235\] {
-    background-color: #f1f5f9 !important;
+    background-color: #ede8df !important;
     border-color: var(--border) !important;
 }
 html:not(.dark) .bg-\[\#111827\] {
-    background-color: #ffffff !important;
+    background-color: #faf7f2 !important;
 }
 html:not(.dark) .bg-\[\#0b0f1a\] {
-    background-color: #f0f4f8 !important;
+    background-color: #f5f0e8 !important;
 }
 html:not(.dark) .bg-\[\#0f1623\] {
-    background-color: #e2e8f0 !important;
+    background-color: #e8e1d6 !important;
 }
 
 /* ── BORDES ────────────────────────────────── */
 html:not(.dark) .border-\[\#1e2d47\] {
-    border-color: var(--border) !important;
+    border-color: #e0d8ce !important;
 }
 html:not(.dark) [class*="border-[#1e2d47]"] {
-    border-color: var(--border) !important;
+    border-color: #e0d8ce !important;
 }
 
 /* ── TEXTOS ────────────────────────────────── */
@@ -298,7 +298,7 @@ html:not(.dark) tbody tr {
     will-change: background-color;
 }
 html:not(.dark) tbody tr:hover {
-    background-color: #f1f5f9 !important;
+    background-color: #e8e1d6 !important;
 }
 html:not(.dark) tbody tr:hover td {
     background-color: transparent !important;
@@ -307,17 +307,17 @@ html:not(.dark) tbody tr:hover td {
 
 /* Bordes de filas */
 html:not(.dark) tbody tr td {
-    border-bottom-color: #e2e8f0 !important;
+    border-bottom-color: #e0d8ce !important;
     color: #2d3748 !important;
 }
 html:not(.dark) thead th {
     color: #64748b !important;
-    border-bottom-color: #e2e8f0 !important;
+    border-bottom-color: #e0d8ce !important;
 }
 html:not(.dark) tfoot td {
-    background-color: #f8fafc !important;
+    background-color: #f0ece5 !important;
     color: #1a202c !important;
-    border-top-color: #e2e8f0 !important;
+    border-top-color: #e0d8ce !important;
 }
 
 /* ── INPUTS ─────────────────────────────────────────────────── */
@@ -355,8 +355,8 @@ html:not(.dark) tfoot td {
 html:not(.dark) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]),
 html:not(.dark) textarea:not([disabled]),
 html:not(.dark) select:not([disabled]) {
-    background-color: #ffffff !important;
-    border-color: #dde3ec !important;
+    background-color: #f0ece5 !important;
+    border-color: #e0d8ce !important;
     color: #1a202c !important;
     -webkit-text-fill-color: #1a202c !important;
 }
@@ -365,7 +365,7 @@ html:not(.dark) input:focus:not([type="checkbox"]):not([type="radio"]),
 html:not(.dark) textarea:focus,
 html:not(.dark) select:focus {
     border-color: #f59e0b !important;
-    background-color: #fffbeb !important;
+    background-color: #faf3e0 !important;
 }
 
 html:not(.dark) input::placeholder,
@@ -376,7 +376,7 @@ html:not(.dark) textarea::placeholder {
 
 html:not(.dark) input[disabled],
 html:not(.dark) textarea[disabled] {
-    background-color: #e2e8f0 !important;
+    background-color: #e8e1d6 !important;
     color: #94a3b8 !important;
     -webkit-text-fill-color: #94a3b8 !important;
 }
@@ -392,8 +392,8 @@ html:not(.dark) .bg-cyan-500\/10    { background-color: #cffafe !important; }
 
 /* ── PAGINACIÓN ────────────────────────────── */
 html:not(.dark) nav[role="navigation"] a {
-    background-color: #ffffff !important;
-    border-color: #dde3ec !important;
+    background-color: #faf7f2 !important;
+    border-color: #e0d8ce !important;
     color: #4a5568 !important;
 }
 html:not(.dark) nav[role="navigation"] a:hover {
@@ -403,24 +403,24 @@ html:not(.dark) nav[role="navigation"] a:hover {
 
 /* ── DROPDOWN BÚSQUEDA ─────────────────────── */
 html:not(.dark) #busqueda-resultados {
-    background-color: #ffffff !important;
-    border-color: var(--border) !important;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.12) !important;
+    background-color: #faf7f2 !important;
+    border-color: #e0d8ce !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.10) !important;
 }
 html:not(.dark) #busqueda-resultados .hover\:bg-\[\#1a2235\]:hover {
-    background-color: #f1f5f9 !important;
+    background-color: #ede8df !important;
 }
 
 /* ── BOTTOM NAV MÓVIL ──────────────────────── */
 html:not(.dark) .bottom-nav {
-    background-color: #ffffff !important;
-    border-top-color: var(--border) !important;
+    background-color: #faf7f2 !important;
+    border-top-color: #e0d8ce !important;
 }
 
 /* ── FOOTER ────────────────────────────────── */
 html:not(.dark) footer {
-    background-color: #ffffff !important;
-    border-top-color: var(--border) !important;
+    background-color: #faf7f2 !important;
+    border-top-color: #e0d8ce !important;
 }
 html:not(.dark) footer .text-slate-600 {
     color: #94a3b8 !important;
@@ -432,22 +432,22 @@ html:not(.dark) #overlay {
 }
 
 /* ── SCROLLBAR TEMA CLARO ──────────────────── */
-html:not(.dark) ::-webkit-scrollbar-track { background: #f0f4f8; }
-html:not(.dark) ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+html:not(.dark) ::-webkit-scrollbar-track { background: #f5f0e8; }
+html:not(.dark) ::-webkit-scrollbar-thumb { background: #d4cbbd; }
 html:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
 
 /* ── FIX: Cards de precios en inventario ──── */
 html:not(.dark) .bg-\[\#1a2235\].rounded-xl {
-    background-color: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
+    background-color: #ede8df !important;
+    border: 1px solid #e0d8ce !important;
 }
 
 /* ── FIX: Inputs dentro de cards blancas ──── */
 html:not(.dark) .bg-\[\#141c2e\] input:not([disabled]),
 html:not(.dark) .bg-\[\#141c2e\] select:not([disabled]),
 html:not(.dark) .bg-\[\#141c2e\] textarea:not([disabled]) {
-    background-color: #ffffff !important;
-    border-color: #cbd5e1 !important;
+    background-color: #f0ece5 !important;
+    border-color: #e0d8ce !important;
     color: #1a202c !important;
     -webkit-text-fill-color: #1a202c !important;
 }
@@ -496,10 +496,10 @@ select optgroup {
 
 /* ── FIX: Select en tema claro — sobreescribe el fondo oscuro por defecto ─── */
 html:not(.dark) select {
-    background-color: #ffffff !important;
+    background-color: #f0ece5 !important;
     color: #1a202c !important;
     -webkit-text-fill-color: #1a202c !important;
-    border-color: #cbd5e1 !important;
+    border-color: #e0d8ce !important;
     /* Flecha oscura para fondo blanco */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
 }
@@ -517,8 +517,8 @@ html:not(.dark) textarea.bg-\[\#1a2235\],
 html:not(.dark) input.form-input,
 html:not(.dark) select.form-input,
 html:not(.dark) textarea.form-input {
-    background-color: #ffffff !important;
-    border-color: #cbd5e1 !important;
+    background-color: #f0ece5 !important;
+    border-color: #e0d8ce !important;
     color: #1a202c !important;
     -webkit-text-fill-color: #1a202c !important;
 }
@@ -526,8 +526,8 @@ html:not(.dark) textarea.form-input {
 /* ── FIX: Fondo cards stock/precios ─────────── */
 html:not(.dark) .bg-\[\#1a2235\].rounded-xl.p-3,
 html:not(.dark) .bg-\[\#1a2235\].rounded-xl.p-4 {
-    background-color: #f1f5f9 !important;
-    border: 1px solid #e2e8f0 !important;
+    background-color: #ede8df !important;
+    border: 1px solid #e0d8ce !important;
 }
 
 /* ── FIX: Íconos en topbar claro ────────────── */
@@ -541,7 +541,7 @@ html:not(.dark) table tbody tr {
     transition: background-color 0.12s ease !important;
 }
 html:not(.dark) table tbody tr:hover {
-    background-color: #f0f7ff !important;
+    background-color: #e8e1d6 !important;
 }
 html:not(.dark) table tbody tr:hover td {
     background-color: transparent !important;
@@ -550,7 +550,7 @@ html:not(.dark) table tbody tr:hover td {
 /* ── FIX: Borders de tabla ───────────────────── */
 html:not(.dark) table tbody td,
 html:not(.dark) table thead th {
-    border-color: #e5eaf2 !important;
+    border-color: #e0d8ce !important;
 }
 
 /* ── FIX: Overflow sidebar en tema claro ─────── */
@@ -560,7 +560,7 @@ html:not(.dark) aside#sidebar {
 
 /* ── FIX: Gráficas / barras dashboard y reportes ── */
 html:not(.dark) .bg-\[\#1e2d47\].rounded-full {
-    background-color: #e2e8f0 !important;
+    background-color: #e0d8ce !important;
 }
 
 /* ── FIX: Labels de formularios en tema claro ─────── */
@@ -591,19 +591,19 @@ html:not(.dark) span.text-slate-500 {
 html:not(.dark) .permisos-table th,
 html:not(.dark) table th {
     color: #374151 !important;
-    background-color: #f8fafc !important;
+    background-color: #f0ece5 !important;
 }
 
 /* ── FIX: Botones secundarios (volver, cancelar) ──── */
 html:not(.dark) a.bg-\[\#1a2235\].border,
 html:not(.dark) button.bg-\[\#1a2235\].border {
-    background-color: #f1f5f9 !important;
-    border-color: #dde3ec !important;
+    background-color: #ede8df !important;
+    border-color: #e0d8ce !important;
     color: #374151 !important;
 }
 html:not(.dark) a.bg-\[\#1a2235\].border:hover,
 html:not(.dark) button.bg-\[\#1a2235\].border:hover {
-    background-color: #e2e8f0 !important;
+    background-color: #e0d8ce !important;
     color: #1a202c !important;
 }
 
@@ -641,12 +641,12 @@ html:not(.dark) .font-display.font-bold {
 
 /* ── FIX: Íconos de acciones en tablas ────────────── */
 html:not(.dark) .w-8.h-8.bg-\[\#1a2235\] {
-    background-color: #f1f5f9 !important;
-    border-color: #dde3ec !important;
+    background-color: #ede8df !important;
+    border-color: #e0d8ce !important;
     color: #4b5563 !important;
 }
 html:not(.dark) .w-8.h-8.bg-\[\#1a2235\]:hover {
-    background-color: #e2e8f0 !important;
+    background-color: #e0d8ce !important;
 }
 
 /* ── FIX: Inputs tipo date en claro ───────────────── */
@@ -658,15 +658,15 @@ html:not(.dark) input[type="date"] {
 html:not(.dark) #btn-bimestral,
 html:not(.dark) #btn-mensual,
 html:not(.dark) #btn-anual {
-    background-color: #f1f5f9 !important;
-    border-color: #dde3ec !important;
+    background-color: #ede8df !important;
+    border-color: #e0d8ce !important;
     color: #4b5563 !important;
 }
 
 /* ── FIX: Hover items sidebar en claro ────────────── */
 html:not(.dark) aside nav a:not(.bg-amber-500\/10):hover {
-    background-color: #f0f7ff !important;
-    color: #1e40af !important;
+    background-color: #e8e1d6 !important;
+    color: #92400e !important;
 }
 
 /* ── FIX: Separadores y líneas divisoras ──────────── */
