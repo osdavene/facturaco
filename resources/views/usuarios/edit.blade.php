@@ -21,6 +21,8 @@
     <form method="POST" action="{{ route('usuarios.update', $usuario) }}">
         @csrf @method('PUT')
 
+        <x-form-errors class="mb-4" />
+
         {{-- SECCIÓN 1 --}}
         <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">

@@ -21,13 +21,7 @@
         </div>
     </div>
 
-    @if($errors->any())
-    <div class="bg-red-500/10 border border-red-500/30 text-red-400
-                rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-        <i class="fas fa-exclamation-circle flex-shrink-0"></i>
-        {{ $errors->first() }}
-    </div>
-    @endif
+    <x-form-errors class="mb-5" />
 
     <form method="POST" action="{{ route('notas_credito.store') }}">
         @csrf
@@ -49,7 +43,8 @@
                             Fecha *
                         </label>
                         <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}"
-                               class="form-input">
+                               class="form-input @error('fecha') border-red-500 @enderror">
+                        @error('fecha') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>

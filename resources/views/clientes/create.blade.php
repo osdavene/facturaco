@@ -21,6 +21,8 @@
     <form method="POST" action="{{ route('clientes.store') }}">
         @csrf
 
+        <x-form-errors class="mb-4" />
+
         {{-- SECCIÓN 1 --}}
         <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
@@ -55,7 +57,7 @@
                 <div>
                     <label class="form-label">Tipo Documento *</label>
                     <select name="tipo_documento"
-                            class="form-input">
+                            class="form-input @error('tipo_documento') border-red-500 @enderror">
                         <option value="CC"  {{ old('tipo_documento','CC')=='CC'  ? 'selected':'' }}>CC - Cédula de Ciudadanía</option>
                         <option value="NIT" {{ old('tipo_documento')=='NIT' ? 'selected':'' }}>NIT</option>
                         <option value="CE"  {{ old('tipo_documento')=='CE'  ? 'selected':'' }}>CE - Cédula Extranjería</option>
@@ -63,6 +65,7 @@
                         <option value="TI"  {{ old('tipo_documento')=='TI'  ? 'selected':'' }}>TI - Tarjeta Identidad</option>
                         <option value="PEP" {{ old('tipo_documento')=='PEP' ? 'selected':'' }}>PEP</option>
                     </select>
+                    @error('tipo_documento') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="form-label">Número Documento *</label>
@@ -135,10 +138,11 @@
                 <div>
                     <label class="form-label">Régimen Tributario *</label>
                     <select name="regimen"
-                            class="form-input">
+                            class="form-input @error('regimen') border-red-500 @enderror">
                         <option value="simple"          {{ old('regimen','simple')=='simple' ? 'selected':'' }}>Régimen Simple</option>
                         <option value="responsable_iva" {{ old('regimen')=='responsable_iva' ? 'selected':'' }}>Responsable de IVA</option>
                     </select>
+                    @error('regimen') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="form-label">% ReteFuente</label>

@@ -21,6 +21,8 @@
     <form method="POST" action="{{ route('remisiones.store') }}">
         @csrf
 
+        <x-form-errors class="mb-4" />
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
             {{-- COLUMNA PRINCIPAL --}}
@@ -169,8 +171,9 @@
                             </label>
                             <input type="date" name="fecha_emision"
                                    value="{{ old('fecha_emision', date('Y-m-d')) }}"
-                                   class="form-input"
+                                   class="form-input @error('fecha_emision') border-red-500 @enderror"
                                    style="color:#e2e8f0">
+                            @error('fecha_emision') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">

@@ -21,6 +21,8 @@
     <form method="POST" action="{{ route('clientes.update', $cliente) }}">
         @csrf @method('PUT')
 
+        <x-form-errors class="mb-4" />
+
         {{-- SECCIÓN 1 --}}
         <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
@@ -55,7 +57,7 @@
                 <div>
                     <label class="form-label">Tipo Documento *</label>
                     <select name="tipo_documento"
-                            class="form-input">
+                            class="form-input @error('tipo_documento') border-red-500 @enderror">
                         @foreach(['CC'=>'CC - Cédula de Ciudadanía','NIT'=>'NIT','CE'=>'CE - Cédula Extranjería','PP'=>'PP - Pasaporte','TI'=>'TI - Tarjeta Identidad','PEP'=>'PEP'] as $val=>$label)
                         <option value="{{ $val }}"
                             {{ old('tipo_documento',$cliente->tipo_documento)==$val ? 'selected':'' }}>
@@ -63,6 +65,7 @@
                         </option>
                         @endforeach
                     </select>
+                    @error('tipo_documento') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="form-label">Número Documento *</label>
@@ -132,10 +135,11 @@
                 <div>
                     <label class="form-label">Régimen Tributario *</label>
                     <select name="regimen"
-                            class="form-input">
+                            class="form-input @error('regimen') border-red-500 @enderror">
                         <option value="simple"          {{ old('regimen',$cliente->regimen)=='simple' ? 'selected':'' }}>Régimen Simple</option>
                         <option value="responsable_iva" {{ old('regimen',$cliente->regimen)=='responsable_iva' ? 'selected':'' }}>Responsable de IVA</option>
                     </select>
+                    @error('regimen') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="form-label">% ReteFuente</label>

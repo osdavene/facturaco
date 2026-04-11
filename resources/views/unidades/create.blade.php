@@ -23,13 +23,7 @@
 
         <div class="card p-6 space-y-5">
 
-            @if($errors->any())
-            <div class="bg-red-500/10 border border-red-500/30 text-red-400
-                        rounded-xl px-4 py-3 flex items-center gap-3 text-sm">
-                <i class="fas fa-exclamation-circle flex-shrink-0"></i>
-                {{ $errors->first() }}
-            </div>
-            @endif
+            <x-form-errors />
 
             {{-- Nombre --}}
             <div>

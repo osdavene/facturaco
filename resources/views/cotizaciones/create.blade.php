@@ -21,6 +21,8 @@
     <form method="POST" action="{{ route('cotizaciones.store') }}">
         @csrf
 
+        <x-form-errors class="mb-4" />
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
             {{-- COLUMNA PRINCIPAL --}}
