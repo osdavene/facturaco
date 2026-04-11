@@ -245,4 +245,16 @@ class CotizacionController extends Controller
         return redirect()->route('cotizaciones.index')
             ->with('success', 'Cotización eliminada.');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('warning', 'No se seleccionó ningún elemento.');
+        }
+        $count = Cotizacion::whereIn('id', $ids)->count();
+        Cotizacion::whereIn('id', $ids)->delete();
+        return redirect()->route('cotizaciones.index')
+            ->with('success', "{$count} cotización(es) eliminada(s) correctamente.");
+    }
 }

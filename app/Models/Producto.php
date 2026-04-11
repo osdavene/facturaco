@@ -5,12 +5,33 @@ use App\Traits\PertenecerGrupo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Producto extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerGrupo;
+    use HasFactory, SoftDeletes, PertenecerGrupo, LogsActivity;
 
     protected $table = 'productos';
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nombre', 'codigo', 'precio_venta', 'precio_compra', 'stock_actual', 'stock_minimo', 'activo', 'iva_pct'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('producto');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    {
+        $activity->description = match($eventName) {
+            'created' => 'Producto creado',
+            'updated' => 'Producto actualizado',
+            'deleted' => 'Producto eliminado',
+            default   => $eventName,
+        };
+    }
 
     protected $fillable = [
         'empresa_id',

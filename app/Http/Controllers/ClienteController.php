@@ -125,4 +125,16 @@ class ClienteController extends Controller
         return redirect()->route('clientes.index')
             ->with('success', 'Cliente eliminado correctamente.');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('warning', 'No se seleccionó ningún elemento.');
+        }
+        $count = Cliente::whereIn('id', $ids)->count();
+        Cliente::whereIn('id', $ids)->delete();
+        return redirect()->route('clientes.index')
+            ->with('success', "{$count} cliente(s) eliminado(s) correctamente.");
+    }
 }

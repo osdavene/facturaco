@@ -142,5 +142,8 @@
             </div>
         </div>
     </div>
+
+    <x-activity-log :model="$proveedor" />
+
 </div>
 @endsection

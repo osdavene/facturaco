@@ -149,6 +149,18 @@ class ProductoController extends Controller
             ->with('success', 'Producto eliminado correctamente.');
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('warning', 'No se seleccionó ningún elemento.');
+        }
+        $count = Producto::whereIn('id', $ids)->count();
+        Producto::whereIn('id', $ids)->delete();
+        return redirect()->route('inventario.index')
+            ->with('success', "{$count} producto(s) eliminado(s) correctamente.");
+    }
+
     // Ajuste de stock
     public function ajustarStock(Request $request, Producto $inventario)
     {

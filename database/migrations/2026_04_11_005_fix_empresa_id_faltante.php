@@ -46,7 +46,17 @@ return new class extends Migration
 
         foreach ($uniques as $tabla => $col) {
             if (Schema::hasTable($tabla) && Schema::hasColumn($tabla, 'empresa_id')) {
-                DB::statement("DROP INDEX IF EXISTS \"{$tabla}_{$col}_unique\"");
+                // Eliminar constraint con nombre o índice (PostgreSQL requiere DROP CONSTRAINT cuando existe como constraint)
+                $constraintName = "{$tabla}_{$col}_unique";
+                $constraintExists = DB::selectOne(
+                    "SELECT 1 FROM information_schema.table_constraints WHERE table_name = ? AND constraint_name = ? AND constraint_type = 'UNIQUE'",
+                    [$tabla, $constraintName]
+                );
+                if ($constraintExists) {
+                    DB::statement("ALTER TABLE \"{$tabla}\" DROP CONSTRAINT \"{$constraintName}\"");
+                } else {
+                    DB::statement("DROP INDEX IF EXISTS \"{$constraintName}\"");
+                }
                 DB::statement("
                     CREATE UNIQUE INDEX IF NOT EXISTS \"{$tabla}_empresa_{$col}_unique\"
                     ON \"{$tabla}\" (\"empresa_id\", \"{$col}\")
@@ -55,7 +65,16 @@ return new class extends Migration
         }
 
         if (Schema::hasTable('productos') && Schema::hasColumn('productos', 'empresa_id')) {
-            DB::statement("DROP INDEX IF EXISTS \"productos_codigo_barras_unique\"");
+            $constraintName = 'productos_codigo_barras_unique';
+            $constraintExists = DB::selectOne(
+                "SELECT 1 FROM information_schema.table_constraints WHERE table_name = 'productos' AND constraint_name = ? AND constraint_type = 'UNIQUE'",
+                [$constraintName]
+            );
+            if ($constraintExists) {
+                DB::statement("ALTER TABLE \"productos\" DROP CONSTRAINT \"{$constraintName}\"");
+            } else {
+                DB::statement("DROP INDEX IF EXISTS \"{$constraintName}\"");
+            }
             DB::statement("
                 CREATE UNIQUE INDEX IF NOT EXISTS \"productos_empresa_codigo_barras_unique\"
                 ON \"productos\" (\"empresa_id\", \"codigo_barras\")

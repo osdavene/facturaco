@@ -78,10 +78,18 @@
 
 {{-- Tabla --}}
 <div class="card overflow-hidden">
+    <form id="bulk-form" method="POST" action="{{ route('cotizaciones.bulk-delete') }}">
+        @csrf @method('DELETE')
+    </form>
+
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
+                    <th class="w-10 px-4 py-3">
+                        <input type="checkbox" class="bulk-select-all w-4 h-4 rounded border-[#2d3f5c]
+                               bg-[#1a2235] accent-amber-500 cursor-pointer">
+                    </th>
                     <th class="table-th">Número</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cliente</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Emisión</th>
@@ -94,6 +102,10 @@
             <tbody>
                 @forelse($cotizaciones as $cotizacion)
                 <tr class="table-row">
+                    <td class="px-4 py-4">
+                        <input type="checkbox" class="bulk-item w-4 h-4 rounded border-[#2d3f5c]
+                               bg-[#1a2235] accent-amber-500 cursor-pointer" value="{{ $cotizacion->id }}">
+                    </td>
                     <td class="px-5 py-4">
                         <div class="font-mono text-sm font-semibold text-blue-400">
                             {{ $cotizacion->numero }}
@@ -164,7 +176,7 @@
                     subtitle="Envía propuestas comerciales a tus clientes antes de facturar."
                     href="{{ route('cotizaciones.create') }}"
                     label="Nueva Cotización"
-                    :colspan="7" />
+                    :colspan="8" />
                 @endforelse
             </tbody>
         </table>
@@ -174,5 +186,26 @@
         {{ $cotizaciones->links() }}
     </div>
     @endif
+</div>
+
+<div id="bulk-bar"
+     class="hidden fixed bottom-16 left-0 right-0 z-[95]
+            bg-[#0d1526]/97 backdrop-blur border-t border-amber-500/20
+            px-4 py-3 flex items-center gap-3 lg:left-64">
+    <div class="w-8 h-8 bg-amber-500/10 border border-amber-500/20 rounded-lg
+                flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-check-square text-amber-400 text-sm"></i>
+    </div>
+    <span id="bulk-count" class="text-sm font-medium text-slate-200 flex-1">0 seleccionados</span>
+    <button onclick="submitBulkAction('delete')"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/30
+                   hover:bg-red-500/20 text-red-400 rounded-xl text-sm transition-colors">
+        <i class="fas fa-trash text-xs"></i> Eliminar
+    </button>
+    <button onclick="clearBulkSelection()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-[#1a2235] border border-[#1e2d47]
+                   hover:border-slate-500 text-slate-400 rounded-xl text-sm transition-colors">
+        <i class="fas fa-times text-xs"></i> Cancelar
+    </button>
 </div>
 @endsection

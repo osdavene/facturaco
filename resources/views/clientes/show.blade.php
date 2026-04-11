@@ -170,6 +170,8 @@
                 </div>
             </div>
 
+            <x-activity-log :model="$cliente" />
+
         </div>
     </div>
 </div>

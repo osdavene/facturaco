@@ -6,12 +6,33 @@ use App\Traits\PertenecerGrupo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Proveedor extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerGrupo;
+    use HasFactory, SoftDeletes, PertenecerGrupo, LogsActivity;
 
     protected $table = 'proveedores';
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['razon_social', 'nombre_contacto', 'email', 'celular', 'activo', 'plazo_pago', 'cupo_credito'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('proveedor');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    {
+        $activity->description = match($eventName) {
+            'created' => 'Proveedor creado',
+            'updated' => 'Proveedor actualizado',
+            'deleted' => 'Proveedor eliminado',
+            default   => $eventName,
+        };
+    }
 
     protected $fillable = [
         'empresa_id',

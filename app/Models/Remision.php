@@ -5,12 +5,33 @@ use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Remision extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerEmpresa;
+    use HasFactory, SoftDeletes, PertenecerEmpresa, LogsActivity;
 
     protected $table = 'remisiones';
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['estado', 'total', 'lugar_entrega', 'transportador', 'guia', 'observaciones'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('remision');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    {
+        $activity->description = match($eventName) {
+            'created' => 'Remisión creada',
+            'updated' => 'Remisión actualizada',
+            'deleted' => 'Remisión eliminada',
+            default   => $eventName,
+        };
+    }
 
     protected $fillable = [
         'empresa_id',

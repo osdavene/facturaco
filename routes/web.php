@@ -236,7 +236,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/clientes/{cliente}',          [ClienteController::class, 'show'])   ->name('clientes.show');
     Route::get('/clientes/{cliente}/editar',   [ClienteController::class, 'edit'])   ->name('clientes.edit');
     Route::put('/clientes/{cliente}',          [ClienteController::class, 'update']) ->name('clientes.update');
-    Route::delete('/clientes/{cliente}',       [ClienteController::class, 'destroy'])->name('clientes.destroy');
+    Route::delete('/clientes/{cliente}',       [ClienteController::class, 'destroy'])     ->name('clientes.destroy');
+    Route::delete('/clientes',                 [ClienteController::class, 'bulkDelete'])  ->name('clientes.bulk-delete');
 
     // ── Proveedores ───────────────────────────────────────────
     Route::get('/proveedores',                    [ProveedorController::class, 'index'])  ->name('proveedores.index');
@@ -245,7 +246,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/proveedores/{proveedor}',        [ProveedorController::class, 'show'])   ->name('proveedores.show');
     Route::get('/proveedores/{proveedor}/editar', [ProveedorController::class, 'edit'])   ->name('proveedores.edit');
     Route::put('/proveedores/{proveedor}',        [ProveedorController::class, 'update']) ->name('proveedores.update');
-    Route::delete('/proveedores/{proveedor}',     [ProveedorController::class, 'destroy'])->name('proveedores.destroy');
+    Route::delete('/proveedores/{proveedor}',     [ProveedorController::class, 'destroy'])    ->name('proveedores.destroy');
+    Route::delete('/proveedores',                 [ProveedorController::class, 'bulkDelete']) ->name('proveedores.bulk-delete');
 
     // ── Inventario ────────────────────────────────────────────
     Route::get('/inventario',                       [ProductoController::class, 'index'])       ->name('inventario.index');
@@ -256,6 +258,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/inventario/{inventario}',          [ProductoController::class, 'update'])      ->name('inventario.update');
     Route::delete('/inventario/{inventario}',       [ProductoController::class, 'destroy'])     ->name('inventario.destroy');
     Route::post('/inventario/{inventario}/ajustar', [ProductoController::class, 'ajustarStock'])->name('inventario.ajustar');
+    Route::delete('/inventario',                    [ProductoController::class, 'bulkDelete'])  ->name('inventario.bulk-delete');
 
     // ── Facturación ───────────────────────────────────────────
     Route::get('/facturas',                    [FacturaController::class, 'index'])       ->name('facturas.index');
@@ -269,6 +272,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/facturas/{factura}/pdf',      [FacturaController::class, 'pdf'])         ->name('facturas.pdf');
     Route::get('/facturas/{factura}/enviar',   [FacturaController::class, 'formEnviar'])  ->name('facturas.formEnviar');
     Route::post('/facturas/{factura}/enviar',  [FacturaController::class, 'enviar'])      ->name('facturas.enviar');
+    Route::delete('/facturas',                 [FacturaController::class, 'bulkDelete'])  ->name('facturas.bulk-delete');
 
     // ── Wompi retorno ─────────────────────────────────────────
     Route::get('/facturas/{factura}/wompi/retorno', [WompiController::class, 'retorno'])->name('wompi.retorno');
@@ -289,6 +293,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/cotizaciones/{cotizacion}/estado',  [CotizacionController::class, 'cambiarEstado'])->name('cotizaciones.estado');
     Route::post('/cotizaciones/{cotizacion}/convertir',[CotizacionController::class, 'convertir'])    ->name('cotizaciones.convertir');
     Route::get('/cotizaciones/{cotizacion}/pdf',       [CotizacionController::class, 'pdf'])          ->name('cotizaciones.pdf');
+    Route::delete('/cotizaciones',                     [CotizacionController::class, 'bulkDelete'])   ->name('cotizaciones.bulk-delete');
 
     // ── Órdenes de Compra ─────────────────────────────────────
     Route::get('/ordenes',                      [OrdenCompraController::class, 'index'])        ->name('ordenes.index');
@@ -301,6 +306,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/ordenes/{orden}/estado',     [OrdenCompraController::class, 'cambiarEstado'])->name('ordenes.estado');
     Route::post('/ordenes/{orden}/recibir',     [OrdenCompraController::class, 'recibir'])      ->name('ordenes.recibir');
     Route::get('/ordenes/{orden}/pdf',          [OrdenCompraController::class, 'pdf'])          ->name('ordenes.pdf');
+    Route::delete('/ordenes',                   [OrdenCompraController::class, 'bulkDelete'])   ->name('ordenes.bulk-delete');
 
     // ── Recibos de Caja ───────────────────────────────────────
     Route::get('/recibos',              [ReciboCajaController::class, 'index'])  ->name('recibos.index');

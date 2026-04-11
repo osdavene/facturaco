@@ -744,6 +744,84 @@
     @stack('scripts')
 
     {{-- ═══════════════════════════════════════
+         BULK ACTIONS
+    ═══════════════════════════════════════ --}}
+    <script>
+    (function() {
+        function initBulkActions() {
+            const allCheckbox = document.querySelector('.bulk-select-all');
+            const bar         = document.getElementById('bulk-bar');
+            const countEl     = document.getElementById('bulk-count');
+            const form        = document.getElementById('bulk-form');
+            if (!bar || !form) return;
+
+            function getChecked() {
+                return [...document.querySelectorAll('.bulk-item:checked')];
+            }
+
+            function updateBar() {
+                const checked = getChecked();
+                if (checked.length > 0) {
+                    countEl && (countEl.textContent = checked.length + ' elemento' + (checked.length !== 1 ? 's' : '') + ' seleccionado' + (checked.length !== 1 ? 's' : ''));
+                    bar.classList.remove('hidden');
+                } else {
+                    bar.classList.add('hidden');
+                }
+                if (allCheckbox) {
+                    const all = document.querySelectorAll('.bulk-item');
+                    allCheckbox.indeterminate = checked.length > 0 && checked.length < all.length;
+                    allCheckbox.checked = all.length > 0 && checked.length === all.length;
+                }
+            }
+
+            if (allCheckbox) {
+                allCheckbox.addEventListener('change', function() {
+                    document.querySelectorAll('.bulk-item').forEach(cb => cb.checked = this.checked);
+                    updateBar();
+                });
+            }
+
+            document.addEventListener('change', function(e) {
+                if (e.target.matches('.bulk-item')) updateBar();
+            });
+
+            window.clearBulkSelection = function() {
+                document.querySelectorAll('.bulk-item').forEach(cb => cb.checked = false);
+                if (allCheckbox) { allCheckbox.checked = false; allCheckbox.indeterminate = false; }
+                bar.classList.add('hidden');
+            };
+
+            window.submitBulkAction = function(action) {
+                const checked = getChecked();
+                if (checked.length === 0) return;
+                const actionLabel = action === 'delete' ? 'eliminar' : action;
+                if (!confirm('¿Confirmas que deseas ' + actionLabel + ' los ' + checked.length + ' elemento(s) seleccionado(s)?')) return;
+
+                // Limpiar inputs anteriores
+                form.querySelectorAll('input[name="ids[]"]').forEach(el => el.remove());
+                form.querySelector('input[name="bulk_action"]')?.remove();
+
+                // Agregar IDs seleccionados
+                checked.forEach(cb => {
+                    const inp = document.createElement('input');
+                    inp.type = 'hidden'; inp.name = 'ids[]'; inp.value = cb.value;
+                    form.appendChild(inp);
+                });
+
+                // Agregar acción
+                const actInp = document.createElement('input');
+                actInp.type = 'hidden'; actInp.name = 'bulk_action'; actInp.value = action;
+                form.appendChild(actInp);
+
+                form.submit();
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', initBulkActions);
+    })();
+    </script>
+
+    {{-- ═══════════════════════════════════════
          LOADING STATES
     ═══════════════════════════════════════ --}}
     <script>

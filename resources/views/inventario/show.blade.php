@@ -222,6 +222,8 @@
     </div>
     @endif
 
+    <x-activity-log :model="$producto" />
+
 </div>
 
 @push('scripts')

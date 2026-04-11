@@ -5,12 +5,33 @@ use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Factura extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerEmpresa;
+    use HasFactory, SoftDeletes, PertenecerEmpresa, LogsActivity;
 
     protected $table = 'facturas';
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['estado', 'total', 'total_pagado', 'fecha_vencimiento', 'observaciones', 'forma_pago'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('factura');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    {
+        $activity->description = match($eventName) {
+            'created' => 'Factura creada',
+            'updated' => 'Factura actualizada',
+            'deleted' => 'Factura eliminada',
+            default   => $eventName,
+        };
+    }
 
     protected $fillable = [
         'empresa_id',

@@ -235,5 +235,7 @@
     </div>
     @endif
 
+    <x-activity-log :model="$orden" />
+
 </div>
 @endsection

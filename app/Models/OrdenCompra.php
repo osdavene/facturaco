@@ -5,13 +5,34 @@ use App\Traits\PertenecerEmpresa;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 
 class OrdenCompra extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerEmpresa;
+    use HasFactory, SoftDeletes, PertenecerEmpresa, LogsActivity;
 
     protected $table = 'ordenes_compra';
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['estado', 'total', 'fecha_esperada', 'notas_recepcion', 'observaciones'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('orden_compra');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    {
+        $activity->description = match($eventName) {
+            'created' => 'Orden de compra creada',
+            'updated' => 'Orden de compra actualizada',
+            'deleted' => 'Orden de compra eliminada',
+            default   => $eventName,
+        };
+    }
 
     protected $fillable = [
         'empresa_id',

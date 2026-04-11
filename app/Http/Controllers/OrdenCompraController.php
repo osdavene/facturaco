@@ -161,6 +161,18 @@ class OrdenCompraController extends Controller
             ->with('success', 'Orden anulada correctamente.');
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('warning', 'No se seleccionó ningún elemento.');
+        }
+        $count = OrdenCompra::whereIn('id', $ids)->count();
+        OrdenCompra::whereIn('id', $ids)->delete();
+        return redirect()->route('ordenes.index')
+            ->with('success', "{$count} orden(es) eliminada(s) correctamente.");
+    }
+
     public function cambiarEstado(Request $request, OrdenCompra $orden)
     {
         $request->validate([

@@ -233,5 +233,7 @@
     </div>
     @endif
 
+    <x-activity-log :model="$cotizacion" />
+
 </div>
 @endsection

@@ -219,6 +219,18 @@ class FacturaController extends Controller
             ->with('success', 'Factura anulada correctamente.');
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('warning', 'No se seleccionó ningún elemento.');
+        }
+        $count = Factura::whereIn('id', $ids)->where('estado', 'borrador')->count();
+        Factura::whereIn('id', $ids)->where('estado', 'borrador')->delete();
+        return redirect()->route('facturas.index')
+            ->with('success', "{$count} factura(s) eliminada(s) correctamente.");
+    }
+
     // ── CAMBIAR ESTADO ────────────────────────────────────────
 
     public function cambiarEstado(Request $request, Factura $factura)

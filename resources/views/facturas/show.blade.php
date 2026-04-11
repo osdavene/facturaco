@@ -271,5 +271,7 @@
     </div>
     @endif
 
+    <x-activity-log :model="$factura" />
+
 </div>
 @endsection

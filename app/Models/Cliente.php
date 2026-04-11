@@ -6,12 +6,33 @@ use App\Traits\PertenecerGrupo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Cliente extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerGrupo;
+    use HasFactory, SoftDeletes, PertenecerGrupo, LogsActivity;
 
     protected $table = 'clientes';
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nombres', 'apellidos', 'razon_social', 'email', 'celular', 'telefono', 'activo', 'plazo_pago', 'cupo_credito', 'regimen', 'direccion'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('cliente');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    {
+        $activity->description = match($eventName) {
+            'created' => 'Cliente creado',
+            'updated' => 'Cliente actualizado',
+            'deleted' => 'Cliente eliminado',
+            default   => $eventName,
+        };
+    }
 
     protected $fillable = [
         'empresa_id',

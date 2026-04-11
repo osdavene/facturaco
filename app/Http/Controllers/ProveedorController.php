@@ -117,4 +117,16 @@ class ProveedorController extends Controller
         return redirect()->route('proveedores.index')
             ->with('success', 'Proveedor eliminado correctamente.');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('warning', 'No se seleccionó ningún elemento.');
+        }
+        $count = Proveedor::whereIn('id', $ids)->count();
+        Proveedor::whereIn('id', $ids)->delete();
+        return redirect()->route('proveedores.index')
+            ->with('success', "{$count} proveedor(es) eliminado(s) correctamente.");
+    }
 }
