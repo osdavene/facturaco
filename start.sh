@@ -1,16 +1,15 @@
 #!/bin/bash
-set -e
+# SIN set -e para que ningún fallo mate el arranque del servidor
 
 cd /var/www/html
 
-APP_PORT="8080"
+# Railway asigna $PORT dinámicamente; si no está definido usamos 8080
+APP_PORT="${PORT:-8080}"
 
 echo "=== Iniciando FacturaCO en puerto ${APP_PORT} ==="
 
-# ── Subir límite de subida de archivos PHP ─────────────────────────────────
-# Por defecto PHP sólo permite 2MB; lo subimos a 10MB para que la validación
-# de Laravel pueda mostrar el error amigable en vez de la página de error 500.
-PHP_INI_DIR=$(php --ini | grep "Loaded Configuration" | awk '{print $NF}' | xargs dirname 2>/dev/null || echo "/usr/local/etc/php")
+# ── PHP ini ────────────────────────────────────────────────────────────────
+PHP_INI_DIR=$(php --ini 2>/dev/null | grep "Loaded Configuration" | awk '{print $NF}' | xargs dirname 2>/dev/null || echo "/usr/local/etc/php")
 mkdir -p "${PHP_INI_DIR}/conf.d"
 cat > "${PHP_INI_DIR}/conf.d/99-facturaco-uploads.ini" << 'PHP_INI'
 upload_max_filesize = 10M
@@ -18,36 +17,36 @@ post_max_size = 12M
 memory_limit = 256M
 max_execution_time = 60
 PHP_INI
-echo "=== PHP upload_max_filesize seteado a 10M ==="
+echo "=== PHP ini configurado ==="
 
-# Configurar Nginx
-cat > /etc/nginx/sites-available/default << 'NGINX'
+# ── Nginx ──────────────────────────────────────────────────────────────────
+# Usamos ${APP_PORT} y escapamos las variables propias de nginx con \$
+cat > /etc/nginx/sites-available/default << NGINX_CONF
 server {
-    listen 8080;
+    listen ${APP_PORT};
     root /var/www/html/public;
     index index.php index.html;
 
     access_log /dev/stdout;
     error_log /dev/stderr;
 
-    # Subir el límite también en Nginx (debe coincidir con PHP)
     client_max_body_size 10M;
 
     location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
-        try_files $uri =404;
+        try_files \$uri =404;
     }
 
     location / {
-        try_files $uri $uri/ /index.php?$query_string;
+        try_files \$uri \$uri/ /index.php?\$query_string;
     }
 
     location ~ \.php$ {
         fastcgi_pass 127.0.0.1:9000;
         fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param HTTP_HOST $http_host;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        fastcgi_param HTTP_HOST \$http_host;
         include fastcgi_params;
         fastcgi_read_timeout 300;
     }
@@ -56,9 +55,11 @@ server {
         deny all;
     }
 }
-NGINX
+NGINX_CONF
 
-# Generar .env con variables de Railway
+echo "=== Nginx configurado en puerto ${APP_PORT} ==="
+
+# ── .env ───────────────────────────────────────────────────────────────────
 cat > .env << EOF
 APP_NAME="${APP_NAME:-FacturaCO}"
 APP_ENV=production
@@ -113,17 +114,20 @@ EOF
 
 echo "=== .env generado ==="
 
-# Storage link y cache de vistas (rápidos, antes de arrancar)
+# ── Preparación rápida ──────────────────────────────────────────────────────
 php artisan storage:link 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 
+# ── PHP-FPM ────────────────────────────────────────────────────────────────
 echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
+echo "=== PHP-FPM iniciado (PID: $!) ==="
 
-# Migraciones en BACKGROUND para no bloquear el arranque del servidor
+# ── Migraciones en background (no bloquean el arranque) ───────────────────
 echo "=== Migraciones iniciando en background ==="
 (php artisan migrate --force 2>&1 && echo "=== Migraciones completadas ===") \
     || echo "=== ADVERTENCIA: migración falló ===" &
 
-echo "=== Nginx iniciando en puerto ${APP_PORT} ==="
+# ── Nginx en primer plano (mantiene el container vivo) ────────────────────
+echo "=== Nginx iniciando ==="
 exec nginx -g 'daemon off;'

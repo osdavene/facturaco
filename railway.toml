@@ -1,5 +1,4 @@
 [deploy]
-startCommand = "php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan event:cache && php artisan migrate --force && php artisan storage:link --force && php -S 0.0.0.0:$PORT -t public"
 healthcheckPath = "/login"
 healthcheckTimeout = 120
 restartPolicyType = "on_failure"
