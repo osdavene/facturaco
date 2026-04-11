@@ -100,14 +100,19 @@ Route::middleware('auth')->group(function () {
 
             $ventasPorMes = collect();
             for ($i = 11; $i >= 0; $i--) {
-                $fecha = now()->subMonths($i);
-                $total = \App\Models\Factura::whereMonth('fecha_emision', $fecha->month)
-                          ->whereYear('fecha_emision', $fecha->year)
-                          ->where('estado', '!=', 'anulada')->sum('total');
+                $fecha      = now()->subMonths($i);
+                $fechaAnio  = now()->subMonths($i)->subYear();
+                $total      = \App\Models\Factura::whereMonth('fecha_emision', $fecha->month)
+                              ->whereYear('fecha_emision', $fecha->year)
+                              ->where('estado', '!=', 'anulada')->sum('total');
+                $totalAnio  = \App\Models\Factura::whereMonth('fecha_emision', $fechaAnio->month)
+                              ->whereYear('fecha_emision', $fechaAnio->year)
+                              ->where('estado', '!=', 'anulada')->sum('total');
                 $ventasPorMes->push([
-                    'mes'   => $fecha->locale('es')->isoFormat('MMM'),
-                    'anio'  => $fecha->year,
-                    'total' => (float) $total,
+                    'mes'        => $fecha->locale('es')->isoFormat('MMM'),
+                    'anio'       => $fecha->year,
+                    'total'      => (float) $total,
+                    'total_anio' => (float) $totalAnio,
                 ]);
             }
 
@@ -155,10 +160,44 @@ Route::middleware('auth')->group(function () {
                                 ->whereYear('fecha_emision', now()->year)
                                 ->groupBy('estado')->get()
                                 ->keyBy('estado');
+
+            // ── Deltas para tendencias ────────────────────────────
+            $mesAnterior       = now()->subMonth();
+            $ventasMesAnterior = \App\Models\Factura::whereMonth('fecha_emision', $mesAnterior->month)
+                                  ->whereYear('fecha_emision', $mesAnterior->year)
+                                  ->where('estado', '!=', 'anulada')->sum('total');
+
+            $ventasAyer        = \App\Models\Factura::whereDate('fecha_emision', today()->subDay())
+                                  ->where('estado', '!=', 'anulada')->sum('total');
+
+            $ventasAnoAnterior = \App\Models\Factura::whereYear('fecha_emision', now()->year - 1)
+                                  ->where('estado', '!=', 'anulada')->sum('total');
+
+            $deltaHoy = $ventasAyer > 0
+                ? round((($ventasHoy - $ventasAyer) / $ventasAyer) * 100, 1)
+                : ($ventasHoy > 0 ? 100 : 0);
+
+            $deltaMes = $ventasMesAnterior > 0
+                ? round((($ventasMes - $ventasMesAnterior) / $ventasMesAnterior) * 100, 1)
+                : ($ventasMes > 0 ? 100 : 0);
+
+            $deltaAno = $ventasAnoAnterior > 0
+                ? round((($ventasAno - $ventasAnoAnterior) / $ventasAnoAnterior) * 100, 1)
+                : ($ventasAno > 0 ? 100 : 0);
+
+            $ticketPromedio        = $facturasMes > 0 ? round($ventasMes / $facturasMes) : 0;
+            $facturasMesAnterior   = \App\Models\Factura::whereMonth('fecha_emision', $mesAnterior->month)
+                                      ->whereYear('fecha_emision', $mesAnterior->year)->count();
+            $deltaTicket           = $facturasMesAnterior > 0
+                ? round((($facturasMes - $facturasMesAnterior) / $facturasMesAnterior) * 100, 1)
+                : ($facturasMes > 0 ? 100 : 0);
+
         } catch (\Throwable) {
             $ventasHoy = $ventasMes = $ventasAno = $cartera = $facturasMes = $facturasVencidas = 0;
             $ultimasFacturas = $ventasPorMes = $ventasSemana = $topClientes = $topProductos = collect();
             $ventasPorEstado = collect();
+            $deltaHoy = $deltaMes = $deltaAno = $deltaTicket = 0;
+            $ticketPromedio = 0;
         }
 
         try {
@@ -185,7 +224,8 @@ Route::middleware('auth')->group(function () {
             'empresa', 'ventasHoy', 'ventasMes', 'ventasAno', 'cartera', 'facturasMes',
             'facturasVencidas', 'productosStockBajo', 'cotizacionesPend', 'ordenesPend',
             'ultimasFacturas', 'ventasSemana', 'ventasPorMes', 'topClientes',
-            'topProductos', 'ventasPorEstado'
+            'topProductos', 'ventasPorEstado',
+            'deltaHoy', 'deltaMes', 'deltaAno', 'deltaTicket', 'ticketPromedio'
         ));
     })->middleware('verified')->name('dashboard');
 

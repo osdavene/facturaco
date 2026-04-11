@@ -5,19 +5,6 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
 
-    @if(session('success'))
-    <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
-                rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-        <i class="fas fa-check-circle"></i> {{ session('success') }}
-    </div>
-    @endif
-
-    @if($errors->any())
-    <div class="bg-red-500/10 border border-red-500/30 text-red-400
-                rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-        <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
-    </div>
-    @endif
 
     {{-- Header perfil --}}
     <div class="card p-6 mb-4">

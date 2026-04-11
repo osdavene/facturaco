@@ -4,13 +4,6 @@
 
 @section('content')
 
-@if(session('success'))
-<div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
-            rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-    <i class="fas fa-check-circle"></i> {{ session('success') }}
-</div>
-@endif
-
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
         <h1 class="font-display font-bold text-2xl">Proveedores</h1>
@@ -153,21 +146,13 @@
                     </td>
                 </tr>
                 @empty
-                <tr>
-                    <td colspan="6" class="px-5 py-16 text-center">
-                        <div class="flex flex-col items-center gap-3">
-                            <div class="w-14 h-14 bg-[#1a2235] rounded-2xl flex items-center
-                                        justify-center text-slate-600 text-2xl">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                            <div class="text-slate-500">No hay proveedores registrados</div>
-                            <a href="{{ route('proveedores.create') }}"
-                               class="text-amber-500 hover:underline text-sm font-medium">
-                                + Crear el primero
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                <x-empty-state
+                    icon="fa-truck"
+                    title="No hay proveedores registrados"
+                    subtitle="Registra tus proveedores para gestionar órdenes de compra y pagos."
+                    href="{{ route('proveedores.create') }}"
+                    label="Nuevo Proveedor"
+                    :colspan="6" />
                 @endforelse
             </tbody>
         </table>

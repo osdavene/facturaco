@@ -4,13 +4,6 @@
 
 @section('content')
 
-@if(session('success'))
-<div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
-            rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-    <i class="fas fa-check-circle"></i> {{ session('success') }}
-</div>
-@endif
-
 {{-- Alerta resolución DIAN --}}
 @if($empresa->resolucion_vencimiento)
     @if(!$empresa->resolucion_vigente)

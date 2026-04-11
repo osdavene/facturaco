@@ -13,6 +13,13 @@
 </head>
 <body class="bg-[#0b0f1a] text-slate-200 font-sans">
 
+    {{-- Barra de progreso de navegación --}}
+    <div id="page-progress"
+         style="position:fixed;top:0;left:0;height:2px;background:#f59e0b;z-index:9999;
+                width:0%;opacity:0;pointer-events:none;
+                box-shadow:0 0 8px rgba(245,158,11,0.6);
+                transition:width 0.25s ease,opacity 0.2s ease;"></div>
+
     {{-- Overlay móvil --}}
     <div id="overlay" onclick="closeSidebar()"
          class="hidden fixed inset-0 bg-black/50 z-[99] lg:hidden"></div>
@@ -735,6 +742,83 @@
     </script>
 
     @stack('scripts')
+
+    {{-- ═══════════════════════════════════════
+         LOADING STATES
+    ═══════════════════════════════════════ --}}
+    <script>
+    (function() {
+        const bar = document.getElementById('page-progress');
+
+        function progressStart() {
+            if (!bar) return;
+            bar.style.transition = 'none';
+            bar.style.width      = '0%';
+            bar.style.opacity    = '1';
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                bar.style.transition = 'width 15s cubic-bezier(0.1,0.05,0,1)';
+                bar.style.width      = '92%';
+            }));
+        }
+
+        function progressDone() {
+            if (!bar) return;
+            bar.style.transition = 'width 0.2s ease, opacity 0.3s ease 0.25s';
+            bar.style.width      = '100%';
+            bar.style.opacity    = '0';
+            setTimeout(() => { bar.style.width = '0%'; bar.style.transition = 'none'; }, 600);
+        }
+
+        // Progreso en navegación (clics en enlaces internos)
+        document.addEventListener('click', function(e) {
+            const a = e.target.closest('a[href]');
+            if (!a) return;
+            const href = a.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript') ||
+                href.startsWith('mailto') || href.startsWith('tel')) return;
+            if (a.target === '_blank') return;
+            if (a.hasAttribute('data-no-progress')) return;
+            progressStart();
+        });
+
+        // Completar barra cuando la página carga / regresa del bfcache
+        window.addEventListener('pageshow', progressDone);
+        window.addEventListener('load',     progressDone);
+
+        // Loading state en submit de formularios
+        document.addEventListener('submit', function(e) {
+            if (e.defaultPrevented) return;
+
+            const form = e.target;
+            // Saltar formularios de eliminación (método DELETE oculto)
+            const methodInput = form.querySelector('input[name="_method"]');
+            if (methodInput && ['DELETE', 'delete'].includes(methodInput.value)) return;
+
+            progressStart();
+
+            // Buscar el botón submit activo
+            const btn = form.querySelector('[type="submit"]:not([data-no-loading])') ||
+                        document.querySelector(`[form="${form.id}"][type="submit"]:not([data-no-loading])`);
+            if (!btn) return;
+
+            btn.disabled = true;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin inline-block w-4 h-4 mr-1.5 -mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>Guardando…`;
+
+            // Restaurar si el usuario regresa (bfcache)
+            window.addEventListener('pageshow', function onPageShow(ev) {
+                if (ev.persisted) {
+                    btn.disabled  = false;
+                    btn.innerHTML = originalHTML;
+                }
+                window.removeEventListener('pageshow', onPageShow);
+            });
+        });
+    })();
+    </script>
 
     {{-- ═══════════════════════════════════════
          TOAST NOTIFICATIONS

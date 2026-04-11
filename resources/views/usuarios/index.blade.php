@@ -4,20 +4,6 @@
 
 @section('content')
 
-@if(session('success'))
-<div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
-            rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-    <i class="fas fa-check-circle"></i> {{ session('success') }}
-</div>
-@endif
-
-@if(session('error'))
-<div class="bg-red-500/10 border border-red-500/30 text-red-400
-            rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-</div>
-@endif
-
 {{-- Encabezado --}}
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
@@ -180,17 +166,13 @@
                     </td>
                 </tr>
                 @empty
-                <tr>
-                    <td colspan="6" class="px-5 py-16 text-center">
-                        <div class="flex flex-col items-center gap-3">
-                            <div class="w-14 h-14 bg-[#1a2235] rounded-2xl flex items-center
-                                        justify-center text-slate-600 text-2xl">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="text-slate-500">No hay usuarios registrados</div>
-                        </div>
-                    </td>
-                </tr>
+                <x-empty-state
+                    icon="fa-user-circle"
+                    title="No hay usuarios registrados"
+                    subtitle="Invita usuarios a tu equipo y asígnales roles según sus responsabilidades."
+                    href="{{ route('usuarios.create') }}"
+                    label="Nuevo Usuario"
+                    :colspan="6" />
                 @endforelse
             </tbody>
         </table>

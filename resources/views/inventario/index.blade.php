@@ -4,13 +4,6 @@
 
 @section('content')
 
-@if(session('success'))
-<div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
-            rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-    <i class="fas fa-check-circle"></i> {{ session('success') }}
-</div>
-@endif
-
 {{-- Encabezado --}}
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
@@ -204,21 +197,13 @@
                     </td>
                 </tr>
                 @empty
-                <tr>
-                    <td colspan="6" class="px-5 py-16 text-center">
-                        <div class="flex flex-col items-center gap-3">
-                            <div class="w-14 h-14 bg-[#1a2235] rounded-2xl flex items-center
-                                        justify-center text-slate-600 text-2xl">
-                                <i class="fas fa-boxes"></i>
-                            </div>
-                            <div class="text-slate-500">No hay productos registrados</div>
-                            <a href="{{ route('inventario.create') }}"
-                               class="text-amber-500 hover:underline text-sm font-medium">
-                                + Crear el primero
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                <x-empty-state
+                    icon="fa-boxes"
+                    title="No hay productos en el inventario"
+                    subtitle="Crea productos o servicios para agregarlos a tus facturas y cotizaciones."
+                    href="{{ route('inventario.create') }}"
+                    label="Nuevo Producto"
+                    :colspan="6" />
                 @endforelse
             </tbody>
         </table>

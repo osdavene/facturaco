@@ -4,13 +4,6 @@
 
 @section('content')
 
-@if(session('success'))
-<div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
-            rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-    <i class="fas fa-check-circle"></i> {{ session('success') }}
-</div>
-@endif
-
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
         <h1 class="font-display font-bold text-2xl">Órdenes de Compra</h1>
@@ -160,21 +153,13 @@
                     </td>
                 </tr>
                 @empty
-                <tr>
-                    <td colspan="7" class="px-5 py-16 text-center">
-                        <div class="flex flex-col items-center gap-3">
-                            <div class="w-14 h-14 bg-[#1a2235] rounded-2xl flex items-center
-                                        justify-center text-slate-600 text-2xl">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
-                            <div class="text-slate-500">No hay órdenes de compra</div>
-                            <a href="{{ route('ordenes.create') }}"
-                               class="text-amber-500 hover:underline text-sm">
-                                + Crear la primera
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                <x-empty-state
+                    icon="fa-shopping-cart"
+                    title="No hay órdenes de compra"
+                    subtitle="Genera órdenes a tus proveedores para controlar las compras de inventario."
+                    href="{{ route('ordenes.create') }}"
+                    label="Nueva Orden"
+                    :colspan="7" />
                 @endforelse
             </tbody>
         </table>

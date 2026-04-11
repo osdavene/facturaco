@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaCO — Página no encontrada</title>
+    <title>FacturaCO — Acceso denegado</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
-        .orb-1 { width: 400px; height: 400px; background: rgba(245,158,11,0.06); top: -100px; right: -100px; animation: drift 8s ease-in-out infinite; }
-        .orb-2 { width: 300px; height: 300px; background: rgba(59,130,246,0.05); bottom: -80px; left: -80px; animation: drift 10s ease-in-out infinite reverse; }
+        .orb-1 { width: 400px; height: 400px; background: rgba(139,92,246,0.07); top: -100px; right: -100px; animation: drift 8s ease-in-out infinite; }
+        .orb-2 { width: 300px; height: 300px; background: rgba(245,158,11,0.04); bottom: -80px; left: -80px; animation: drift 10s ease-in-out infinite reverse; }
         @keyframes drift {
             0%,100% { transform: translate(0,0) scale(1); }
             50% { transform: translate(30px,20px) scale(1.05); }
         }
-        .code-glow {
-            text-shadow: 0 0 80px rgba(245,158,11,0.15), 0 0 160px rgba(245,158,11,0.05);
-        }
+        .code-glow { text-shadow: 0 0 80px rgba(139,92,246,0.12), 0 0 160px rgba(139,92,246,0.05); }
         .grid-bg {
             background-image:
                 linear-gradient(rgba(30,45,71,0.4) 1px, transparent 1px),
@@ -34,28 +32,24 @@
 
     <div class="relative text-center max-w-lg w-full z-10">
 
-        {{-- Código --}}
         <div class="font-display font-black text-[9rem] sm:text-[11rem] leading-none
-                    text-amber-500/10 code-glow select-none mb-2 tracking-tight">
-            404
+                    text-violet-500/10 code-glow select-none mb-2 tracking-tight">
+            403
         </div>
 
-        {{-- Icono --}}
-        <div class="w-20 h-20 bg-amber-500/10 border border-amber-500/20 rounded-3xl
+        <div class="w-20 h-20 bg-violet-500/10 border border-violet-500/20 rounded-3xl
                     flex items-center justify-center mx-auto -mt-8 mb-6 relative z-10
-                    shadow-lg shadow-amber-500/5">
-            <i class="fas fa-map-signs text-amber-500 text-3xl"></i>
+                    shadow-lg shadow-violet-500/5">
+            <i class="fas fa-lock text-violet-400 text-3xl"></i>
         </div>
 
-        {{-- Texto --}}
         <h1 class="font-display font-bold text-2xl sm:text-3xl mb-3">
-            Página no encontrada
+            Sin permisos de acceso
         </h1>
         <p class="text-slate-400 text-sm sm:text-base leading-relaxed mb-8 max-w-sm mx-auto">
-            La dirección que escribiste no existe o fue movida. Verifica la URL o regresa al inicio.
+            No tienes autorización para ver esta sección. Si crees que es un error, contacta al administrador del sistema.
         </p>
 
-        {{-- Acciones --}}
         <div class="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="javascript:history.back()"
                class="inline-flex items-center justify-center gap-2 px-5 py-2.5
@@ -80,10 +74,9 @@
             @endauth
         </div>
 
-        {{-- Branding --}}
         <div class="mt-12 flex items-center justify-center gap-2 text-slate-700">
             <span class="font-display font-black text-sm">FacturaCO</span>
-            <span class="text-xs">· Error 404</span>
+            <span class="text-xs">· Error 403</span>
         </div>
 
     </div>

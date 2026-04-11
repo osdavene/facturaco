@@ -5,13 +5,6 @@
 @section('content')
 <div class="max-w-5xl mx-auto">
 
-    @if(session('success'))
-    <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
-                rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
-        <i class="fas fa-check-circle"></i> {{ session('success') }}
-    </div>
-    @endif
-
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="font-display font-bold text-2xl">Notas de Crédito</h1>
@@ -60,13 +53,11 @@
     {{-- Tabla --}}
     <div class="card overflow-hidden">
         @if($notas->isEmpty())
-        <div class="py-16 flex flex-col items-center text-slate-500">
-            <i class="fas fa-file-invoice text-5xl mb-4 opacity-20"></i>
-            <p class="font-semibold">No hay notas de crédito</p>
-            <p class="text-sm mt-1 text-slate-600">
-                Las notas de crédito se crean desde el detalle de una factura.
-            </p>
-        </div>
+        <x-empty-state
+            :table="false"
+            icon="fa-file-invoice"
+            title="No hay notas de crédito"
+            subtitle="Las notas de crédito se generan desde el detalle de una factura emitida." />
         @else
         <table class="w-full text-sm">
             <thead>

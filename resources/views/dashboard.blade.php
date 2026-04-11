@@ -29,6 +29,52 @@
     </div>
 </div>
 
+{{-- MÉTRICAS SECUNDARIAS --}}
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-xl px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center text-red-400 flex-shrink-0">
+            <i class="fas fa-hand-holding-usd text-xs"></i>
+        </div>
+        <div>
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Cartera</div>
+            <div class="font-bold text-sm text-red-400">${{ number_format($cartera/1000000, 1) }}M</div>
+        </div>
+    </div>
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-xl px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500 flex-shrink-0">
+            <i class="fas fa-receipt text-xs"></i>
+        </div>
+        <div>
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Ticket Promedio</div>
+            <div class="font-bold text-sm text-amber-500">
+                ${{ $ticketPromedio > 0 ? number_format($ticketPromedio/1000, 0).'k' : '—' }}
+            </div>
+        </div>
+    </div>
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-xl px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 flex-shrink-0">
+            <i class="fas fa-exclamation-triangle text-xs"></i>
+        </div>
+        <div>
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Vencidas</div>
+            <div class="font-bold text-sm {{ $facturasVencidas > 0 ? 'text-red-400' : 'text-slate-400' }}">
+                {{ $facturasVencidas }} factura{{ $facturasVencidas != 1 ? 's' : '' }}
+            </div>
+        </div>
+    </div>
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-xl px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500 flex-shrink-0">
+            <i class="fas fa-boxes text-xs"></i>
+        </div>
+        <div>
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Stock Bajo</div>
+            <div class="font-bold text-sm {{ $productosStockBajo > 0 ? 'text-amber-400' : 'text-slate-400' }}">
+                {{ $productosStockBajo }} producto{{ $productosStockBajo != 1 ? 's' : '' }}
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- ALERTAS --}}
 @if($facturasVencidas > 0 || $productosStockBajo > 0 || $cotizacionesPend > 0 || $ordenesPend > 0)
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -87,8 +133,23 @@
 </div>
 @endif
 
+@php
+// Helper para badge de tendencia
+function deltaBadge(float $delta): string {
+    if ($delta == 0) return '<span class="text-[10px] text-slate-500">— sin cambio</span>';
+    $up    = $delta > 0;
+    $color = $up ? 'emerald' : 'red';
+    $arrow = $up ? '▲' : '▼';
+    $abs   = abs($delta);
+    return "<span class=\"inline-flex items-center gap-0.5 text-[10px] font-semibold text-{$color}-400\">"
+         . "{$arrow} {$abs}% <span class=\"text-slate-600 font-normal\">vs anterior</span></span>";
+}
+@endphp
+
 {{-- KPIs PRINCIPALES --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+    {{-- Ventas Hoy --}}
     <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas Hoy</div>
@@ -99,8 +160,10 @@
         <div class="font-display font-bold text-2xl text-emerald-500">
             ${{ number_format($ventasHoy, 0, ',', '.') }}
         </div>
-        <div class="text-xs text-slate-500 mt-1">{{ now()->format('d/m/Y') }}</div>
+        <div class="mt-1.5">{!! deltaBadge($deltaHoy) !!}</div>
     </div>
+
+    {{-- Ventas del Mes --}}
     <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Mes</div>
@@ -111,10 +174,10 @@
         <div class="font-display font-bold text-2xl text-blue-400">
             ${{ number_format($ventasMes, 0, ',', '.') }}
         </div>
-        <div class="text-xs text-slate-500 mt-1">
-            {{ $facturasMes }} facturas · {{ now()->locale('es')->monthName }}
-        </div>
+        <div class="mt-1.5">{!! deltaBadge($deltaMes) !!}</div>
     </div>
+
+    {{-- Ventas del Año --}}
     <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Año</div>
@@ -125,20 +188,28 @@
         <div class="font-display font-bold text-2xl text-amber-500">
             ${{ number_format($ventasAno, 0, ',', '.') }}
         </div>
-        <div class="text-xs text-slate-500 mt-1">Acumulado {{ now()->year }}</div>
+        <div class="mt-1.5">{!! deltaBadge($deltaAno) !!}</div>
     </div>
+
+    {{-- Facturas del Mes --}}
     <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider">Cartera</div>
-            <div class="w-9 h-9 bg-red-500/10 rounded-xl flex items-center justify-center text-red-400">
-                <i class="fas fa-hand-holding-usd text-sm"></i>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">Facturas del Mes</div>
+            <div class="w-9 h-9 bg-violet-500/10 rounded-xl flex items-center justify-center text-violet-400">
+                <i class="fas fa-file-invoice text-sm"></i>
             </div>
         </div>
-        <div class="font-display font-bold text-2xl text-red-400">
-            ${{ number_format($cartera, 0, ',', '.') }}
+        <div class="flex items-end gap-2">
+            <div class="font-display font-bold text-2xl text-violet-400">{{ $facturasMes }}</div>
+            @if($ticketPromedio > 0)
+            <div class="text-xs text-slate-500 mb-1 pb-0.5">
+                ~${{ number_format($ticketPromedio/1000, 0) }}k/ticket
+            </div>
+            @endif
         </div>
-        <div class="text-xs text-slate-500 mt-1">Por cobrar</div>
+        <div class="mt-1.5">{!! deltaBadge($deltaTicket) !!}</div>
     </div>
+
 </div>
 
 {{-- FILA 1: Ventas 12 meses + Donut estados --}}
@@ -362,14 +433,13 @@
                     </td>
                 </tr>
                 @empty
-                <tr>
-                    <td colspan="5" class="px-5 py-10 text-center text-slate-500 text-sm">
-                        No hay facturas aún —
-                        <a href="{{ route('facturas.create') }}" class="text-amber-500 hover:underline">
-                            crear la primera
-                        </a>
-                    </td>
-                </tr>
+                <x-empty-state
+                    icon="fa-file-invoice"
+                    title="No hay facturas aún"
+                    subtitle="Crea tu primera factura para verla aquí."
+                    href="{{ route('facturas.create') }}"
+                    label="Nueva Factura"
+                    :colspan="5" />
                 @endforelse
             </tbody>
         </table>
@@ -386,8 +456,9 @@ Chart.defaults.borderColor = '#1e2d47';
 Chart.defaults.font.family = 'Inter, sans-serif';
 
 // ── Datos desde PHP ───────────────────────────────────────
-const meses = @json($ventasPorMes->pluck('mes'));
-const totalesMeses = @json($ventasPorMes->pluck('total'));
+const meses         = @json($ventasPorMes->pluck('mes'));
+const totalesMeses  = @json($ventasPorMes->pluck('total'));
+const totalesAnio   = @json($ventasPorMes->pluck('total_anio'));
 
 const dias = @json($ventasSemana->pluck('dia'));
 const totalesDias = @json($ventasSemana->pluck('total'));
@@ -411,34 +482,65 @@ new Chart(document.getElementById('chartVentasMeses'), {
     type: 'line',
     data: {
         labels: meses,
-        datasets: [{
-            label: 'Ventas',
-            data: totalesMeses,
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245,158,11,0.08)',
-            borderWidth: 2.5,
-            pointBackgroundColor: '#f59e0b',
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            tension: 0.4,
-            fill: true,
-        }]
+        datasets: [
+            {
+                label: '{{ now()->year }}',
+                data: totalesMeses,
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245,158,11,0.06)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#f59e0b',
+                pointRadius: 3,
+                pointHoverRadius: 6,
+                tension: 0.4,
+                fill: true,
+                order: 1,
+            },
+            {
+                label: '{{ now()->year - 1 }}',
+                data: totalesAnio,
+                borderColor: '#334155',
+                backgroundColor: 'transparent',
+                borderWidth: 1.5,
+                borderDash: [4, 3],
+                pointBackgroundColor: '#334155',
+                pointRadius: 2,
+                pointHoverRadius: 4,
+                tension: 0.4,
+                fill: false,
+                order: 2,
+            }
+        ]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
         plugins: {
-            legend: { display: false },
+            legend: {
+                display: true,
+                position: 'top',
+                align: 'end',
+                labels: {
+                    boxWidth: 12,
+                    boxHeight: 2,
+                    padding: 12,
+                    color: '#64748b',
+                    font: { size: 11 },
+                    usePointStyle: true,
+                    pointStyle: 'line',
+                }
+            },
             tooltip: {
                 callbacks: {
-                    label: ctx => ' ' + formatCOP(ctx.parsed.y)
+                    label: ctx => ' ' + ctx.dataset.label + ': ' + formatCOP(ctx.parsed.y)
                 }
             }
         },
         scales: {
-            x: { grid: { color: '#1e2d47' } },
+            x: { grid: { color: '#1e2d4730' } },
             y: {
-                grid: { color: '#1e2d47' },
+                grid: { color: '#1e2d4730' },
                 ticks: { callback: v => formatCOP(v) }
             }
         }

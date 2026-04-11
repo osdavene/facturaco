@@ -4,28 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FacturaCO — Error del servidor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+        .orb-1 { width: 400px; height: 400px; background: rgba(239,68,68,0.06); top: -100px; right: -100px; animation: drift 8s ease-in-out infinite; }
+        .orb-2 { width: 300px; height: 300px; background: rgba(245,158,11,0.04); bottom: -80px; left: -80px; animation: drift 10s ease-in-out infinite reverse; }
+        @keyframes drift {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(30px,20px) scale(1.05); }
+        }
+        .code-glow { text-shadow: 0 0 80px rgba(239,68,68,0.12), 0 0 160px rgba(239,68,68,0.05); }
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(30,45,71,0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30,45,71,0.4) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+    </style>
 </head>
-<body class="bg-[#0b0f1a] text-slate-200 font-sans min-h-screen flex items-center justify-center p-6">
-    <div class="text-center max-w-md">
-        <div class="font-display font-black text-[8rem] leading-none text-red-500/20 mb-4">
+<body class="bg-[#0b0f1a] text-slate-200 font-sans min-h-screen flex items-center justify-center p-6 overflow-hidden relative">
+
+    <div class="grid-bg absolute inset-0 opacity-60"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="relative text-center max-w-lg w-full z-10">
+
+        <div class="font-display font-black text-[9rem] sm:text-[11rem] leading-none
+                    text-red-500/10 code-glow select-none mb-2 tracking-tight">
             500
         </div>
-        <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl
-                    flex items-center justify-center mx-auto mb-6">
-            <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
+
+        <div class="w-20 h-20 bg-red-500/10 border border-red-500/20 rounded-3xl
+                    flex items-center justify-center mx-auto -mt-8 mb-6 relative z-10
+                    shadow-lg shadow-red-500/5">
+            <i class="fas fa-server text-red-400 text-3xl"></i>
         </div>
-        <h1 class="font-display font-bold text-2xl mb-3">Error del servidor</h1>
-        <p class="text-slate-400 text-sm mb-8">
-            Algo salió mal. Intenta de nuevo o contacta al administrador.
+
+        <h1 class="font-display font-bold text-2xl sm:text-3xl mb-3">
+            Error interno del servidor
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base leading-relaxed mb-8 max-w-sm mx-auto">
+            Algo salió mal en el servidor. Ya fuimos notificados y estamos trabajando en ello. Intenta de nuevo en unos momentos.
         </p>
-        <a href="{{ route('dashboard') }}"
-           class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-black font-semibold
-                  rounded-xl transition-colors text-sm inline-flex items-center gap-2">
-            <i class="fas fa-chart-line text-xs"></i> Ir al Dashboard
-        </a>
+
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="javascript:location.reload()"
+               class="inline-flex items-center justify-center gap-2 px-5 py-2.5
+                      bg-[#141c2e] border border-[#1e2d47] hover:border-slate-500
+                      text-slate-400 hover:text-slate-200 rounded-xl transition-colors text-sm">
+                <i class="fas fa-redo text-xs"></i> Reintentar
+            </a>
+            @auth
+            <a href="{{ route('dashboard') }}"
+               class="inline-flex items-center justify-center gap-2 px-6 py-2.5
+                      bg-amber-500 hover:bg-amber-600 text-black font-semibold
+                      rounded-xl transition-colors text-sm">
+                <i class="fas fa-chart-line text-xs"></i> Ir al Dashboard
+            </a>
+            @else
+            <a href="{{ route('login') }}"
+               class="inline-flex items-center justify-center gap-2 px-6 py-2.5
+                      bg-amber-500 hover:bg-amber-600 text-black font-semibold
+                      rounded-xl transition-colors text-sm">
+                <i class="fas fa-sign-in-alt text-xs"></i> Inicio
+            </a>
+            @endauth
+        </div>
+
+        <div class="mt-12 flex items-center justify-center gap-2 text-slate-700">
+            <span class="font-display font-black text-sm">FacturaCO</span>
+            <span class="text-xs">· Error 500</span>
+        </div>
+
     </div>
 </body>
 </html>
