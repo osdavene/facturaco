@@ -113,9 +113,9 @@ EOF
 
 echo "=== .env generado ==="
 
-# Ejecutar migraciones
+# Ejecutar migraciones (|| true para que un fallo no mate el servidor)
 echo "=== Ejecutando migraciones ==="
-php artisan migrate --force
+php artisan migrate --force || echo "=== ADVERTENCIA: migración falló, el servidor igual arrancará ==="
 
 # Storage link
 php artisan storage:link 2>/dev/null || true
