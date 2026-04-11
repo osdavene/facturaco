@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+
 class FacturaController extends Controller
 {
     public function __construct(
@@ -39,18 +40,16 @@ class FacturaController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $totales = DB::selectOne("
-            SELECT
-                COUNT(*)::int                                                          AS total,
-                SUM(CASE WHEN estado='pagada'  THEN 1 ELSE 0 END)::int               AS pagadas,
-                SUM(CASE WHEN estado='emitida' THEN 1 ELSE 0 END)::int               AS emitidas,
-                SUM(CASE WHEN estado='vencida' THEN 1 ELSE 0 END)::int               AS vencidas,
-                COALESCE(SUM(CASE WHEN estado != 'anulada' THEN total ELSE 0 END),0)  AS monto_total,
-                COALESCE(SUM(CASE WHEN estado IN ('emitida','vencida')
-                               THEN (total - total_pagado) ELSE 0 END),0)             AS cartera
-            FROM facturas
-            WHERE deleted_at IS NULL
-        ");
+        $totales = (object) [
+            'total'       => Factura::count(),
+            'pagadas'     => Factura::where('estado', 'pagada')->count(),
+            'emitidas'    => Factura::where('estado', 'emitida')->count(),
+            'vencidas'    => Factura::where('estado', 'vencida')->count(),
+            'monto_total' => Factura::where('estado', '!=', 'anulada')->sum('total'),
+            'cartera'     => Factura::whereIn('estado', ['emitida', 'vencida'])
+                                ->selectRaw('COALESCE(SUM(total - total_pagado), 0) as cartera')
+                                ->value('cartera') ?? 0,
+        ];
 
         return view('facturas.index', compact('facturas', 'totales'));
     }

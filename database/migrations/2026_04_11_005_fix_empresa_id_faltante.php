@@ -1,16 +1,15 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     /**
-     * Esta migración repara el caso en que la migración
-     * 2026_04_11_002_add_empresa_id_to_all_tables quedó
-     * registrada en la tabla migrations pero los ALTER TABLE
-     * no se aplicaron realmente en la base de datos.
+     * Repara el caso en que _002 quedó registrada pero los ALTER TABLE
+     * no se aplicaron. En SQLite (tests) siempre es un no-op porque _002 ya corrió.
      */
     private array $tablas = [
         'clientes', 'proveedores', 'productos', 'categorias', 'unidades_medida',
@@ -21,19 +20,25 @@ return new class extends Migration
     public function up(): void
     {
         $empresaId = DB::table('empresa')->value('id') ?? 1;
+        $driver    = DB::getDriverName();
 
         foreach ($this->tablas as $tabla) {
             if (Schema::hasTable($tabla) && !Schema::hasColumn($tabla, 'empresa_id')) {
-                DB::statement("
-                    ALTER TABLE \"{$tabla}\"
-                    ADD COLUMN \"empresa_id\" BIGINT NOT NULL DEFAULT {$empresaId}
-                    REFERENCES \"empresa\"(\"id\") ON DELETE CASCADE
-                ");
-                DB::statement("ALTER TABLE \"{$tabla}\" ALTER COLUMN \"empresa_id\" DROP DEFAULT");
+                if ($driver === 'sqlite') {
+                    Schema::table($tabla, function (Blueprint $table) use ($empresaId) {
+                        $table->unsignedBigInteger('empresa_id')->default($empresaId)->after('id');
+                    });
+                } else {
+                    DB::statement("
+                        ALTER TABLE \"{$tabla}\"
+                        ADD COLUMN \"empresa_id\" BIGINT NOT NULL DEFAULT {$empresaId}
+                        REFERENCES \"empresa\"(\"id\") ON DELETE CASCADE
+                    ");
+                    DB::statement("ALTER TABLE \"{$tabla}\" ALTER COLUMN \"empresa_id\" DROP DEFAULT");
+                }
             }
         }
 
-        // Reemplazar unique constraints simples por compuestos (empresa_id, columna)
         $uniques = [
             'facturas'       => 'numero',
             'cotizaciones'   => 'numero',
@@ -45,41 +50,36 @@ return new class extends Migration
         ];
 
         foreach ($uniques as $tabla => $col) {
-            if (Schema::hasTable($tabla) && Schema::hasColumn($tabla, 'empresa_id')) {
-                // Eliminar constraint con nombre o índice (PostgreSQL requiere DROP CONSTRAINT cuando existe como constraint)
-                $constraintName = "{$tabla}_{$col}_unique";
-                $constraintExists = DB::selectOne(
-                    "SELECT 1 FROM information_schema.table_constraints WHERE table_name = ? AND constraint_name = ? AND constraint_type = 'UNIQUE'",
-                    [$tabla, $constraintName]
-                );
-                if ($constraintExists) {
-                    DB::statement("ALTER TABLE \"{$tabla}\" DROP CONSTRAINT \"{$constraintName}\"");
-                } else {
-                    DB::statement("DROP INDEX IF EXISTS \"{$constraintName}\"");
-                }
-                DB::statement("
-                    CREATE UNIQUE INDEX IF NOT EXISTS \"{$tabla}_empresa_{$col}_unique\"
-                    ON \"{$tabla}\" (\"empresa_id\", \"{$col}\")
-                ");
+            if (!Schema::hasTable($tabla) || !Schema::hasColumn($tabla, 'empresa_id')) {
+                continue;
             }
+            $constraintName = "{$tabla}_{$col}_unique";
+            $newIndex       = "{$tabla}_empresa_{$col}_unique";
+
+            if ($driver === 'pgsql') {
+                DB::statement("ALTER TABLE \"{$tabla}\" DROP CONSTRAINT IF EXISTS \"{$constraintName}\"");
+                DB::statement("DROP INDEX IF EXISTS \"{$constraintName}\"");
+            } else {
+                DB::statement("DROP INDEX IF EXISTS \"{$constraintName}\"");
+            }
+
+            DB::statement("CREATE UNIQUE INDEX IF NOT EXISTS \"{$newIndex}\" ON \"{$tabla}\" (\"empresa_id\", \"{$col}\")");
         }
 
         if (Schema::hasTable('productos') && Schema::hasColumn('productos', 'empresa_id')) {
             $constraintName = 'productos_codigo_barras_unique';
-            $constraintExists = DB::selectOne(
-                "SELECT 1 FROM information_schema.table_constraints WHERE table_name = 'productos' AND constraint_name = ? AND constraint_type = 'UNIQUE'",
-                [$constraintName]
-            );
-            if ($constraintExists) {
-                DB::statement("ALTER TABLE \"productos\" DROP CONSTRAINT \"{$constraintName}\"");
+            if ($driver === 'pgsql') {
+                DB::statement("ALTER TABLE \"productos\" DROP CONSTRAINT IF EXISTS \"{$constraintName}\"");
+                DB::statement("DROP INDEX IF EXISTS \"{$constraintName}\"");
             } else {
                 DB::statement("DROP INDEX IF EXISTS \"{$constraintName}\"");
             }
-            DB::statement("
-                CREATE UNIQUE INDEX IF NOT EXISTS \"productos_empresa_codigo_barras_unique\"
-                ON \"productos\" (\"empresa_id\", \"codigo_barras\")
-                WHERE \"codigo_barras\" IS NOT NULL
-            ");
+
+            if ($driver === 'sqlite') {
+                DB::statement("CREATE UNIQUE INDEX IF NOT EXISTS \"productos_empresa_codigo_barras_unique\" ON \"productos\" (\"empresa_id\", \"codigo_barras\")");
+            } else {
+                DB::statement("CREATE UNIQUE INDEX IF NOT EXISTS \"productos_empresa_codigo_barras_unique\" ON \"productos\" (\"empresa_id\", \"codigo_barras\") WHERE \"codigo_barras\" IS NOT NULL");
+            }
         }
     }
 
@@ -87,7 +87,11 @@ return new class extends Migration
     {
         foreach ($this->tablas as $tabla) {
             try {
-                DB::statement("ALTER TABLE \"{$tabla}\" DROP COLUMN IF EXISTS \"empresa_id\"");
+                if (DB::getDriverName() === 'sqlite') {
+                    Schema::table($tabla, fn (Blueprint $t) => $t->dropColumn('empresa_id'));
+                } else {
+                    DB::statement("ALTER TABLE \"{$tabla}\" DROP COLUMN IF EXISTS \"empresa_id\"");
+                }
             } catch (\Throwable) {}
         }
     }

@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -16,23 +16,30 @@ return new class extends Migration
     public function up(): void
     {
         $empresaId = DB::table('empresa')->value('id') ?? 1;
+        $driver    = DB::getDriverName();
 
         foreach ($this->tablas as $tabla) {
             if (!Schema::hasColumn($tabla, 'empresa_id')) {
-                // SQL puro para PostgreSQL:
-                // 1. Agregar columna NOT NULL con DEFAULT temporal (necesario para filas existentes)
-                DB::statement("
-                    ALTER TABLE \"{$tabla}\"
-                    ADD COLUMN \"empresa_id\" BIGINT NOT NULL DEFAULT {$empresaId}
-                    REFERENCES \"empresa\"(\"id\") ON DELETE CASCADE
-                ");
-                // 2. Quitar el DEFAULT (la columna queda NOT NULL sin default)
-                DB::statement("ALTER TABLE \"{$tabla}\" ALTER COLUMN \"empresa_id\" DROP DEFAULT");
+                if ($driver === 'sqlite') {
+                    Schema::table($tabla, function (Blueprint $table) use ($empresaId) {
+                        $table->unsignedBigInteger('empresa_id')->default($empresaId)->after('id');
+                    });
+                } else {
+                    DB::statement("
+                        ALTER TABLE \"{$tabla}\"
+                        ADD COLUMN \"empresa_id\" BIGINT NOT NULL DEFAULT {$empresaId}
+                        REFERENCES \"empresa\"(\"id\") ON DELETE CASCADE
+                    ");
+                    DB::statement("ALTER TABLE \"{$tabla}\" ALTER COLUMN \"empresa_id\" DROP DEFAULT");
+                }
             }
         }
 
-        // ── Reemplazar unique constraints simples por compuestos (empresa_id, columna) ──
+        $this->reemplazarUniques($driver);
+    }
 
+    private function reemplazarUniques(string $driver): void
+    {
         $uniques = [
             'facturas'       => 'numero',
             'cotizaciones'   => 'numero',
@@ -44,33 +51,43 @@ return new class extends Migration
         ];
 
         foreach ($uniques as $tabla => $col) {
-            $this->reemplazarUnique($tabla, $col);
+            $this->reemplazarUnique($tabla, $col, $driver);
         }
 
-        // codigo_barras nullable aparte
-        $this->reemplazarUnique('productos', 'codigo_barras');
+        $this->reemplazarUnique('productos', 'codigo_barras', $driver, nullable: true);
     }
 
-    private function reemplazarUnique(string $tabla, string $columna): void
+    private function reemplazarUnique(string $tabla, string $columna, string $driver, bool $nullable = false): void
     {
         $oldIndex = "{$tabla}_{$columna}_unique";
         $newIndex = "{$tabla}_empresa_{$columna}_unique";
 
-        // Eliminar el índice único simple si existe
-        DB::statement("DROP INDEX IF EXISTS \"{$oldIndex}\"");
+        if ($driver === 'pgsql') {
+            // Blueprint->unique() crea una CONSTRAINT en PostgreSQL, no solo un índice.
+            // Hay que usar DROP CONSTRAINT (con IF EXISTS para que no aborte la transacción).
+            DB::statement("ALTER TABLE \"{$tabla}\" DROP CONSTRAINT IF EXISTS \"{$oldIndex}\"");
+            // Por si en algún entorno existía como índice suelto:
+            DB::statement("DROP INDEX IF EXISTS \"{$oldIndex}\"");
+        } else {
+            DB::statement("DROP INDEX IF EXISTS \"{$oldIndex}\"");
+        }
 
-        // Crear el índice único compuesto si no existe aún
-        DB::statement("
-            CREATE UNIQUE INDEX IF NOT EXISTS \"{$newIndex}\"
-            ON \"{$tabla}\" (\"empresa_id\", \"{$columna}\")
-        ");
+        if ($nullable && $driver === 'pgsql') {
+            DB::statement("CREATE UNIQUE INDEX IF NOT EXISTS \"{$newIndex}\" ON \"{$tabla}\" (\"empresa_id\", \"{$columna}\") WHERE \"{$columna}\" IS NOT NULL");
+        } else {
+            DB::statement("CREATE UNIQUE INDEX IF NOT EXISTS \"{$newIndex}\" ON \"{$tabla}\" (\"empresa_id\", \"{$columna}\")");
+        }
     }
 
     public function down(): void
     {
         foreach ($this->tablas as $tabla) {
             try {
-                DB::statement("ALTER TABLE \"{$tabla}\" DROP COLUMN IF EXISTS \"empresa_id\"");
+                if (DB::getDriverName() === 'sqlite') {
+                    Schema::table($tabla, fn (Blueprint $t) => $t->dropColumn('empresa_id'));
+                } else {
+                    DB::statement("ALTER TABLE \"{$tabla}\" DROP COLUMN IF EXISTS \"empresa_id\"");
+                }
             } catch (\Throwable) {}
         }
     }
