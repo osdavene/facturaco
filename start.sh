@@ -118,8 +118,12 @@ echo "=== .env generado ==="
 echo "=== Verificando columnas empresa_id ==="
 php -r "
 try {
-    \$url = getenv('DATABASE_URL');
-    \$pdo = new PDO(\$url, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    // DATABASE_URL = postgresql://user:pass@host:port/dbname
+    // PDO necesita DSN: pgsql:host=...;port=...;dbname=...
+    \$raw = getenv('DATABASE_URL');
+    \$u   = parse_url(\$raw);
+    \$dsn = 'pgsql:host=' . \$u['host'] . ';port=' . (\$u['port'] ?? 5432) . ';dbname=' . ltrim(\$u['path'], '/');
+    \$pdo = new PDO(\$dsn, \$u['user'], \$u['pass'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
     \$empresa_id = \$pdo->query('SELECT id FROM empresa ORDER BY id LIMIT 1')->fetchColumn();
     if (!\$empresa_id) \$empresa_id = 1;
