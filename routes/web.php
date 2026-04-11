@@ -25,6 +25,7 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\NotaCreditoController;
 use App\Http\Controllers\WompiController;
 use App\Http\Controllers\EmpresaSelectorController;
+use App\Http\Controllers\BackofficeController;
 
 RateLimiter::for('login', function (Request $request) {
     return Limit::perMinute(5)->by($request->ip());
@@ -411,6 +412,21 @@ Route::middleware('auth')->group(function () {
 
     }); // fin grupo middleware('empresa')
 
+});
+
+// ── BackOffice (solo superadmin de plataforma) ────────────────
+Route::middleware(['auth', 'backoffice'])->prefix('backoffice')->name('backoffice.')->group(function () {
+    Route::get('/',                                 [BackofficeController::class, 'dashboard'])     ->name('dashboard');
+    Route::get('/empresas',                         [BackofficeController::class, 'empresasIndex']) ->name('empresas');
+    Route::get('/empresas/crear',                   [BackofficeController::class, 'empresasCrear']) ->name('empresas.crear');
+    Route::post('/empresas',                        [BackofficeController::class, 'empresasStore']) ->name('empresas.store');
+    Route::get('/empresas/{empresa}/editar',        [BackofficeController::class, 'empresasEditar'])->name('empresas.editar');
+    Route::put('/empresas/{empresa}',               [BackofficeController::class, 'empresasUpdate'])->name('empresas.update');
+    Route::delete('/empresas/{empresa}',            [BackofficeController::class, 'empresasDestroy'])->name('empresas.destroy');
+    Route::get('/empresas/{empresa}/crear-admin',   [BackofficeController::class, 'crearAdmin'])   ->name('empresas.admin.crear');
+    Route::post('/empresas/{empresa}/crear-admin',  [BackofficeController::class, 'storeAdmin'])   ->name('empresas.admin.store');
+    Route::post('/empresas/{empresa}/impersonar',   [BackofficeController::class, 'impersonar'])   ->name('impersonar');
+    Route::post('/salir-impersonar',                [BackofficeController::class, 'salirImpersonar'])->name('salir');
 });
 
 require __DIR__.'/auth.php';

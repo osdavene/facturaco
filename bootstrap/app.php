@@ -16,7 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhooks/wompi',
         ]);
         $middleware->alias([
-            'empresa' => \App\Http\Middleware\EnsureEmpresaSeleccionada::class,
+            'empresa'     => \App\Http\Middleware\EnsureEmpresaSeleccionada::class,
+            'backoffice'  => \App\Http\Middleware\EsBackoffice::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
