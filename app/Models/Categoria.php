@@ -1,13 +1,13 @@
 <?php
 namespace App\Models;
 
-use App\Traits\PertenecerEmpresa;
+use App\Traits\PertenecerGrupo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Categoria extends Model
 {
-    use HasFactory, PertenecerEmpresa;
+    use HasFactory, PertenecerGrupo;
 
     protected $table = 'categorias';
 

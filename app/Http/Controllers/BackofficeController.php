@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Empresa;
 use App\Models\User;
+use App\Http\Controllers\EmpresaSelectorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -165,7 +166,7 @@ class BackofficeController extends Controller
 
     public function impersonar(Empresa $empresa)
     {
-        session(['empresa_activa_id' => $empresa->id]);
+        EmpresaSelectorController::establecerSesionEmpresa($empresa);
         session(['backoffice_impersonando' => true]);
 
         return redirect()->route('dashboard')

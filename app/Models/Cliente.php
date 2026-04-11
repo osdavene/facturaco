@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Traits\PertenecerEmpresa;
+use App\Traits\PertenecerGrupo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Cliente extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerEmpresa;
+    use HasFactory, SoftDeletes, PertenecerGrupo;
 
     protected $table = 'clientes';
 

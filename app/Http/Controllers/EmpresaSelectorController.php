@@ -33,7 +33,7 @@ class EmpresaSelectorController extends Controller
             ->where('empresa_id', $empresaId)
             ->firstOrFail();
 
-        session(['empresa_activa_id' => $empresa->id]);
+        $this->establecerSesionEmpresa($empresa);
 
         return redirect()->intended(route('dashboard'));
     }
@@ -77,9 +77,25 @@ class EmpresaSelectorController extends Controller
             'activo' => true,
         ]);
 
-        session(['empresa_activa_id' => $empresa->id]);
+        $this->establecerSesionEmpresa($empresa);
 
         return redirect()->route('dashboard')
             ->with('success', "Empresa «{$empresa->razon_social}» creada correctamente.");
+    }
+
+    /**
+     * Almacena en sesión el ID activo, el ID de la raíz del grupo
+     * y todos los IDs del grupo (para scoping de catálogos compartidos).
+     */
+    public static function establecerSesionEmpresa(Empresa $empresa): void
+    {
+        $raiz      = $empresa->raiz();
+        $grupoIds  = $empresa->idsGrupo();
+
+        session([
+            'empresa_activa_id' => $empresa->id,
+            'empresa_raiz_id'   => $raiz->id,
+            'empresa_grupo_ids' => $grupoIds,
+        ]);
     }
 }
