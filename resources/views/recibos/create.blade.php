@@ -22,7 +22,7 @@
         @csrf
 
         {{-- SECCIÓN 1: Cliente --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                              text-black text-xs font-black">1</span>
@@ -73,7 +73,7 @@
         </div>
 
         {{-- SECCIÓN 2: Factura relacionada --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                              text-black text-xs font-black">2</span>
@@ -127,7 +127,7 @@
         </div>
 
         {{-- SECCIÓN 3: Pago --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                              text-black text-xs font-black">3</span>
@@ -135,19 +135,17 @@
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Fecha *
                     </label>
                     <input type="date" name="fecha"
                            value="{{ old('fecha', date('Y-m-d')) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm focus:outline-none focus:border-amber-500
-                                  @error('fecha') border-red-500 @enderror"
+                           class="form-input @error('fecha') border-red-500 @enderror"
                            style="color:#e2e8f0">
                     @error('fecha') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Valor Recibido *
                     </label>
                     <input type="text" inputmode="decimal" name="valor"
@@ -155,20 +153,17 @@
                            id="valor-pago"
                            placeholder="0"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500
-                                  @error('valor') border-red-500 @enderror"
+                           class="form-input @error('valor') border-red-500 @enderror"
                            style="color:#e2e8f0">
                     @error('valor') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Forma de Pago *
                     </label>
                     <select name="forma_pago" id="forma_pago"
                             onchange="toggleBanco(this.value)"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm focus:outline-none focus:border-amber-500"
+                            class="form-input"
                             style="color:#e2e8f0">
                         @foreach([
                             'efectivo'     => 'Efectivo',
@@ -184,52 +179,47 @@
                     </select>
                 </div>
                 <div id="campo-banco">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Banco / Entidad
                     </label>
                     <input type="text" name="banco"
                            value="{{ old('banco') }}"
                            placeholder="BANCOLOMBIA, DAVIVIENDA..."
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                           class="form-input"
                            style="color:#e2e8f0">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         N° Referencia / Cheque
                     </label>
                     <input type="text" name="num_referencia"
                            value="{{ old('num_referencia') }}"
                            placeholder="NÚMERO DE TRANSACCIÓN"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                           class="form-input"
                            style="color:#e2e8f0">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Concepto *
                     </label>
                     <input type="text" name="concepto"
                            value="{{ old('concepto', $factura ? 'PAGO FACTURA '.$factura->numero : '') }}"
                            placeholder="DESCRIPCIÓN DEL PAGO"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500
-                                  @error('concepto') border-red-500 @enderror"
+                           class="form-input @error('concepto') border-red-500 @enderror"
                            style="color:#e2e8f0">
                     @error('concepto') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Observaciones
                     </label>
                     <textarea name="observaciones" rows="2"
                               placeholder="NOTAS ADICIONALES..."
                               data-uppercase
-                              class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                     text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500 resize-none"
+                              class="form-input resize-none"
                               style="color:#e2e8f0">{{ old('observaciones') }}</textarea>
                 </div>
             </div>

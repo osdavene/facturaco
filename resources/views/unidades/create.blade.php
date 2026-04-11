@@ -21,7 +21,7 @@
     <form method="POST" action="{{ route('unidades.store') }}">
         @csrf
 
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 space-y-5">
+        <div class="card p-6 space-y-5">
 
             @if($errors->any())
             <div class="bg-red-500/10 border border-red-500/30 text-red-400
@@ -33,7 +33,7 @@
 
             {{-- Nombre --}}
             <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                <label class="form-label">
                     Nombre de la Unidad *
                 </label>
                 <input type="text" name="nombre"
@@ -41,10 +41,7 @@
                        placeholder="EJ: UNIDAD, KILOGRAMO, LITRO, METRO..."
                        data-uppercase
                        autofocus
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                              text-sm text-slate-200 placeholder-slate-600
-                              focus:outline-none focus:border-amber-500 transition-colors
-                              @error('nombre') border-red-500 @enderror">
+                       class="form-input @error('nombre') border-red-500 @enderror">
                 @error('nombre')
                 <p class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
                     <i class="fas fa-exclamation-circle"></i> {{ $message }}
@@ -54,7 +51,7 @@
 
             {{-- Abreviatura --}}
             <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                <label class="form-label">
                     Abreviatura *
                     <span class="text-slate-600 normal-case font-normal">(máx. 10 caracteres)</span>
                 </label>
@@ -63,8 +60,7 @@
                        placeholder="EJ: UN, KG, LT, MT, M2..."
                        data-uppercase
                        maxlength="10"
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                              text-sm text-slate-200 placeholder-slate-600 font-mono tracking-widest
+                       class="form-input font-mono tracking-widest
                               focus:outline-none focus:border-amber-500 transition-colors
                               @error('abreviatura') border-red-500 @enderror">
                 @error('abreviatura')

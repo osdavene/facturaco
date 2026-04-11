@@ -35,7 +35,7 @@
     </div>
 
     {{-- Tabla --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
         @if($unidades->isEmpty())
         <div class="flex flex-col items-center justify-center py-16 text-slate-500">
             <i class="fas fa-ruler text-5xl mb-4 opacity-20"></i>
@@ -137,7 +137,7 @@
     </div>
 
     {{-- Referencia rápida de unidades comunes --}}
-    <div class="mt-4 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="mt-4 card p-5">
         <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
             <i class="fas fa-lightbulb text-amber-500"></i>
             Unidades comunes en Colombia

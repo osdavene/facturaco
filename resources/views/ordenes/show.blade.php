@@ -51,7 +51,7 @@
     @endif
 
     {{-- Estado + cambiar --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-4">
+    <div class="card p-4 mb-4">
         <div class="flex items-center gap-3 flex-wrap">
             <span class="text-sm text-slate-400">Estado:</span>
             <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full
@@ -86,12 +86,12 @@
 
     {{-- Info --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Proveedor</h3>
             <div class="font-semibold text-base" style="color:#e2e8f0">{{ $orden->proveedor_nombre }}</div>
             <div class="text-sm text-slate-400 mt-1">{{ $orden->proveedor_documento }}</div>
         </div>
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Detalles</h3>
             <div class="grid grid-cols-2 gap-3 text-sm">
                 <div>
@@ -115,7 +115,7 @@
     </div>
 
     {{-- Items --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden mb-4">
+    <div class="card overflow-hidden mb-4">
         <div class="px-5 py-4 border-b border-[#1e2d47]">
             <div class="font-display font-bold text-base">Productos</div>
         </div>
@@ -123,7 +123,7 @@
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-[#1e2d47]">
-                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Descripción</th>
+                        <th class="table-th">Descripción</th>
                         <th class="text-center text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cant.</th>
                         <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">Precio Unit.</th>
                         <th class="text-center text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">IVA</th>
@@ -203,14 +203,13 @@
                 @endforeach
             </div>
             <div class="mb-4">
-                <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                <label class="form-label">
                     Notas de Recepción
                 </label>
                 <textarea name="notas_recepcion" rows="2"
                           placeholder="OBSERVACIONES DE LA RECEPCIÓN..."
                           style="text-transform:uppercase;color:#e2e8f0"
-                          class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                 text-sm placeholder-slate-600 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+                          class="form-input focus:border-emerald-500 resize-none"></textarea>
             </div>
             <button type="submit"
                     class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white
@@ -223,7 +222,7 @@
     @endif
 
     @if($orden->estado === 'recibida' && $orden->notas_recepcion)
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
             Notas de Recepción
         </h3>

@@ -24,7 +24,7 @@
             <p class="text-slate-400 text-sm">Elige una contraseña segura para tu cuenta</p>
         </div>
 
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-8">
+        <div class="card p-8">
 
             @if($errors->any())
             <div class="bg-red-500/10 border border-red-500/30 text-red-400
@@ -38,27 +38,25 @@
                 <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Correo Electrónico
                     </label>
                     <input type="email" name="email"
                            value="{{ old('email', $request->email) }}"
                            autocomplete="email"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm focus:outline-none focus:border-amber-500"
+                           class="form-input"
                            style="color:#e2e8f0">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Nueva Contraseña
                     </label>
                     <div class="relative">
                         <input type="password" name="password" id="password"
                                autocomplete="new-password"
                                placeholder="••••••••"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500 pr-10"
+                               class="form-input pr-10"
                                style="color:#e2e8f0">
                         <button type="button" onclick="togglePass('password','icon1')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
@@ -73,15 +71,14 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Confirmar Contraseña
                     </label>
                     <div class="relative">
                         <input type="password" name="password_confirmation" id="password2"
                                autocomplete="new-password"
                                placeholder="••••••••"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500 pr-10"
+                               class="form-input pr-10"
                                style="color:#e2e8f0">
                         <button type="button" onclick="togglePass('password2','icon2')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">

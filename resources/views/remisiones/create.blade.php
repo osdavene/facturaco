@@ -27,7 +27,7 @@
             <div class="lg:col-span-2 space-y-4">
 
                 {{-- Cliente --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                         <i class="fas fa-user text-amber-500"></i> Cliente
                     </h2>
@@ -55,9 +55,7 @@
                                    value="{{ old('cliente_nombre') }}"
                                    placeholder="NOMBRE DEL CLIENTE"
                                    data-uppercase
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500
-                                          @error('cliente_nombre') border-red-500 @enderror"
+                                   class="form-input @error('cliente_nombre') border-red-500 @enderror"
                                    style="color:#e2e8f0">
                             @error('cliente_nombre')
                             <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
@@ -68,8 +66,7 @@
                             <input type="text" name="cliente_documento" id="cliente_documento"
                                    value="{{ old('cliente_documento') }}"
                                    placeholder="NIT / CC"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
@@ -77,8 +74,7 @@
                             <input type="text" name="cliente_telefono" id="cliente_telefono"
                                    value="{{ old('cliente_telefono') }}"
                                    placeholder="300 000 0000"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div class="sm:col-span-2">
@@ -87,15 +83,14 @@
                                    value="{{ old('cliente_direccion') }}"
                                    placeholder="DIRECCIÓN DE ENTREGA"
                                    data-uppercase
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                     </div>
                 </div>
 
                 {{-- Items --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="font-display font-bold text-sm flex items-center gap-2">
                             <i class="fas fa-boxes text-amber-500"></i> Productos a Despachar
@@ -147,16 +142,14 @@
                 </div>
 
                 {{-- Observaciones --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-3 flex items-center gap-2">
                         <i class="fas fa-comment text-amber-500"></i> Observaciones
                     </h2>
                     <textarea name="observaciones" rows="2"
                               placeholder="NOTAS DEL DESPACHO..."
                               data-uppercase
-                              class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                     text-sm placeholder-slate-600 focus:outline-none
-                                     focus:border-amber-500 resize-none"
+                              class="form-input resize-none"
                               style="color:#e2e8f0">{{ old('observaciones') }}</textarea>
                 </div>
             </div>
@@ -165,7 +158,7 @@
             <div class="space-y-4">
 
                 {{-- Datos --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                         <i class="fas fa-calendar text-amber-500"></i> Datos
                     </h2>
@@ -176,8 +169,7 @@
                             </label>
                             <input type="date" name="fecha_emision"
                                    value="{{ old('fecha_emision', date('Y-m-d')) }}"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
@@ -186,8 +178,7 @@
                             </label>
                             <input type="date" name="fecha_entrega"
                                    value="{{ old('fecha_entrega') }}"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
@@ -198,8 +189,7 @@
                                    value="{{ old('lugar_entrega') }}"
                                    placeholder="BODEGA, DIRECCIÓN..."
                                    data-uppercase
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
@@ -210,8 +200,7 @@
                                    value="{{ old('transportador') }}"
                                    placeholder="NOMBRE DEL TRANSPORTADOR"
                                    data-uppercase
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
@@ -221,8 +210,7 @@
                             <input type="text" name="guia"
                                    value="{{ old('guia') }}"
                                    placeholder="NÚMERO DE GUÍA"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
@@ -230,8 +218,7 @@
                                 Estado
                             </label>
                             <select name="estado"
-                                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                           text-sm focus:outline-none focus:border-amber-500"
+                                    class="form-input"
                                     style="color:#e2e8f0">
                                 <option value="borrador">Borrador</option>
                                 <option value="enviada">Enviada</option>
@@ -241,7 +228,7 @@
                 </div>
 
                 {{-- Total --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-3 flex items-center gap-2">
                         <i class="fas fa-calculator text-amber-500"></i> Resumen
                     </h2>

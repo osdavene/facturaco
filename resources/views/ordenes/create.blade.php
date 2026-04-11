@@ -32,7 +32,7 @@
             <div class="lg:col-span-2 space-y-4">
 
                 {{-- Proveedor --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                         <i class="fas fa-truck text-amber-500"></i> Proveedor
                     </h2>
@@ -69,7 +69,7 @@
                 </div>
 
                 {{-- Items --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="font-display font-bold text-sm flex items-center gap-2">
                             <i class="fas fa-boxes text-amber-500"></i> Productos a Comprar
@@ -119,16 +119,14 @@
                 </div>
 
                 {{-- Observaciones --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-3 flex items-center gap-2">
                         <i class="fas fa-comment text-amber-500"></i> Observaciones
                     </h2>
                     <textarea name="observaciones" rows="2"
                               placeholder="NOTAS PARA EL PROVEEDOR..."
                               data-uppercase
-                              class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                     text-sm placeholder-slate-600
-                                     focus:outline-none focus:border-amber-500 resize-none"
+                              class="form-input resize-none"
                               style="color:#e2e8f0">{{ old('observaciones', isset($orden)?$orden->observaciones:'') }}</textarea>
                 </div>
             </div>
@@ -137,7 +135,7 @@
             <div class="space-y-4">
 
                 {{-- Datos OC --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                         <i class="fas fa-file-alt text-amber-500"></i> Datos
                     </h2>
@@ -146,23 +144,20 @@
                             <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Fecha Emisión *</label>
                             <input type="date" name="fecha_emision"
                                    value="{{ old('fecha_emision', date('Y-m-d')) }}"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Fecha Esperada</label>
                             <input type="date" name="fecha_esperada"
                                    value="{{ old('fecha_esperada') }}"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Forma de Pago</label>
                             <select name="forma_pago"
-                                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                           text-sm focus:outline-none focus:border-amber-500"
+                                    class="form-input"
                                     style="color:#e2e8f0">
                                 <option value="credito">Crédito</option>
                                 <option value="contado">Contado</option>
@@ -174,15 +169,13 @@
                             <input type="text" inputmode="decimal" name="plazo_pago"
                                    value="{{ old('plazo_pago', 30) }}"
                                    data-numeric
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Estado</label>
                             <select name="estado"
-                                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                           text-sm focus:outline-none focus:border-amber-500"
+                                    class="form-input"
                                     style="color:#e2e8f0">
                                 <option value="borrador">Borrador</option>
                                 <option value="enviada">Enviada al proveedor</option>
@@ -193,7 +186,7 @@
                 </div>
 
                 {{-- Totales --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                         <i class="fas fa-calculator text-amber-500"></i> Totales
                     </h2>

@@ -25,19 +25,19 @@
 
 {{-- KPIs --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Total Facturas</div>
         <div class="font-display font-bold text-2xl">{{ $totales->total ?? 0 }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Emitidas</div>
         <div class="font-display font-bold text-2xl text-blue-400">{{ $totales->emitidas ?? 0 }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Vencidas</div>
         <div class="font-display font-bold text-2xl text-red-400">{{ $totales->vencidas ?? 0 }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Pagadas</div>
         <div class="font-display font-bold text-2xl text-emerald-500">{{ $totales->pagadas ?? 0 }}</div>
     </div>
@@ -45,7 +45,7 @@
 
 {{-- Filtros --}}
 <form method="GET" action="{{ route('facturas.index') }}"
-      class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-5">
+      class="card p-4 mb-5">
     <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
@@ -56,19 +56,16 @@
                           focus:outline-none focus:border-amber-500">
         </div>
         <select name="estado"
-                class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                       text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+                class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
             <option value="">Todos los estados</option>
             @foreach(['borrador'=>'Borrador','emitida'=>'Emitida','pagada'=>'Pagada','vencida'=>'Vencida','anulada'=>'Anulada'] as $val=>$label)
             <option value="{{ $val }}" {{ request('estado')==$val ? 'selected':'' }}>{{ $label }}</option>
             @endforeach
         </select>
         <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
-               class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                      text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+               class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
         <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
-               class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                      text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+               class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
         <button type="submit"
                 class="bg-amber-500 hover:bg-amber-600 text-black font-semibold
                        px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap">
@@ -86,12 +83,12 @@
 </form>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Número</th>
+                    <th class="table-th">Número</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cliente</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Fecha</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Vence</th>
@@ -102,7 +99,7 @@
             </thead>
             <tbody>
                 @forelse($facturas as $factura)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-4">
                         <div class="font-mono text-sm font-semibold text-amber-500">
                             {{ $factura->numero }}

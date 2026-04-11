@@ -129,17 +129,17 @@
 
         {{-- Alertas de sesión --}}
         @if(session('success'))
-        <div class="mb-6 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl px-4 py-3 text-sm flex items-center gap-2 fade-in">
+        <div class="mb-6 alert-success fade-in">
             <i class="fas fa-check-circle flex-shrink-0"></i>{{ session('success') }}
         </div>
         @endif
         @if(session('info'))
-        <div class="mb-6 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-xl px-4 py-3 text-sm flex items-center gap-2 fade-in">
+        <div class="mb-6 alert-info fade-in">
             <i class="fas fa-info-circle flex-shrink-0"></i>{{ session('info') }}
         </div>
         @endif
         @if($errors->any())
-        <div class="mb-6 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-4 py-3 text-sm fade-in">
+        <div class="mb-6 alert-error fade-in">
             @foreach($errors->all() as $e)
             <div class="flex items-center gap-2"><i class="fas fa-circle-exclamation flex-shrink-0"></i>{{ $e }}</div>
             @endforeach

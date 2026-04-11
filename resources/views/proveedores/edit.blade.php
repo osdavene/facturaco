@@ -22,27 +22,24 @@
         @csrf @method('PUT')
 
         {{-- SECCIÓN 1 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
                 Identificación
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Razón Social *</label>
+                    <label class="form-label">Razón Social *</label>
                     <input type="text" name="razon_social"
                            value="{{ old('razon_social',$proveedor->razon_social) }}"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500
-                                  @error('razon_social') border-red-500 @enderror">
+                           class="form-input @error('razon_social') border-red-500 @enderror">
                     @error('razon_social') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Tipo Documento</label>
+                    <label class="form-label">Tipo Documento</label>
                     <select name="tipo_documento"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         @foreach(['NIT','CC','CE'] as $td)
                         <option value="{{ $td }}" {{ old('tipo_documento',$proveedor->tipo_documento)==$td ? 'selected':'' }}>{{ $td }}</option>
                         @endforeach
@@ -50,27 +47,25 @@
                 </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div class="col-span-2">
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Número Documento *</label>
+                        <label class="form-label">Número Documento *</label>
                         <input type="text" name="numero_documento"
                                value="{{ old('numero_documento',$proveedor->numero_documento) }}"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                               class="form-input">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">DV</label>
+                        <label class="form-label">DV</label>
                         <input type="text" name="digito_verificacion" maxlength="1"
                                value="{{ old('digito_verificacion',$proveedor->digito_verificacion) }}"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                               class="form-input">
                     </div>
                 </div>
             </div>
         </div>
 
         {{-- SECCIÓN 2 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
                 Contacto y Dirección
@@ -87,94 +82,85 @@
                     ['direccion',      'Dirección',      'text',  true,  false],
                 ] as [$name, $label, $type, $upper, $numeric])
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">{{ $label }}</label>
+                    <label class="form-label">{{ $label }}</label>
                     <input type="{{ $type }}" name="{{ $name }}"
                            value="{{ old($name,$proveedor->$name) }}"
                            @if($upper) data-uppercase @endif
                            @if($numeric) data-numeric @endif
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 @endforeach
             </div>
         </div>
 
         {{-- SECCIÓN 3 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">3</span>
                 Tributario y Bancario
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Régimen</label>
+                    <label class="form-label">Régimen</label>
                     <select name="regimen"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="responsable_iva" {{ old('regimen',$proveedor->regimen)=='responsable_iva' ? 'selected':'' }}>Resp. IVA</option>
                         <option value="simple"          {{ old('regimen',$proveedor->regimen)=='simple' ? 'selected':'' }}>Simple</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Banco</label>
+                    <label class="form-label">Banco</label>
                     <input type="text" name="banco"
                            value="{{ old('banco',$proveedor->banco) }}"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Tipo Cuenta</label>
+                    <label class="form-label">Tipo Cuenta</label>
                     <select name="tipo_cuenta"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="">Seleccionar</option>
                         <option value="ahorros"   {{ old('tipo_cuenta',$proveedor->tipo_cuenta)=='ahorros'   ? 'selected':'' }}>Ahorros</option>
                         <option value="corriente" {{ old('tipo_cuenta',$proveedor->tipo_cuenta)=='corriente' ? 'selected':'' }}>Corriente</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">N° Cuenta</label>
+                    <label class="form-label">N° Cuenta</label>
                     <input type="text" name="cuenta_bancaria"
                            value="{{ old('cuenta_bancaria',$proveedor->cuenta_bancaria) }}"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Estado</label>
+                    <label class="form-label">Estado</label>
                     <select name="activo"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="1" {{ old('activo',$proveedor->activo) ? 'selected':'' }}>Activo</option>
                         <option value="0" {{ !old('activo',$proveedor->activo) ? 'selected':'' }}>Inactivo</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Plazo (días)</label>
+                    <label class="form-label">Plazo (días)</label>
                     <input type="text" inputmode="decimal" name="plazo_pago"
                            value="{{ old('plazo_pago',$proveedor->plazo_pago) }}"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">% ReteFuente</label>
+                    <label class="form-label">% ReteFuente</label>
                     <input type="text" inputmode="decimal" name="retefuente_pct"
                            value="{{ old('retefuente_pct',$proveedor->retefuente_pct) }}"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">% ReteICA</label>
+                    <label class="form-label">% ReteICA</label>
                     <input type="text" inputmode="decimal" name="reteica_pct"
                            value="{{ old('reteica_pct',$proveedor->reteica_pct) }}"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
             </div>
             <div class="flex flex-wrap gap-5">

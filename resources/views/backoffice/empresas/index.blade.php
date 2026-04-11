@@ -17,7 +17,7 @@
 
 <div class="space-y-4">
     @forelse($empresas as $emp)
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
 
         {{-- Matriz --}}
         <div class="flex items-center justify-between px-6 py-4">
@@ -138,7 +138,7 @@
 
     </div>
     @empty
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-16 text-center">
+    <div class="card p-16 text-center">
         <i class="fas fa-building text-4xl text-slate-700 mb-4 block"></i>
         <p class="text-slate-400 font-medium">No hay empresas registradas</p>
         <a href="{{ route('backoffice.empresas.crear') }}"

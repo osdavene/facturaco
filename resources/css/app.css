@@ -629,3 +629,102 @@ html:not(.dark) .text-blue-400 { color: #1d4ed8 !important; }
 html:not(.dark) .text-xs.text-slate-500:not(nav *) {
     color: #4b5563 !important;
 }
+
+/* ══════════════════════════════════════════════════════
+   COMPONENTES — clases reutilizables con @apply
+   Usar en lugar de repetir las cadenas de utilidades.
+   ══════════════════════════════════════════════════════ */
+@layer components {
+
+    /* ── Tarjeta base ──────────────────────────────── */
+    .card {
+        @apply bg-[#141c2e] border border-[#1e2d47] rounded-2xl;
+    }
+
+    /* ── Formularios ───────────────────────────────── */
+    .form-label {
+        @apply block text-xs font-semibold text-slate-400
+               uppercase tracking-wider mb-1.5;
+    }
+
+    .form-input {
+        @apply w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
+               px-4 py-2.5 text-sm placeholder-slate-600
+               focus:outline-none focus:border-amber-500 transition-colors;
+    }
+
+    /* ── Botones ───────────────────────────────────── */
+    .btn-primary {
+        @apply inline-flex items-center gap-2
+               bg-amber-500 hover:bg-amber-600
+               text-black font-semibold text-sm
+               px-6 py-2.5 rounded-xl transition-colors;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center gap-2
+               bg-[#1a2235] border border-[#1e2d47] rounded-xl
+               text-slate-400 hover:text-slate-200
+               text-sm px-6 py-2.5 transition-colors;
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center gap-2
+               border border-red-500/30 text-red-400
+               hover:bg-red-500/10 text-sm px-4 py-2
+               rounded-xl transition-colors;
+    }
+
+    /* Botón cuadrado para acciones en tabla (editar, eliminar) */
+    .btn-icon {
+        @apply w-8 h-8 bg-[#1a2235] border border-[#1e2d47] rounded-lg
+               flex items-center justify-center
+               text-slate-400 transition-colors;
+    }
+
+    /* ── Alertas ───────────────────────────────────── */
+    .alert-success {
+        @apply bg-emerald-500/10 border border-emerald-500/30
+               text-emerald-400 rounded-xl px-4 py-3
+               text-sm flex items-center gap-2;
+    }
+
+    .alert-error {
+        @apply bg-red-500/10 border border-red-500/30
+               text-red-400 rounded-xl px-4 py-3 text-sm;
+    }
+
+    .alert-info {
+        @apply bg-blue-500/10 border border-blue-500/30
+               text-blue-400 rounded-xl px-4 py-3
+               text-sm flex items-center gap-2;
+    }
+
+    .alert-warning {
+        @apply bg-amber-500/10 border border-amber-500/20
+               text-amber-500/80 rounded-xl px-4 py-3 text-sm;
+    }
+
+    /* ── Tabla ─────────────────────────────────────── */
+    .table-th {
+        @apply text-left text-[11px] font-semibold text-slate-500
+               uppercase tracking-wider px-5 py-3;
+    }
+
+    .table-row {
+        @apply border-b border-[#1e2d47]/50
+               hover:bg-[#1a2235]/50 transition-colors;
+    }
+
+    /* ── Badges ────────────────────────────────────── */
+    .badge {
+        @apply text-xs px-2.5 py-1 rounded-full font-semibold;
+    }
+
+    .badge-amber  { @apply badge bg-amber-500/10 text-amber-500; }
+    .badge-green  { @apply badge bg-emerald-500/10 text-emerald-400; }
+    .badge-red    { @apply badge bg-red-500/10 text-red-400; }
+    .badge-blue   { @apply badge bg-blue-500/10 text-blue-400; }
+    .badge-slate  { @apply badge bg-[#1a2235] text-slate-400; }
+
+}

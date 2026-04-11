@@ -31,19 +31,17 @@
 
 {{-- Filtros --}}
 <form method="GET" action="{{ route('reportes.inventario') }}"
-      class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-5">
+      class="card p-4 mb-5">
     <div class="flex flex-col sm:flex-row gap-3">
         <select name="filtro"
-                class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                       text-sm focus:outline-none focus:border-amber-500"
+                class="form-input"
                 style="color:#e2e8f0">
             <option value="todos"      {{ $filtro=='todos'      ? 'selected':'' }}>Todos los productos</option>
             <option value="bajo_stock" {{ $filtro=='bajo_stock' ? 'selected':'' }}>Bajo stock</option>
             <option value="sin_stock"  {{ $filtro=='sin_stock'  ? 'selected':'' }}>Sin stock</option>
         </select>
         <select name="categoria_id"
-                class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                       text-sm focus:outline-none focus:border-amber-500"
+                class="form-input"
                 style="color:#e2e8f0">
             <option value="">Todas las categorías</option>
             @foreach($categorias as $cat)
@@ -62,23 +60,23 @@
 
 {{-- KPIs --}}
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Total Productos</div>
         <div class="font-display font-bold text-xl">{{ $productos->count() }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Bajo Stock</div>
         <div class="font-display font-bold text-xl text-amber-500">
             {{ $productos->where('es_servicio', false)->filter(fn($p) => $p->bajo_stock)->count() }}
         </div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Sin Stock</div>
         <div class="font-display font-bold text-xl text-red-400">
             {{ $productos->where('es_servicio', false)->where('stock_actual', 0)->count() }}
         </div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Valor Inventario</div>
         <div class="font-display font-bold text-xl text-emerald-500">
             ${{ number_format($valorInventario, 0, ',', '.') }}
@@ -87,12 +85,12 @@
 </div>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Producto</th>
+                    <th class="table-th">Producto</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Categoría</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Stock Actual</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">Mínimo</th>
@@ -104,7 +102,7 @@
             </thead>
             <tbody>
                 @forelse($productos as $producto)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-3">
                         <div class="text-sm font-semibold" style="color:#e2e8f0">{{ $producto->nombre }}</div>
                         <div class="text-xs text-slate-500 font-mono">{{ $producto->codigo }}</div>

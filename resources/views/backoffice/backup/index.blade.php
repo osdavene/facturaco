@@ -14,7 +14,7 @@
 <div class="max-w-3xl mx-auto space-y-5">
 
     {{-- Resumen de registros --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <h2 class="font-display font-bold text-base flex items-center gap-2 mb-4">
             <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">
                 <i class="fas fa-database text-[10px]"></i>
@@ -39,7 +39,7 @@
     </div>
 
     {{-- Descarga SQL --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
         <div class="px-6 py-5 flex items-start justify-between gap-6 flex-wrap">
             <div class="flex items-start gap-4">
                 <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl

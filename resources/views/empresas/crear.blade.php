@@ -33,126 +33,109 @@
         @endif
 
         <form method="POST" action="{{ route('empresas.store') }}"
-              class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 space-y-4">
+              class="card p-6 space-y-4">
             @csrf
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {{-- Razón social --}}
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Razón Social <span class="text-amber-500">*</span>
                     </label>
                     <input type="text" name="razon_social"
                            value="{{ old('razon_social') }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500 transition-colors"
+                           class="form-input"
                            placeholder="MI EMPRESA S.A.S"
                            required>
                 </div>
 
                 {{-- Nombre comercial --}}
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Nombre Comercial
                     </label>
                     <input type="text" name="nombre_comercial"
                            value="{{ old('nombre_comercial') }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500 transition-colors"
+                           class="form-input"
                            placeholder="Nombre visible en facturas (opcional)">
                 </div>
 
                 {{-- NIT --}}
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         NIT <span class="text-amber-500">*</span>
                     </label>
                     <input type="text" name="nit"
                            value="{{ old('nit') }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500 transition-colors"
+                           class="form-input"
                            placeholder="900000000"
                            required>
                 </div>
 
                 {{-- Dígito de verificación --}}
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Dígito Verificación
                     </label>
                     <input type="text" name="digito_verificacion"
                            value="{{ old('digito_verificacion') }}"
                            maxlength="1"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500 transition-colors"
+                           class="form-input"
                            placeholder="0">
                 </div>
 
                 {{-- Email --}}
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Email
                     </label>
                     <input type="email" name="email"
                            value="{{ old('email') }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500 transition-colors"
+                           class="form-input"
                            placeholder="empresa@correo.com">
                 </div>
 
                 {{-- Teléfono --}}
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Teléfono
                     </label>
                     <input type="text" name="telefono"
                            value="{{ old('telefono') }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500 transition-colors"
+                           class="form-input"
                            placeholder="601 0000000">
                 </div>
 
                 {{-- Ciudad --}}
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Municipio
                     </label>
                     <input type="text" name="municipio"
                            value="{{ old('municipio') }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500 transition-colors"
+                           class="form-input"
                            placeholder="Bogotá D.C.">
                 </div>
 
                 {{-- Prefijo --}}
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Prefijo de Factura
                     </label>
                     <input type="text" name="prefijo_factura"
                            value="{{ old('prefijo_factura', 'FE') }}"
                            maxlength="10"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500 transition-colors"
+                           class="form-input"
                            placeholder="FE">
                 </div>
 
                 {{-- Moneda --}}
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Moneda
                     </label>
                     <select name="moneda"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                            class="form-input">
                         <option value="COP" {{ old('moneda', 'COP') === 'COP' ? 'selected' : '' }}>
                             COP — Peso Colombiano
                         </option>

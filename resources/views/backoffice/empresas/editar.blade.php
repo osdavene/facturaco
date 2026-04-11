@@ -33,54 +33,48 @@
     <form method="POST" action="{{ route('backoffice.empresas.update', $empresa) }}">
         @csrf @method('PUT')
 
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 space-y-5">
+        <div class="card p-6 space-y-5">
             <h2 class="font-display font-bold text-base flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
                 Datos de la empresa
             </h2>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Razón social *</label>
+                <label class="form-label">Razón social *</label>
                 <input type="text" name="razon_social" value="{{ old('razon_social', $empresa->razon_social) }}" required
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                              focus:outline-none focus:border-amber-500 transition-colors">
+                       class="form-input">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">NIT *</label>
+                    <label class="form-label">NIT *</label>
                     <input type="text" name="nit" value="{{ old('nit', $empresa->nit) }}" required
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Teléfono</label>
+                    <label class="form-label">Teléfono</label>
                     <input type="text" name="telefono" value="{{ old('telefono', $empresa->telefono) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
+                    <label class="form-label">Email</label>
                     <input type="email" name="email" value="{{ old('email', $empresa->email) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Municipio</label>
+                    <label class="form-label">Municipio</label>
                     <input type="text" name="municipio" value="{{ old('municipio', $empresa->municipio) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Jerarquía</label>
+                <label class="form-label">Jerarquía</label>
                 <select name="empresa_padre_id"
-                        class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                               focus:outline-none focus:border-amber-500 transition-colors">
+                        class="form-input">
                     <option value="">— Empresa matriz independiente —</option>
                     @foreach($matrices as $m)
                         <option value="{{ $m->id }}"
@@ -102,7 +96,7 @@
     </form>
 
     {{-- Admins asignados --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="font-display font-bold text-base">Administradores</h2>
             <a href="{{ route('backoffice.empresas.admin.crear', $empresa) }}"

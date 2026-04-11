@@ -26,7 +26,7 @@
 
 {{-- KPIs --}}
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Total Productos</div>
             <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400">
@@ -35,7 +35,7 @@
         </div>
         <div class="font-display font-bold text-2xl">{{ $totalProductos }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5 cursor-pointer
+    <div class="card p-5 cursor-pointer
                 hover:border-amber-500/50 transition-colors"
          onclick="document.querySelector('[name=stock]').value='bajo'; document.querySelector('#filtros').submit()">
         <div class="flex items-center justify-between mb-2">
@@ -47,7 +47,7 @@
         <div class="font-display font-bold text-2xl text-amber-500">{{ $bajoStock }}</div>
         <div class="text-xs text-slate-500 mt-1">Clic para filtrar</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Sin Stock</div>
             <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center text-red-400">
@@ -60,7 +60,7 @@
 
 {{-- Filtros --}}
 <form id="filtros" method="GET" action="{{ route('inventario.index') }}"
-      class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-5">
+      class="card p-4 mb-5">
     <input type="hidden" name="stock" value="{{ request('stock') }}">
     <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">
@@ -72,8 +72,7 @@
                           focus:outline-none focus:border-amber-500">
         </div>
         <select name="categoria_id"
-                class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                       text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+                class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
             <option value="">Todas las categorías</option>
             @foreach($categorias as $cat)
             <option value="{{ $cat->id }}" {{ request('categoria_id')==$cat->id ? 'selected':'' }}>
@@ -82,8 +81,7 @@
             @endforeach
         </select>
         <select name="estado"
-                class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                       text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+                class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
             <option value="">Todos</option>
             <option value="activo"   {{ request('estado')=='activo'   ? 'selected':'' }}>Activos</option>
             <option value="inactivo" {{ request('estado')=='inactivo' ? 'selected':'' }}>Inactivos</option>
@@ -105,12 +103,12 @@
 </form>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Producto</th>
+                    <th class="table-th">Producto</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Categoría</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Stock</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">Precio Venta</th>
@@ -120,7 +118,7 @@
             </thead>
             <tbody>
                 @forelse($productos as $producto)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
 
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-3">

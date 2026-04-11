@@ -35,7 +35,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
 
         <div class="lg:col-span-1 space-y-4">
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 text-center">
+            <div class="card p-6 text-center">
                 <div class="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl
                             {{ $inventario->es_servicio
                                ? 'bg-gradient-to-br from-purple-500 to-pink-600'
@@ -55,7 +55,7 @@
             </div>
 
             @if(!$inventario->es_servicio)
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+            <div class="card p-5">
                 <h3 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                     <i class="fas fa-warehouse text-amber-500"></i> Stock
                 </h3>
@@ -91,7 +91,7 @@
 
         <div class="lg:col-span-2 space-y-4">
 
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h3 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <i class="fas fa-dollar-sign text-amber-500 text-sm"></i> Precios
                 </h3>
@@ -118,7 +118,7 @@
             </div>
 
             @if(!$inventario->es_servicio)
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h3 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <i class="fas fa-sliders-h text-amber-500 text-sm"></i> Ajustar Stock
                 </h3>
@@ -126,38 +126,33 @@
                     @csrf
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Tipo</label>
+                            <label class="form-label">Tipo</label>
                             <select name="tipo"
-                                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                           text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    class="form-input">
                                 <option value="entrada">➕ Entrada</option>
                                 <option value="salida">➖ Salida</option>
                                 <option value="ajuste">🔧 Ajuste directo</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Cantidad</label>
+                            <label class="form-label">Cantidad</label>
                             <input type="text" inputmode="decimal"
                                    name="cantidad" placeholder="0"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                   class="form-input">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Referencia</label>
+                            <label class="form-label">Referencia</label>
                             <input type="text" name="referencia"
                                    placeholder="OC-001, ETC."
                                    style="text-transform:uppercase"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm text-slate-200 placeholder-slate-600 uppercase
-                                          focus:outline-none focus:border-amber-500">
+                                   class="form-input">
                         </div>
                     </div>
                     <div class="flex gap-3">
                         <input type="text" name="motivo"
                                placeholder="MOTIVO DEL AJUSTE *"
                                style="text-transform:uppercase"
-                               class="flex-1 bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm text-slate-200 placeholder-slate-600 uppercase
+                               class="flex-1 form-input uppercase
                                       focus:outline-none focus:border-amber-500">
                         <button type="submit"
                                 class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-black
@@ -172,7 +167,7 @@
     </div>
 
     @if(!$inventario->es_servicio && $movimientos->count() > 0)
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
         <div class="px-5 py-4 border-b border-[#1e2d47]">
             <div class="font-display font-bold text-base">Últimos Movimientos</div>
         </div>
@@ -180,12 +175,12 @@
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-[#1e2d47]">
-                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Tipo</th>
+                        <th class="table-th">Tipo</th>
                         <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cantidad</th>
                         <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">Stock Ant.</th>
                         <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">Stock Nuevo</th>
                         <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Motivo</th>
-                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3 hidden md:table-cell">Usuario / Fecha</th>
+                        <th class="table-th hidden md:table-cell">Usuario / Fecha</th>
                     </tr>
                 </thead>
                 <tbody>

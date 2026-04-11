@@ -22,7 +22,7 @@
         @csrf
 
         {{-- SECCIÓN 1 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
                 Información Básica
@@ -42,44 +42,35 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Código *</label>
+                    <label class="form-label">Código *</label>
                     <input type="text" name="codigo"
                            value="{{ old('codigo') }}"
                            placeholder="EJ: PROD-001"
                            style="text-transform:uppercase"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600 uppercase
-                                  focus:outline-none focus:border-amber-500
-                                  @error('codigo') border-red-500 @enderror">
+                           class="form-input @error('codigo') border-red-500 @enderror">
                     @error('codigo') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Código de Barras</label>
+                    <label class="form-label">Código de Barras</label>
                     <input type="text" name="codigo_barras"
                            value="{{ old('codigo_barras') }}"
                            placeholder="EAN-13 O INTERNO"
                            style="text-transform:uppercase"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600 uppercase
-                                  focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Nombre *</label>
+                    <label class="form-label">Nombre *</label>
                     <input type="text" name="nombre"
                            value="{{ old('nombre') }}"
                            placeholder="NOMBRE DEL PRODUCTO"
                            style="text-transform:uppercase"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600 uppercase
-                                  focus:outline-none focus:border-amber-500
-                                  @error('nombre') border-red-500 @enderror">
+                           class="form-input @error('nombre') border-red-500 @enderror">
                     @error('nombre') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Categoría</label>
+                    <label class="form-label">Categoría</label>
                     <select name="categoria_id"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="">Sin categoría</option>
                         @foreach($categorias as $cat)
                         <option value="{{ $cat->id }}" {{ old('categoria_id')==$cat->id ? 'selected':'' }}>
@@ -89,10 +80,9 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Unidad de Medida</label>
+                    <label class="form-label">Unidad de Medida</label>
                     <select name="unidad_medida_id"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="">Seleccionar</option>
                         @foreach($unidades as $u)
                         <option value="{{ $u->id }}" {{ old('unidad_medida_id')==$u->id ? 'selected':'' }}>
@@ -102,67 +92,59 @@
                     </select>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Descripción</label>
+                    <label class="form-label">Descripción</label>
                     <textarea name="descripcion" rows="2"
                               placeholder="DESCRIPCIÓN OPCIONAL..."
                               style="text-transform:uppercase"
-                              class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                     text-sm text-slate-200 placeholder-slate-600 uppercase
-                                     focus:outline-none focus:border-amber-500 resize-none">{{ old('descripcion') }}</textarea>
+                              class="form-input resize-none">{{ old('descripcion') }}</textarea>
                 </div>
             </div>
         </div>
 
         {{-- SECCIÓN 2: Precios --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
                 Precios e IVA
             </h2>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Precio Compra</label>
+                    <label class="form-label">Precio Compra</label>
                     <input type="text" inputmode="decimal" name="precio_compra"
                            value="{{ old('precio_compra', 0) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Precio Venta * <span class="text-slate-600">(principal)</span>
                     </label>
                     <input type="text" inputmode="decimal" name="precio_venta"
                            value="{{ old('precio_venta', 0) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500
-                                  @error('precio_venta') border-red-500 @enderror">
+                           class="form-input @error('precio_venta') border-red-500 @enderror">
                     @error('precio_venta') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Precio 2 <span class="text-slate-600">(mayorista)</span>
                     </label>
                     <input type="text" inputmode="decimal" name="precio_venta2"
                            value="{{ old('precio_venta2', 0) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Precio 3 <span class="text-slate-600">(especial)</span>
                     </label>
                     <input type="text" inputmode="decimal" name="precio_venta3"
                            value="{{ old('precio_venta3', 0) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
             </div>
             <div class="flex flex-wrap items-end gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">% IVA</label>
+                    <label class="form-label">% IVA</label>
                     <select name="iva_pct"
-                            class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="0"  {{ old('iva_pct','19')=='0'  ? 'selected':'' }}>0% - Excluido</option>
                         <option value="5"  {{ old('iva_pct')=='5'       ? 'selected':'' }}>5%</option>
                         <option value="19" {{ old('iva_pct','19')=='19' ? 'selected':'' }}>19% - General</option>
@@ -178,42 +160,37 @@
         </div>
 
         {{-- SECCIÓN 3: Stock --}}
-        <div id="seccion-stock" class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-6">
+        <div id="seccion-stock" class="card p-6 mb-6">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">3</span>
                 Stock e Inventario
             </h2>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Stock Inicial</label>
+                    <label class="form-label">Stock Inicial</label>
                     <input type="text" inputmode="decimal" name="stock_actual"
                            value="{{ old('stock_actual', 0) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Stock Mínimo</label>
+                    <label class="form-label">Stock Mínimo</label>
                     <input type="text" inputmode="decimal" name="stock_minimo"
                            value="{{ old('stock_minimo', 0) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Stock Máximo</label>
+                    <label class="form-label">Stock Máximo</label>
                     <input type="text" inputmode="decimal" name="stock_maximo"
                            value="{{ old('stock_maximo', 0) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Ubicación</label>
+                    <label class="form-label">Ubicación</label>
                     <input type="text" name="ubicacion"
                            value="{{ old('ubicacion') }}"
                            placeholder="BODEGA A / ESTANTE 3"
                            style="text-transform:uppercase"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600 uppercase
-                                  focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
             </div>
         </div>

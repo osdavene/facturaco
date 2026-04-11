@@ -102,7 +102,7 @@
                 </div>
             </div>
             @empty
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl py-12 flex flex-col items-center text-slate-500">
+            <div class="card py-12 flex flex-col items-center text-slate-500">
                 <i class="fas fa-users-slash text-4xl mb-3 opacity-20"></i>
                 <p class="font-semibold text-sm">No hay sesiones activas</p>
             </div>
@@ -118,7 +118,7 @@
 
         {{-- Filtros --}}
         <form method="GET" action="{{ route('sesiones.index') }}"
-              class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-4">
+              class="card p-4 mb-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
 
                 <div>
@@ -171,7 +171,7 @@
         </form>
 
         {{-- Tabla historial --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+        <div class="card overflow-hidden">
             @if($historial->isEmpty())
             <div class="py-12 flex flex-col items-center text-slate-500">
                 <i class="fas fa-history text-4xl mb-3 opacity-20"></i>

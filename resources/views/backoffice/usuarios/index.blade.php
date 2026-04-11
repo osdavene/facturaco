@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
 
     <div class="grid grid-cols-2 border-b border-[#1e2d47]">
         <div class="px-5 py-3 text-center border-r border-[#1e2d47]">
@@ -29,7 +29,7 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Usuario</th>
+                    <th class="table-th">Usuario</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Email</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Empresas asignadas</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Acciones</th>
@@ -37,7 +37,7 @@
             </thead>
             <tbody>
                 @forelse($usuarios as $usuario)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm

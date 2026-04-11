@@ -89,7 +89,7 @@
 
 {{-- KPIs PRINCIPALES --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas Hoy</div>
             <div class="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
@@ -101,7 +101,7 @@
         </div>
         <div class="text-xs text-slate-500 mt-1">{{ now()->format('d/m/Y') }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Mes</div>
             <div class="w-9 h-9 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400">
@@ -115,7 +115,7 @@
             {{ $facturasMes }} facturas · {{ now()->locale('es')->monthName }}
         </div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Año</div>
             <div class="w-9 h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
@@ -127,7 +127,7 @@
         </div>
         <div class="text-xs text-slate-500 mt-1">Acumulado {{ now()->year }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Cartera</div>
             <div class="w-9 h-9 bg-red-500/10 rounded-xl flex items-center justify-center text-red-400">
@@ -145,7 +145,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
 
     {{-- Gráfica línea — ventas 12 meses --}}
-    <div class="lg:col-span-2 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="lg:col-span-2 card p-6">
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h3 class="font-display font-bold text-base">Ventas Últimos 12 Meses</h3>
@@ -160,7 +160,7 @@
     </div>
 
     {{-- Donut — estados del mes --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h3 class="font-display font-bold text-base">Facturas del Mes</h3>
@@ -197,7 +197,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
 
     {{-- Barras — ventas 7 días --}}
-    <div class="lg:col-span-2 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="lg:col-span-2 card p-6">
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h3 class="font-display font-bold text-base">Ventas Últimos 7 Días</h3>
@@ -210,7 +210,7 @@
     </div>
 
     {{-- Top clientes --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <div class="flex items-center justify-between mb-5">
             <h3 class="font-display font-bold text-base">Top Clientes</h3>
             <span class="text-xs text-slate-500">Este mes</span>
@@ -248,7 +248,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
 
     {{-- Top productos --}}
-    <div class="lg:col-span-2 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="lg:col-span-2 card p-6">
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h3 class="font-display font-bold text-base">Top Productos del Mes</h3>
@@ -286,7 +286,7 @@
     </div>
 
     {{-- Accesos rápidos --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <h3 class="font-display font-bold text-base mb-4">Accesos Rápidos</h3>
         <div class="grid grid-cols-2 gap-2">
             @foreach([
@@ -318,7 +318,7 @@
 </div>
 
 {{-- Últimas facturas --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="px-5 py-4 border-b border-[#1e2d47] flex items-center justify-between">
         <h3 class="font-display font-bold text-base">Facturas Recientes</h3>
         <a href="{{ route('facturas.index') }}"
@@ -328,16 +328,16 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Número</th>
+                    <th class="table-th">Número</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cliente</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Fecha</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Total</th>
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Estado</th>
+                    <th class="table-th">Estado</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($ultimasFacturas as $factura)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-3">
                         <a href="{{ route('facturas.show', $factura) }}"
                            class="font-mono text-sm font-semibold text-amber-500 hover:underline">

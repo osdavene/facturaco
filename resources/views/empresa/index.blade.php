@@ -43,7 +43,7 @@
         <div class="lg:col-span-2 space-y-4">
 
             {{-- SECCIÓN 1: Identificación --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                                  text-black text-xs font-black">1</span>
@@ -51,37 +51,33 @@
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Razón Social *
                         </label>
                         <input type="text" name="razon_social"
                                value="{{ old('razon_social', $empresa->razon_social) }}"
                                data-uppercase
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm focus:outline-none focus:border-amber-500
-                                      @error('razon_social') border-red-500 @enderror"
+                               class="form-input @error('razon_social') border-red-500 @enderror"
                                style="color:#e2e8f0">
                         @error('razon_social') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Nombre Comercial
                         </label>
                         <input type="text" name="nombre_comercial"
                                value="{{ old('nombre_comercial', $empresa->nombre_comercial) }}"
                                data-uppercase
                                placeholder="NOMBRE COMERCIAL"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Tipo de Persona
                         </label>
                         <select name="tipo_persona"
-                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                       text-sm focus:outline-none focus:border-amber-500"
+                                class="form-input"
                                 style="color:#e2e8f0">
                             <option value="juridica" {{ old('tipo_persona',$empresa->tipo_persona)=='juridica' ? 'selected':'' }}>Persona Jurídica</option>
                             <option value="natural"  {{ old('tipo_persona',$empresa->tipo_persona)=='natural'  ? 'selected':'' }}>Persona Natural</option>
@@ -89,35 +85,31 @@
                     </div>
                     <div class="grid grid-cols-3 gap-2">
                         <div class="col-span-2">
-                            <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">NIT *</label>
+                            <label class="form-label">NIT *</label>
                             <input type="text" name="nit"
                                    value="{{ old('nit', $empresa->nit) }}"
                                    placeholder="900000000"
                                    data-numeric
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500
-                                          @error('nit') border-red-500 @enderror"
+                                   class="form-input @error('nit') border-red-500 @enderror"
                                    style="color:#e2e8f0">
                             @error('nit') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">DV</label>
+                            <label class="form-label">DV</label>
                             <input type="text" name="digito_verificacion" maxlength="1"
                                    value="{{ old('digito_verificacion', $empresa->digito_verificacion) }}"
                                    placeholder="0"
                                    data-numeric
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                                   class="form-input"
                                    style="color:#e2e8f0">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Régimen Tributario
                         </label>
                         <select name="regimen"
-                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                       text-sm focus:outline-none focus:border-amber-500"
+                                class="form-input"
                                 style="color:#e2e8f0">
                             <option value="responsable_iva" {{ old('regimen',$empresa->regimen)=='responsable_iva' ? 'selected':'' }}>Responsable de IVA</option>
                             <option value="simple"          {{ old('regimen',$empresa->regimen)=='simple'          ? 'selected':'' }}>Régimen Simple</option>
@@ -127,7 +119,7 @@
             </div>
 
             {{-- SECCIÓN 2: Contacto --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                                  text-black text-xs font-black">2</span>
@@ -135,78 +127,71 @@
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Email</label>
+                        <label class="form-label">Email</label>
                         <input type="email" name="email"
                                value="{{ old('email', $empresa->email) }}"
                                placeholder="info@empresa.com"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Teléfono</label>
+                        <label class="form-label">Teléfono</label>
                         <input type="text" name="telefono"
                                value="{{ old('telefono', $empresa->telefono) }}"
                                placeholder="601 1234567"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Celular</label>
+                        <label class="form-label">Celular</label>
                         <input type="text" name="celular"
                                value="{{ old('celular', $empresa->celular) }}"
                                placeholder="300 1234567"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Sitio Web</label>
+                        <label class="form-label">Sitio Web</label>
                         <input type="text" name="sitio_web"
                                value="{{ old('sitio_web', $empresa->sitio_web) }}"
                                placeholder="www.empresa.com"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Departamento</label>
+                        <label class="form-label">Departamento</label>
                         <input type="text" name="departamento"
                                value="{{ old('departamento', $empresa->departamento) }}"
                                placeholder="CÓRDOBA"
                                data-uppercase
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Municipio</label>
+                        <label class="form-label">Municipio</label>
                         <input type="text" name="municipio"
                                value="{{ old('municipio', $empresa->municipio) }}"
                                placeholder="MONTERÍA"
                                data-uppercase
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div class="sm:col-span-2 lg:col-span-3">
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Dirección</label>
+                        <label class="form-label">Dirección</label>
                         <input type="text" name="direccion"
                                value="{{ old('direccion', $empresa->direccion) }}"
                                placeholder="CRA 5 # 10-20"
                                data-uppercase
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                 </div>
             </div>
 
             {{-- SECCIÓN 3: DIAN --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                                  text-black text-xs font-black">3</span>
@@ -225,88 +210,81 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Prefijo Factura
                         </label>
                         <input type="text" name="prefijo_factura"
                                value="{{ old('prefijo_factura', $empresa->prefijo_factura) }}"
                                placeholder="FE"
                                data-uppercase
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             N° Resolución
                         </label>
                         <input type="text" name="resolucion_numero"
                                value="{{ old('resolucion_numero', $empresa->resolucion_numero) }}"
                                placeholder="18764030"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Fecha Resolución
                         </label>
                         <input type="date" name="resolucion_fecha"
                                value="{{ old('resolucion_fecha', $empresa->resolucion_fecha?->format('Y-m-d')) }}"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Fecha Vencimiento
                         </label>
                         <input type="date" name="resolucion_vencimiento"
                                value="{{ old('resolucion_vencimiento', $empresa->resolucion_vencimiento?->format('Y-m-d')) }}"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Desde Consecutivo
                         </label>
                         <input type="text" name="consecutivo_desde"
                                value="{{ old('consecutivo_desde', $empresa->consecutivo_desde) }}"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Hasta Consecutivo
                         </label>
                         <input type="text" name="consecutivo_hasta"
                                value="{{ old('consecutivo_hasta', $empresa->consecutivo_hasta) }}"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div class="sm:col-span-2 lg:col-span-3">
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Clave Técnica DIAN
                         </label>
                         <input type="text" name="clave_tecnica"
                                value="{{ old('clave_tecnica', $empresa->clave_tecnica) }}"
                                placeholder="CLAVE TÉCNICA PROPORCIONADA POR LA DIAN"
                                data-uppercase
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                 </div>
             </div>
 
             {{-- SECCIÓN 4: Impuestos por defecto --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                                  text-black text-xs font-black">4</span>
@@ -314,12 +292,11 @@
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             % IVA por Defecto
                         </label>
                         <select name="iva_defecto"
-                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                       text-sm focus:outline-none focus:border-amber-500"
+                                class="form-input"
                                 style="color:#e2e8f0">
                             <option value="0"  {{ old('iva_defecto',$empresa->iva_defecto)==0  ? 'selected':'' }}>0% - Excluido</option>
                             <option value="5"  {{ old('iva_defecto',$empresa->iva_defecto)==5  ? 'selected':'' }}>5%</option>
@@ -327,32 +304,30 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             % ReteFuente por Defecto
                         </label>
                         <input type="text" inputmode="decimal" name="retefuente_defecto"
                                value="{{ old('retefuente_defecto', $empresa->retefuente_defecto) }}"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             % ReteICA por Defecto
                         </label>
                         <input type="text" inputmode="decimal" name="reteica_defecto"
                                value="{{ old('reteica_defecto', $empresa->reteica_defecto) }}"
                                data-numeric
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                 </div>
             </div>
 
             {{-- SECCIÓN 5: Textos --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                                  text-black text-xs font-black">5</span>
@@ -360,25 +335,23 @@
                 </h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Pie de Página de Factura
                         </label>
                         <textarea name="pie_factura" rows="2"
                                   placeholder="TEXTO QUE APARECE AL PIE DE CADA FACTURA..."
                                   data-uppercase
-                                  class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                         text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500 resize-none"
+                                  class="form-input resize-none"
                                   style="color:#e2e8f0">{{ old('pie_factura', $empresa->pie_factura) }}</textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Términos y Condiciones
                         </label>
                         <textarea name="terminos_condiciones" rows="3"
                                   placeholder="TÉRMINOS Y CONDICIONES DE VENTA..."
                                   data-uppercase
-                                  class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                         text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500 resize-none"
+                                  class="form-input resize-none"
                                   style="color:#e2e8f0">{{ old('terminos_condiciones', $empresa->terminos_condiciones) }}</textarea>
                     </div>
                 </div>
@@ -390,7 +363,7 @@
         <div class="space-y-4">
 
             {{-- Logo --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h3 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <i class="fas fa-image text-amber-500 text-sm"></i>
                     Logo de la Empresa
@@ -425,19 +398,18 @@
                     @endif
                 </div>
 
-                <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                <label class="form-label">
                     Subir Logo <span class="text-slate-600">(PNG, JPG máx 2MB)</span>
                 </label>
                 <input type="file" name="logo" accept="image/*"
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                              text-sm text-slate-400 focus:outline-none focus:border-amber-500
+                       class="form-input text-slate-400 focus:outline-none focus:border-amber-500
                               file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0
                               file:text-xs file:font-semibold file:bg-amber-500 file:text-black
                               hover:file:bg-amber-600 cursor-pointer">
             </div>
 
             {{-- Info resolución --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+            <div class="card p-5">
                 <h3 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                     <i class="fas fa-file-contract text-amber-500"></i>
                     Estado Resolución DIAN
@@ -495,7 +467,7 @@
             </div>
 
             {{-- Resumen empresa --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+            <div class="card p-5">
                 <h3 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                     <i class="fas fa-building text-amber-500"></i>
                     Resumen
@@ -535,7 +507,7 @@
             </div>
 
             {{-- SECCIÓN: Configuración de Correo --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-1 flex items-center gap-2">
                     <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                                 text-black text-xs font-black">
@@ -590,25 +562,22 @@
 
                     {{-- Host --}}
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Servidor SMTP (Host)
                         </label>
                         <input type="text" name="mail_host" id="mail_host"
                             value="{{ old('mail_host', $empresa->mail_host) }}"
                             placeholder="smtp.resend.com"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                    text-sm text-slate-200 placeholder-slate-600
-                                    focus:outline-none focus:border-amber-500 transition-colors">
+                            class="form-input">
                     </div>
 
                     {{-- Puerto --}}
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Puerto
                         </label>
                         <select name="mail_port" id="mail_port"
-                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                    text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                                class="form-input">
                             <option value="587" {{ old('mail_port', $empresa->mail_port) == 587 ? 'selected' : '' }}>587 — TLS (recomendado)</option>
                             <option value="465" {{ old('mail_port', $empresa->mail_port) == 465 ? 'selected' : '' }}>465 — SSL</option>
                             <option value="25"  {{ old('mail_port', $empresa->mail_port) == 25  ? 'selected' : '' }}>25 — Sin cifrado</option>
@@ -617,21 +586,19 @@
 
                     {{-- Usuario --}}
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Usuario SMTP
                         </label>
                         <input type="text" name="mail_username" id="mail_username"
                             value="{{ old('mail_username', $empresa->mail_username) }}"
                             placeholder="resend o tucorreo@gmail.com"
                             autocomplete="off"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                    text-sm text-slate-200 placeholder-slate-600
-                                    focus:outline-none focus:border-amber-500 transition-colors">
+                            class="form-input">
                     </div>
 
                     {{-- Contraseña --}}
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Contraseña / API Key
                         </label>
                         <div class="relative">
@@ -653,12 +620,11 @@
 
                     {{-- Cifrado --}}
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Cifrado
                         </label>
                         <select name="mail_encryption" id="mail_encryption"
-                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                    text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                                class="form-input">
                             <option value="tls" {{ old('mail_encryption', $empresa->mail_encryption) == 'tls' ? 'selected' : '' }}>TLS</option>
                             <option value="ssl" {{ old('mail_encryption', $empresa->mail_encryption) == 'ssl' ? 'selected' : '' }}>SSL</option>
                             <option value=""    {{ old('mail_encryption', $empresa->mail_encryption) == ''    ? 'selected' : '' }}>Ninguno</option>
@@ -667,29 +633,25 @@
 
                     {{-- From address --}}
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Correo remitente
                         </label>
                         <input type="email" name="mail_from_address" id="mail_from_address"
                             value="{{ old('mail_from_address', $empresa->mail_from_address ?? $empresa->email) }}"
                             placeholder="facturacion@miempresa.com"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                    text-sm text-slate-200 placeholder-slate-600
-                                    focus:outline-none focus:border-amber-500 transition-colors">
+                            class="form-input">
                         <p class="text-xs text-slate-600 mt-1">El correo que verá el cliente como remitente.</p>
                     </div>
 
                     {{-- From name --}}
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Nombre remitente
                         </label>
                         <input type="text" name="mail_from_name" id="mail_from_name"
                             value="{{ old('mail_from_name', $empresa->mail_from_name ?? $empresa->razon_social) }}"
                             placeholder="Nombre que verá el cliente al recibir el correo"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                    text-sm text-slate-200 placeholder-slate-600
-                                    focus:outline-none focus:border-amber-500 transition-colors">
+                            class="form-input">
                     </div>
 
                 </div>
@@ -720,7 +682,7 @@
             </div>
 
             {{-- SECCIÓN: Pagos en Línea (Wompi) --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-1 flex items-center gap-2">
                     <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                                 text-black text-xs font-black">
@@ -751,7 +713,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Llave Pública Wompi
                         </label>
                         <div class="relative">
@@ -776,12 +738,11 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Moneda
                         </label>
                         <select name="wompi_currency"
-                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                    text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                                class="form-input">
                             <option value="COP" {{ ($empresa->wompi_currency ?? 'COP') === 'COP' ? 'selected' : '' }}>
                                 COP — Peso Colombiano
                             </option>
@@ -794,7 +755,7 @@
 
                 {{-- Events Key para verificación de webhooks --}}
                 <div class="mt-4">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Llave de Eventos (Webhook)
                         <span class="ml-1 text-slate-600 font-normal normal-case tracking-normal">— opcional, para verificar firmas</span>
                     </label>

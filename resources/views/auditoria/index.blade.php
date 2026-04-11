@@ -15,7 +15,7 @@
 
     {{-- Filtros --}}
     <form method="GET" action="{{ route('auditoria.index') }}"
-          class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4">
+          class="card p-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
 
             <div>
@@ -71,7 +71,7 @@
     </form>
 
     {{-- Tabla --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
         @if($registros->isEmpty())
         <div class="py-16 flex flex-col items-center text-slate-500">
             <i class="fas fa-clipboard-list text-5xl mb-4 opacity-20"></i>

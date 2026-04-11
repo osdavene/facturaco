@@ -25,7 +25,7 @@
 
 {{-- KPIs --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Recaudado Hoy</div>
             <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500">
@@ -37,7 +37,7 @@
         </div>
         <div class="text-xs text-slate-500 mt-1">{{ now()->format('d/m/Y') }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Recaudado del Mes</div>
             <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400">
@@ -53,7 +53,7 @@
 
 {{-- Filtros --}}
 <form method="GET" action="{{ route('recibos.index') }}"
-      class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-5">
+      class="card p-4 mb-5">
     <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
@@ -66,14 +66,12 @@
         </div>
         <div>
             <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
-                   class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                          text-sm focus:outline-none focus:border-amber-500"
+                   class="form-input"
                    style="color:#e2e8f0">
         </div>
         <div>
             <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
-                   class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                          text-sm focus:outline-none focus:border-amber-500"
+                   class="form-input"
                    style="color:#e2e8f0">
         </div>
         <button type="submit"
@@ -93,12 +91,12 @@
 </form>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Número</th>
+                    <th class="table-th">Número</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cliente</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Fecha</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden lg:table-cell">Forma Pago</th>
@@ -110,7 +108,7 @@
             </thead>
             <tbody>
                 @forelse($recibos as $recibo)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-4">
                         <div class="font-mono text-sm font-semibold text-emerald-500">
                             {{ $recibo->numero }}

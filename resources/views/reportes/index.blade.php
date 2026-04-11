@@ -33,7 +33,7 @@
 
 {{-- KPIs --}}
 <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Mes</div>
             <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500">
@@ -46,7 +46,7 @@
         <div class="text-xs text-slate-500 mt-1">{{ now()->locale('es')->monthName }}</div>
     </div>
 
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Año</div>
             <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400">
@@ -59,7 +59,7 @@
         <div class="text-xs text-slate-500 mt-1">{{ now()->year }}</div>
     </div>
 
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Cartera</div>
             <div class="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500">
@@ -72,7 +72,7 @@
         <div class="text-xs text-slate-500 mt-1">Por cobrar</div>
     </div>
 
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Facturas Mes</div>
             <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-400">
@@ -83,7 +83,7 @@
         <div class="text-xs text-slate-500 mt-1">Este mes</div>
     </div>
 
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Stock Bajo</div>
             <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center text-red-400">
@@ -98,7 +98,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
 
     {{-- Ventas por mes --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <div class="flex items-center justify-between mb-5">
             <h3 class="font-display font-bold text-base">Ventas Últimos 6 Meses</h3>
             <a href="{{ route('reportes.ventas') }}"
@@ -122,7 +122,7 @@
     </div>
 
     {{-- Top clientes --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <div class="flex items-center justify-between mb-5">
             <h3 class="font-display font-bold text-base">Top 5 Clientes</h3>
         </div>
@@ -151,7 +151,7 @@
 </div>
 
 {{-- Top productos --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="px-5 py-4 border-b border-[#1e2d47] flex items-center justify-between">
         <h3 class="font-display font-bold text-base">Top 5 Productos Más Vendidos</h3>
         <a href="{{ route('reportes.inventario') }}"
@@ -161,7 +161,7 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">#</th>
+                    <th class="table-th">#</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Producto</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cantidad</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Total Ventas</th>
@@ -169,7 +169,7 @@
             </thead>
             <tbody>
                 @forelse($topProductos as $i => $prod)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-3">
                         <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold
                                      {{ $i === 0 ? 'bg-amber-500 text-black' : 'bg-[#1a2235] text-slate-400' }}

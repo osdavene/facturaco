@@ -25,46 +25,42 @@
         @csrf @method('PUT')
 
         {{-- Datos básicos --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 space-y-5">
+        <div class="card p-6 space-y-5">
             <h2 class="font-display font-bold text-base flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
                 Datos del usuario
             </h2>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nombre completo *</label>
+                <label class="form-label">Nombre completo *</label>
                 <input type="text" name="name" value="{{ old('name', $usuario->name) }}" required
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                              focus:outline-none focus:border-amber-500 transition-colors">
+                       class="form-input">
             </div>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Correo electrónico *</label>
+                <label class="form-label">Correo electrónico *</label>
                 <input type="email" name="email" value="{{ old('email', $usuario->email) }}" required
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                              focus:outline-none focus:border-amber-500 transition-colors">
+                       class="form-input">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                    <label class="form-label">
                         Nueva contraseña <span class="text-slate-600 normal-case">(vacío = sin cambio)</span>
                     </label>
                     <input type="password" name="password" placeholder="••••••••"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Confirmar contraseña</label>
+                    <label class="form-label">Confirmar contraseña</label>
                     <input type="password" name="password_confirmation" placeholder="••••••••"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
             </div>
         </div>
 
         {{-- Empresas asignadas --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+        <div class="card p-6">
             <h2 class="font-display font-bold text-base flex items-center gap-2 mb-1">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
                 Acceso a empresas

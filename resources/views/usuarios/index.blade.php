@@ -45,7 +45,7 @@
         ];
         $c = $colores[$rol->name] ?? ['bg-slate-500/10','text-slate-400','bg-slate-500'];
     @endphp
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 text-center">
+    <div class="card p-4 text-center">
         <div class="font-display font-bold text-2xl {{ $c[1] }}">{{ $rol->users_count }}</div>
         <div class="text-xs text-slate-500 mt-1 capitalize">{{ str_replace('-',' ',$rol->name) }}</div>
         <div class="w-full h-1 rounded-full mt-2 {{ $c[0] }}">
@@ -57,7 +57,7 @@
 </div>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
 
     {{-- Stats --}}
     <div class="grid grid-cols-2 border-b border-[#1e2d47]">
@@ -77,7 +77,7 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Usuario</th>
+                    <th class="table-th">Usuario</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Email</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Rol</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden lg:table-cell">Empresa(s)</th>
@@ -92,7 +92,7 @@
                     $c = $colores[$rolNombre] ?? ['bg-slate-500/10','text-slate-400','bg-slate-500'];
                     $esActual  = $usuario->id === auth()->id();
                 @endphp
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors
+                <tr class="table-row
                            {{ $esActual ? 'bg-amber-500/3' : '' }}">
 
                     <td class="px-5 py-4">
@@ -204,7 +204,7 @@
 </div>
 
 {{-- Tabla de permisos por rol --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden mt-6">
+<div class="card overflow-hidden mt-6">
     <div class="px-5 py-4 border-b border-[#1e2d47]">
         <div class="font-display font-bold text-base">Permisos por Rol</div>
         <div class="text-xs text-slate-500 mt-1">Referencia de lo que puede hacer cada rol</div>

@@ -32,7 +32,7 @@
         ['Aceptadas',  $totales['aceptada'],   'fa-check-circle', 'emerald', ''],
         ['Convertidas',$totales['convertida'], 'fa-file-invoice', 'purple',  ''],
     ] as [$label, $val, $icon, $color, $prefix])
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4">
+    <div class="card p-4">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-slate-500 uppercase tracking-wider">{{ $label }}</div>
             <div class="w-7 h-7 bg-{{ $color }}-500/10 rounded-lg flex items-center justify-center
@@ -47,7 +47,7 @@
 
 {{-- Filtros --}}
 <form method="GET" action="{{ route('cotizaciones.index') }}"
-      class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-5">
+      class="card p-4 mb-5">
     <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
@@ -59,8 +59,7 @@
                    style="color:#e2e8f0">
         </div>
         <select name="estado"
-                class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                       text-sm focus:outline-none focus:border-amber-500"
+                class="form-input"
                 style="color:#e2e8f0">
             <option value="">Todos los estados</option>
             @foreach(['borrador'=>'Borrador','enviada'=>'Enviada','aceptada'=>'Aceptada',
@@ -85,12 +84,12 @@
 </form>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Número</th>
+                    <th class="table-th">Número</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cliente</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Emisión</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden lg:table-cell">Vence</th>
@@ -101,7 +100,7 @@
             </thead>
             <tbody>
                 @forelse($cotizaciones as $cotizacion)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-4">
                         <div class="font-mono text-sm font-semibold text-blue-400">
                             {{ $cotizacion->numero }}

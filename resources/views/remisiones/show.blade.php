@@ -55,7 +55,7 @@
     @endif
 
     {{-- Estado --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-4">
+    <div class="card p-4 mb-4">
         <div class="flex items-center gap-3 flex-wrap">
             <span class="text-sm text-slate-400">Estado:</span>
             <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full
@@ -111,7 +111,7 @@
 
     {{-- Info --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Cliente</h3>
             <div class="font-semibold text-base" style="color:#e2e8f0">{{ $remision->cliente_nombre }}</div>
             @if($remision->cliente_documento)
@@ -124,7 +124,7 @@
             <div class="text-sm text-slate-500">{{ $remision->cliente_direccion }}</div>
             @endif
         </div>
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Detalles de Envío</h3>
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
@@ -160,7 +160,7 @@
     </div>
 
     {{-- Items --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden mb-4">
+    <div class="card overflow-hidden mb-4">
         <div class="px-5 py-4 border-b border-[#1e2d47]">
             <div class="font-display font-bold text-base">Productos Despachados</div>
         </div>
@@ -168,7 +168,7 @@
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-[#1e2d47]">
-                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Descripción</th>
+                        <th class="table-th">Descripción</th>
                         <th class="text-center text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Unidad</th>
                         <th class="text-center text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cantidad</th>
                         <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Precio Ref.</th>
@@ -211,7 +211,7 @@
     </div>
 
     @if($remision->observaciones)
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Observaciones</h3>
         <p class="text-sm text-slate-300">{{ $remision->observaciones }}</p>
     </div>

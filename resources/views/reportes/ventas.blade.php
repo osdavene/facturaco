@@ -34,27 +34,24 @@
 
 {{-- Filtros --}}
 <form method="GET" action="{{ route('reportes.ventas') }}"
-      class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-5">
+      class="card p-4 mb-5">
     <div class="flex flex-col sm:flex-row gap-3">
         <div>
             <label class="block text-xs text-slate-500 mb-1">Desde</label>
             <input type="date" name="fecha_desde" value="{{ $fechaDesde }}"
-                   class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                          text-sm focus:outline-none focus:border-amber-500"
+                   class="form-input"
                    style="color:#e2e8f0">
         </div>
         <div>
             <label class="block text-xs text-slate-500 mb-1">Hasta</label>
             <input type="date" name="fecha_hasta" value="{{ $fechaHasta }}"
-                   class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                          text-sm focus:outline-none focus:border-amber-500"
+                   class="form-input"
                    style="color:#e2e8f0">
         </div>
         <div>
             <label class="block text-xs text-slate-500 mb-1">Estado</label>
             <select name="estado"
-                    class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                           text-sm focus:outline-none focus:border-amber-500"
+                    class="form-input"
                     style="color:#e2e8f0">
                 <option value="">Todos</option>
                 @foreach(['emitida','pagada','vencida'] as $e)
@@ -80,7 +77,7 @@
         ['IVA Generado',   $totales['iva'],      'fa-percent',      'purple',  '$'],
         ['Total Ventas',   $totales['total'],    'fa-chart-line',   'emerald', '$'],
     ] as [$label, $valor, $icon, $color, $prefix])
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-slate-500 uppercase tracking-wider">{{ $label }}</div>
             <div class="w-8 h-8 bg-{{ $color }}-500/10 rounded-lg flex items-center
@@ -96,23 +93,23 @@
 </div>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Factura</th>
+                    <th class="table-th">Factura</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cliente</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Fecha</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">Subtotal</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">IVA</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Total</th>
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Estado</th>
+                    <th class="table-th">Estado</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($facturas as $factura)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-3">
                         <a href="{{ route('facturas.show', $factura) }}"
                            class="text-amber-500 hover:underline font-mono text-sm font-semibold">

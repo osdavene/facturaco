@@ -22,45 +22,39 @@
         @csrf @method('PUT')
 
         {{-- SECCIÓN 1 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
                 Información Básica
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Código *</label>
+                    <label class="form-label">Código *</label>
                     <input type="text" name="codigo"
                            value="{{ old('codigo', $inventario->codigo) }}"
                            style="text-transform:uppercase"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 uppercase focus:outline-none focus:border-amber-500
-                                  @error('codigo') border-red-500 @enderror">
+                           class="form-input @error('codigo') border-red-500 @enderror">
                     @error('codigo') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Código de Barras</label>
+                    <label class="form-label">Código de Barras</label>
                     <input type="text" name="codigo_barras"
                            value="{{ old('codigo_barras', $inventario->codigo_barras) }}"
                            style="text-transform:uppercase"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 uppercase focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Nombre *</label>
+                    <label class="form-label">Nombre *</label>
                     <input type="text" name="nombre"
                            value="{{ old('nombre', $inventario->nombre) }}"
                            style="text-transform:uppercase"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 uppercase focus:outline-none focus:border-amber-500
-                                  @error('nombre') border-red-500 @enderror">
+                           class="form-input @error('nombre') border-red-500 @enderror">
                     @error('nombre') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Categoría</label>
+                    <label class="form-label">Categoría</label>
                     <select name="categoria_id"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="">Sin categoría</option>
                         @foreach($categorias as $cat)
                         <option value="{{ $cat->id }}"
@@ -71,10 +65,9 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Unidad de Medida</label>
+                    <label class="form-label">Unidad de Medida</label>
                     <select name="unidad_medida_id"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="">Seleccionar</option>
                         @foreach($unidades as $u)
                         <option value="{{ $u->id }}"
@@ -85,10 +78,9 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Estado</label>
+                    <label class="form-label">Estado</label>
                     <select name="activo"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="1" {{ old('activo', $inventario->activo) ? 'selected':'' }}>Activo</option>
                         <option value="0" {{ !old('activo', $inventario->activo) ? 'selected':'' }}>Inactivo</option>
                     </select>
@@ -105,7 +97,7 @@
         </div>
 
         {{-- SECCIÓN 2 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
                 Precios e IVA
@@ -118,20 +110,18 @@
                     ['precio_venta3', 'Precio 3'],
                 ] as [$field, $label])
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">{{ $label }}</label>
+                    <label class="form-label">{{ $label }}</label>
                     <input type="text" inputmode="decimal" name="{{ $field }}"
                            value="{{ old($field, $inventario->$field) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 @endforeach
             </div>
             <div class="flex flex-wrap items-end gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">% IVA</label>
+                    <label class="form-label">% IVA</label>
                     <select name="iva_pct"
-                            class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="0"  {{ old('iva_pct',$inventario->iva_pct)=='0'  ? 'selected':'' }}>0%</option>
                         <option value="5"  {{ old('iva_pct',$inventario->iva_pct)=='5'  ? 'selected':'' }}>5%</option>
                         <option value="19" {{ old('iva_pct',$inventario->iva_pct)=='19' ? 'selected':'' }}>19%</option>
@@ -147,7 +137,7 @@
         </div>
 
         {{-- SECCIÓN 3 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-6">
+        <div class="card p-6 mb-6">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">3</span>
                 Stock e Inventario
@@ -158,32 +148,29 @@
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Stock Actual</label>
+                    <label class="form-label">Stock Actual</label>
                     <input type="text" value="{{ $inventario->stock_actual }}" disabled
                            class="w-full bg-[#0f1623] border border-[#1e2d47] rounded-xl px-4 py-2.5
                                   text-sm text-slate-500 cursor-not-allowed">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Stock Mínimo</label>
+                    <label class="form-label">Stock Mínimo</label>
                     <input type="text" inputmode="decimal" name="stock_minimo"
                            value="{{ old('stock_minimo', $inventario->stock_minimo) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Stock Máximo</label>
+                    <label class="form-label">Stock Máximo</label>
                     <input type="text" inputmode="decimal" name="stock_maximo"
                            value="{{ old('stock_maximo', $inventario->stock_maximo) }}"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Ubicación</label>
+                    <label class="form-label">Ubicación</label>
                     <input type="text" name="ubicacion"
                            value="{{ old('ubicacion', $inventario->ubicacion) }}"
                            style="text-transform:uppercase"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 uppercase focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
             </div>
         </div>

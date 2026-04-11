@@ -36,7 +36,7 @@
         <div class="space-y-4">
 
             {{-- Datos generales --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <span class="w-6 h-6 bg-violet-500 rounded-lg flex items-center justify-center
                                  text-white text-xs font-black">1</span>
@@ -45,33 +45,30 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Fecha *
                         </label>
                         <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                               class="form-input">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Tipo *
                         </label>
                         <select name="tipo" id="tipo"
-                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                       text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                                class="form-input">
                             <option value="parcial">Parcial</option>
                             <option value="total">Total (anula la factura)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Motivo *
                         </label>
                         <select name="motivo"
-                                class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                       text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                                class="form-input">
                             <option value="devolucion_mercancia">Devolución de mercancía</option>
                             <option value="descuento_posterior">Descuento posterior</option>
                             <option value="error_facturacion">Error en facturación</option>
@@ -81,12 +78,11 @@
                     </div>
 
                     <div class="sm:col-span-3">
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Observaciones <span class="text-slate-600 normal-case font-normal">(opcional)</span>
                         </label>
                         <textarea name="observaciones" rows="2"
-                                  class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                         text-sm text-slate-200 placeholder-slate-600 resize-none
+                                  class="form-input resize-none
                                          focus:outline-none focus:border-amber-500 transition-colors"
                                   placeholder="Describe el motivo de la nota de crédito...">{{ old('observaciones') }}</textarea>
                     </div>
@@ -94,7 +90,7 @@
             </div>
 
             {{-- Items a devolver --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <span class="w-6 h-6 bg-violet-500 rounded-lg flex items-center justify-center
                                  text-white text-xs font-black">2</span>

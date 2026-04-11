@@ -33,12 +33,12 @@
 
     {{-- Info --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Cliente</h3>
             <div class="font-semibold text-base text-slate-200">{{ $nota->cliente_nombre }}</div>
             <div class="text-sm text-slate-400 mt-1">{{ $nota->cliente_documento }}</div>
         </div>
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Detalles</h3>
             <div class="grid grid-cols-2 gap-3 text-sm">
                 <div>
@@ -66,7 +66,7 @@
     </div>
 
     {{-- Items --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden mb-4">
+    <div class="card overflow-hidden mb-4">
         <div class="px-5 py-4 border-b border-[#1e2d47]">
             <div class="font-display font-bold text-base">Ítems Devueltos</div>
         </div>
@@ -134,7 +134,7 @@
     </div>
 
     @if($nota->observaciones)
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Observaciones</h3>
         <p class="text-sm text-slate-300">{{ $nota->observaciones }}</p>
     </div>

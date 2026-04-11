@@ -22,7 +22,7 @@
         @csrf
 
         {{-- SECCIÓN 1 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                              text-black text-xs font-black">1</span>
@@ -30,29 +30,25 @@
             </h2>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Nombre Completo *
                     </label>
                     <input type="text" name="name"
                            value="{{ old('name') }}"
                            placeholder="NOMBRE DEL USUARIO"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500
-                                  @error('name') border-red-500 @enderror"
+                           class="form-input @error('name') border-red-500 @enderror"
                            style="color:#e2e8f0">
                     @error('name') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Correo Electrónico *
                     </label>
                     <input type="email" name="email"
                            value="{{ old('email') }}"
                            placeholder="usuario@empresa.com"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500
-                                  @error('email') border-red-500 @enderror"
+                           class="form-input @error('email') border-red-500 @enderror"
                            style="color:#e2e8f0">
                     @error('email') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -60,7 +56,7 @@
         </div>
 
         {{-- SECCIÓN 2 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                              text-black text-xs font-black">2</span>
@@ -68,14 +64,13 @@
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Contraseña * <span class="text-slate-600">(mín. 8 caracteres)</span>
                     </label>
                     <div class="relative">
                         <input type="password" name="password" id="password"
                                placeholder="••••••••"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500 pr-10
+                               class="form-input pr-10
                                       @error('password') border-red-500 @enderror"
                                style="color:#e2e8f0">
                         <button type="button" onclick="togglePass('password')"
@@ -87,14 +82,13 @@
                     @error('password') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Confirmar Contraseña *
                     </label>
                     <div class="relative">
                         <input type="password" name="password_confirmation" id="password_confirmation"
                                placeholder="••••••••"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                      text-sm placeholder-slate-600 focus:outline-none focus:border-amber-500 pr-10"
+                               class="form-input pr-10"
                                style="color:#e2e8f0">
                         <button type="button" onclick="togglePass('password_confirmation')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500
@@ -116,7 +110,7 @@
         </div>
 
         {{-- SECCIÓN 3: Rol --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-6">
+        <div class="card p-6 mb-6">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                              text-black text-xs font-black">3</span>
@@ -172,7 +166,7 @@
 
         {{-- SECCIÓN 4: Acceso a empresas (si el grupo tiene más de una) --}}
         @if($empresasGrupo->count() > 1)
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-6">
+        <div class="card p-6 mb-6">
             <h2 class="font-display font-bold text-base mb-1 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                              text-black text-xs font-black">4</span>

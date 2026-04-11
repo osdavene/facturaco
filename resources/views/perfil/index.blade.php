@@ -20,7 +20,7 @@
     @endif
 
     {{-- Header perfil --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+    <div class="card p-6 mb-4">
         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
 
             {{-- Avatar --}}
@@ -112,7 +112,7 @@
     </div>
 
     {{-- Tabs --}}
-    <div class="flex gap-1 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-1.5 mb-4"
+    <div class="flex gap-1 card p-1.5 mb-4"
          id="tabs-container">
         @foreach([
             ['tab' => 'info',     'icon' => 'fa-user',     'label' => 'Información'],
@@ -133,68 +133,59 @@
     <div id="tab-info" class="tab-content">
         <form method="POST" action="{{ route('perfil.update') }}">
             @csrf @method('PUT')
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-5 flex items-center gap-2">
                     <i class="fas fa-user text-amber-500 text-sm"></i>
                     Datos Personales
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Nombre Completo *
                         </label>
                         <input type="text" name="name"
                                value="{{ old('name', $usuario->name) }}"
                                data-uppercase
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                                      px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500
-                                      @error('name') border-red-500 @enderror"
+                               class="form-input @error('name') border-red-500 @enderror"
                                style="color:#e2e8f0">
                         @error('name') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Correo Electrónico *
                         </label>
                         <input type="email" name="email"
                                value="{{ old('email', $usuario->email) }}"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                                      px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500
-                                      @error('email') border-red-500 @enderror"
+                               class="form-input @error('email') border-red-500 @enderror"
                                style="color:#e2e8f0">
                         @error('email') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Teléfono
                         </label>
                         <input type="text" name="telefono"
                                value="{{ old('telefono', $usuario->telefono) }}"
                                placeholder="300 000 0000"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                                      px-4 py-2.5 text-sm placeholder-slate-600
-                                      focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Cargo / Posición
                         </label>
                         <input type="text" name="cargo"
                                value="{{ old('cargo', $usuario->cargo) }}"
                                placeholder="VENDEDOR, CONTADOR..."
                                data-uppercase
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                                      px-4 py-2.5 text-sm placeholder-slate-600
-                                      focus:outline-none focus:border-amber-500"
+                               class="form-input"
                                style="color:#e2e8f0">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Rol del Sistema
                         </label>
-                        <div class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                                    px-4 py-2.5 text-sm text-slate-500 flex items-center gap-2">
+                        <div class="form-input text-slate-500 flex items-center gap-2">
                             <i class="fas fa-shield-alt text-xs text-amber-500"></i>
                             {{ ucfirst(str_replace('-',' ', $usuario->getRoleNames()->first() ?? 'Sin rol')) }}
                             <span class="text-xs text-slate-600 ml-auto">(solo admin puede cambiar)</span>
@@ -216,21 +207,20 @@
     <div id="tab-password" class="tab-content hidden">
         <form method="POST" action="{{ route('perfil.password') }}">
             @csrf @method('PUT')
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-5 flex items-center gap-2">
                     <i class="fas fa-lock text-amber-500 text-sm"></i>
                     Cambiar Contraseña
                 </h2>
                 <div class="space-y-4 max-w-md">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Contraseña Actual *
                         </label>
                         <div class="relative">
                             <input type="password" name="password_actual" id="pass-actual"
                                    placeholder="••••••••"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                                          px-4 py-2.5 text-sm placeholder-slate-600 pr-10
+                                   class="form-input pr-10
                                           focus:outline-none focus:border-amber-500
                                           @error('password_actual') border-red-500 @enderror"
                                    style="color:#e2e8f0">
@@ -245,14 +235,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Nueva Contraseña *
                         </label>
                         <div class="relative">
                             <input type="password" name="password" id="pass-nueva"
                                    placeholder="••••••••"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                                          px-4 py-2.5 text-sm placeholder-slate-600 pr-10
+                                   class="form-input pr-10
                                           focus:outline-none focus:border-amber-500
                                           @error('password') border-red-500 @enderror"
                                    style="color:#e2e8f0">
@@ -274,14 +263,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                        <label class="form-label">
                             Confirmar Nueva Contraseña *
                         </label>
                         <div class="relative">
                             <input type="password" name="password_confirmation" id="pass-confirm"
                                    placeholder="••••••••"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                                          px-4 py-2.5 text-sm placeholder-slate-600 pr-10
+                                   class="form-input pr-10
                                           focus:outline-none focus:border-amber-500"
                                    style="color:#e2e8f0">
                             <button type="button" onclick="togglePass('pass-confirm','icon-confirm')"
@@ -322,7 +310,7 @@
 
     {{-- TAB: Actividad --}}
     <div id="tab-actividad" class="tab-content hidden">
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+        <div class="card p-6">
             <h2 class="font-display font-bold text-base mb-5 flex items-center gap-2">
                 <i class="fas fa-clock text-amber-500 text-sm"></i>
                 Resumen de Actividad

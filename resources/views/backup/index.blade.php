@@ -24,7 +24,7 @@
     {{-- ═══════════════════════════════════════════
          OPCIÓN A — JSON COMPLETO
     ════════════════════════════════════════════ --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
         <div class="px-6 py-4 border-b border-[#1e2d47] flex items-center justify-between gap-4 flex-wrap">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 rounded-xl
@@ -61,7 +61,7 @@
     {{-- ═══════════════════════════════════════════
          OPCIÓN B — CSV SELECTIVO
     ════════════════════════════════════════════ --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
         <div class="px-6 py-4 border-b border-[#1e2d47] flex items-center gap-3">
             <div class="w-10 h-10 bg-amber-500/10 border border-amber-500/20 rounded-xl
                         flex items-center justify-center text-amber-400">

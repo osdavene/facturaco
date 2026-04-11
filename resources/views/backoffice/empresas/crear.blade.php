@@ -16,7 +16,7 @@
     <form method="POST" action="{{ route('backoffice.empresas.store') }}">
         @csrf
 
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 space-y-5 mb-4">
+        <div class="card p-6 space-y-5 mb-4">
 
             <h2 class="font-display font-bold text-base flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
@@ -24,65 +24,57 @@
             </h2>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Razón social *</label>
+                <label class="form-label">Razón social *</label>
                 <input type="text" name="razon_social" value="{{ old('razon_social') }}" required
                        placeholder="Empresa S.A.S."
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                              focus:outline-none focus:border-amber-500 transition-colors
-                              @error('razon_social') border-red-500 @enderror">
+                       class="form-input @error('razon_social') border-red-500 @enderror">
                 @error('razon_social')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">NIT *</label>
+                    <label class="form-label">NIT *</label>
                     <input type="text" name="nit" value="{{ old('nit') }}" required
                            placeholder="900000000"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors
-                                  @error('nit') border-red-500 @enderror">
+                           class="form-input @error('nit') border-red-500 @enderror">
                     @error('nit')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Teléfono</label>
+                    <label class="form-label">Teléfono</label>
                     <input type="text" name="telefono" value="{{ old('telefono') }}"
                            placeholder="601 000 0000"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
+                    <label class="form-label">Email</label>
                     <input type="email" name="email" value="{{ old('email') }}"
                            placeholder="contacto@empresa.com"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Municipio</label>
+                    <label class="form-label">Municipio</label>
                     <input type="text" name="municipio" value="{{ old('municipio') }}"
                            placeholder="Bogotá D.C."
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
             </div>
         </div>
 
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-5">
+        <div class="card p-6 mb-5">
 
             <h2 class="font-display font-bold text-base flex items-center gap-2 mb-4">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
                 Jerarquía del grupo
             </h2>
 
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+            <label class="form-label">
                 ¿Es filial de otra empresa?
             </label>
             <select name="empresa_padre_id"
-                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                           focus:outline-none focus:border-amber-500 transition-colors">
+                    class="form-input">
                 <option value="">— No, es empresa matriz independiente —</option>
                 @foreach($matrices as $m)
                     <option value="{{ $m->id }}"

@@ -24,7 +24,7 @@
 
 {{-- FILTROS DE PERÍODO --}}
 <form method="GET" action="{{ route('impuestos.index') }}"
-      class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5 mb-6" id="form-filtros">
+      class="card p-5 mb-6" id="form-filtros">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
         {{-- Tipo período --}}
@@ -54,8 +54,7 @@
                 Año
             </label>
             <select name="anio"
-                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                           text-sm focus:outline-none focus:border-amber-500"
+                    class="form-input"
                     style="color:#e2e8f0">
                 @foreach($aniosDisponibles as $a)
                 <option value="{{ $a }}" {{ $anio==$a?'selected':'' }}>{{ $a }}</option>
@@ -74,8 +73,7 @@
             </label>
             {{-- Bimestre --}}
             <select name="bimestre" id="select-bimestre"
-                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                           text-sm focus:outline-none focus:border-amber-500
+                    class="form-input
                            {{ $periodoTipo=='mensual' ? 'hidden':'' }}"
                     style="color:#e2e8f0">
                 @foreach([1=>'1° Ene-Feb',2=>'2° Mar-Abr',3=>'3° May-Jun',
@@ -85,8 +83,7 @@
             </select>
             {{-- Mes --}}
             <select name="mes" id="select-mes"
-                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                           text-sm focus:outline-none focus:border-amber-500
+                    class="form-input
                            {{ $periodoTipo!='mensual' ? 'hidden':'' }}"
                     style="color:#e2e8f0">
                 @foreach([1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',
@@ -111,7 +108,7 @@
 
 {{-- KPIs PRINCIPALES --}}
 <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Total Ventas</div>
             <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500">
@@ -124,7 +121,7 @@
         <div class="text-xs text-slate-500 mt-1">{{ $resumen['num_facturas'] }} facturas</div>
     </div>
 
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">Base Gravable</div>
             <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400">
@@ -137,7 +134,7 @@
         <div class="text-xs text-slate-500 mt-1">Subtotal sin impuestos</div>
     </div>
 
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5 col-span-2 lg:col-span-1">
+    <div class="card p-5 col-span-2 lg:col-span-1">
         <div class="flex items-center justify-between mb-3">
             <div class="text-xs text-slate-500 uppercase tracking-wider">IVA Generado</div>
             <div class="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500">
@@ -154,7 +151,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
 
     {{-- Retenciones --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <h3 class="font-display font-bold text-base mb-5 flex items-center gap-2">
             <i class="fas fa-hand-holding-usd text-amber-500 text-sm"></i>
             Retenciones en la Fuente
@@ -194,7 +191,7 @@
     </div>
 
     {{-- IVA por tasa --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+    <div class="card p-6">
         <h3 class="font-display font-bold text-base mb-5 flex items-center gap-2">
             <i class="fas fa-percent text-amber-500 text-sm"></i>
             IVA por Tarifa
@@ -246,7 +243,7 @@
 
 {{-- Resumen por mes --}}
 @if($ventasPorMes->count())
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden mb-6">
+<div class="card overflow-hidden mb-6">
     <div class="px-5 py-4 border-b border-[#1e2d47]">
         <h3 class="font-display font-bold text-base">Detalle por Mes</h3>
     </div>
@@ -254,7 +251,7 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Mes</th>
+                    <th class="table-th">Mes</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Facturas</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Base Gravable</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">IVA</th>
@@ -268,7 +265,7 @@
                     $nombreMes = \Carbon\Carbon::createFromFormat('Y-m', $mes->mes)
                                     ->locale('es')->monthName;
                 @endphp
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-3 text-sm font-semibold capitalize" style="color:#e2e8f0">
                         {{ $nombreMes }}
                     </td>
@@ -317,7 +314,7 @@
 
 {{-- Top clientes IVA --}}
 @if($topClientesIva->count())
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden mb-6">
+<div class="card overflow-hidden mb-6">
     <div class="px-5 py-4 border-b border-[#1e2d47]">
         <h3 class="font-display font-bold text-base">Top Clientes — IVA Generado</h3>
         <p class="text-xs text-slate-500 mt-0.5">Clientes que más IVA generaron en el período</p>
@@ -326,7 +323,7 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">#</th>
+                    <th class="table-th">#</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cliente</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">Facturas</th>
                     <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Base</th>
@@ -335,7 +332,7 @@
             </thead>
             <tbody>
                 @foreach($topClientesIva as $i => $cli)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-3">
                         <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold inline-flex
                                      {{ $i===0 ? 'bg-amber-500 text-black' : 'bg-[#1a2235] text-slate-400' }}">

@@ -30,7 +30,7 @@
 </div>
 
 {{-- Filtros --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-5">
+<div class="card p-4 mb-5">
     <div class="flex gap-3 flex-wrap">
         @foreach(['pendiente'=>'Pendientes','vencida'=>'Vencidas','pagada'=>'Pagadas'] as $val=>$label)
         <a href="{{ route('reportes.cartera', ['estado'=>$val]) }}"
@@ -46,23 +46,23 @@
 
 {{-- KPIs --}}
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Facturas</div>
         <div class="font-display font-bold text-xl">{{ $totales['count'] }}</div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Total Facturado</div>
         <div class="font-display font-bold text-xl" style="color:#e2e8f0">
             ${{ number_format($totales['total'], 0, ',', '.') }}
         </div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Total Pagado</div>
         <div class="font-display font-bold text-xl text-emerald-500">
             ${{ number_format($totales['pagado'], 0, ',', '.') }}
         </div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+    <div class="card p-5">
         <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Saldo Pendiente</div>
         <div class="font-display font-bold text-xl text-amber-500">
             ${{ number_format($totales['pendiente'], 0, ',', '.') }}
@@ -71,12 +71,12 @@
 </div>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Factura</th>
+                    <th class="table-th">Factura</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Cliente</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Emisión</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Vencimiento</th>
@@ -88,7 +88,7 @@
             <tbody>
                 @forelse($facturas as $factura)
                 @php $saldo = max(0, $factura->total - $factura->total_pagado); @endphp
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
                     <td class="px-5 py-3">
                         <a href="{{ route('facturas.show', $factura) }}"
                            class="text-amber-500 hover:underline font-mono text-sm font-semibold">

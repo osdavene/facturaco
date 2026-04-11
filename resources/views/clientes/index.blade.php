@@ -27,7 +27,7 @@
 
 {{-- Filtros --}}
 <form method="GET" action="{{ route('clientes.index') }}"
-      class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-5">
+      class="card p-4 mb-5">
     <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
@@ -38,15 +38,13 @@
                           focus:outline-none focus:border-amber-500 transition-colors">
         </div>
         <select name="tipo"
-                class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                       text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+                class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
             <option value="">Todos los tipos</option>
             <option value="natural"  {{ request('tipo')=='natural'  ? 'selected':'' }}>Natural</option>
             <option value="juridica" {{ request('tipo')=='juridica' ? 'selected':'' }}>Jurídica</option>
         </select>
         <select name="estado"
-                class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                       text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+                class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
             <option value="">Todos los estados</option>
             <option value="activo"   {{ request('estado')=='activo'   ? 'selected':'' }}>Activos</option>
             <option value="inactivo" {{ request('estado')=='inactivo' ? 'selected':'' }}>Inactivos</option>
@@ -68,7 +66,7 @@
 </form>
 
 {{-- Tabla --}}
-<div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+<div class="card overflow-hidden">
 
     {{-- Stats --}}
     <div class="grid grid-cols-3 border-b border-[#1e2d47]">
@@ -94,7 +92,7 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-[#1e2d47]">
-                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Cliente</th>
+                    <th class="table-th">Cliente</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Documento</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden lg:table-cell">Contacto</th>
                     <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden lg:table-cell">Régimen</th>
@@ -104,7 +102,7 @@
             </thead>
             <tbody>
                 @forelse($clientes as $cliente)
-                <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                <tr class="table-row">
 
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-3">

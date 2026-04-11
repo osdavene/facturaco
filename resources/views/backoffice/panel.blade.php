@@ -29,40 +29,34 @@
             @csrf
             <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Razón social *</label>
+                    <label class="form-label">Razón social *</label>
                     <input type="text" name="razon_social" required placeholder="Empresa S.A.S."
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">NIT *</label>
+                    <label class="form-label">NIT *</label>
                     <input type="text" name="nit" required placeholder="900000000"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
+                    <label class="form-label">Email</label>
                     <input type="email" name="email" placeholder="contacto@empresa.com"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Teléfono</label>
+                    <label class="form-label">Teléfono</label>
                     <input type="text" name="telefono" placeholder="601 000 0000"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Municipio</label>
+                    <label class="form-label">Municipio</label>
                     <input type="text" name="municipio" placeholder="Bogotá D.C."
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div class="col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">¿Es filial de otra empresa?</label>
+                    <label class="form-label">¿Es filial de otra empresa?</label>
                     <select name="empresa_padre_id"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                   focus:outline-none focus:border-amber-500 transition-colors">
+                            class="form-input">
                         <option value="">— No, es empresa matriz independiente —</option>
                         @foreach($todasEmpresas->whereNull('empresa_padre_id') as $m)
                             <option value="{{ $m->id }}">{{ $m->razon_social }}</option>
@@ -103,29 +97,25 @@
         <form :action="adminFormUrl" method="POST" class="space-y-4">
             @csrf
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nombre completo *</label>
+                <label class="form-label">Nombre completo *</label>
                 <input type="text" name="name" required placeholder="Juan Pérez"
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                              focus:outline-none focus:border-amber-500 transition-colors">
+                       class="form-input">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Correo electrónico *</label>
+                <label class="form-label">Correo electrónico *</label>
                 <input type="email" name="email" required placeholder="admin@empresa.com"
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                              focus:outline-none focus:border-amber-500 transition-colors">
+                       class="form-input">
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Contraseña *</label>
+                    <label class="form-label">Contraseña *</label>
                     <input type="password" name="password" required minlength="8" placeholder="••••••••"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Confirmar *</label>
+                    <label class="form-label">Confirmar *</label>
                     <input type="password" name="password_confirmation" required placeholder="••••••••"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
             </div>
             <div class="flex justify-end gap-3 pt-2">
@@ -207,12 +197,12 @@
 
     {{-- Alertas --}}
     @if(session('success'))
-    <div class="mb-6 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl px-4 py-3 text-sm flex items-center gap-2 fade-in">
+    <div class="mb-6 alert-success fade-in">
         <i class="fas fa-check-circle"></i>{{ session('success') }}
     </div>
     @endif
     @if($errors->any())
-    <div class="mb-6 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-4 py-3 text-sm fade-in">
+    <div class="mb-6 alert-error fade-in">
         @foreach($errors->all() as $e)<div><i class="fas fa-circle-exclamation mr-1.5"></i>{{ $e }}</div>@endforeach
     </div>
     @endif
@@ -229,7 +219,7 @@
         @endphp
         @foreach($stats as $s)
         <button @click="tab = '{{ $s['tab'] }}'"
-                class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5 text-left
+                class="card p-5 text-left
                        hover:border-amber-500/40 transition-colors cursor-pointer group">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-slate-500 text-xs">{{ $s['label'] }}</span>
@@ -244,7 +234,7 @@
     </div>
 
     {{-- Tabs --}}
-    <div class="flex items-center gap-1 mb-6 bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-1.5 w-fit">
+    <div class="flex items-center gap-1 mb-6 card p-1.5 w-fit">
         @foreach([['resumen','fa-gauge-high','Resumen'],['empresas','fa-building','Empresas'],['usuarios','fa-users','Usuarios']] as [$t,$icon,$label])
         <button @click="tab = '{{ $t }}'"
                 :class="tab === '{{ $t }}'
@@ -263,7 +253,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             {{-- Grupos recientes --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+            <div class="card overflow-hidden">
                 <div class="flex items-center justify-between px-5 py-4 border-b border-[#1e2d47]">
                     <div>
                         <h2 class="font-display font-bold text-base">Grupos empresariales</h2>
@@ -335,7 +325,7 @@
             </div>
 
             {{-- Últimos usuarios --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+            <div class="card overflow-hidden">
                 <div class="flex items-center justify-between px-5 py-4 border-b border-[#1e2d47]">
                     <div>
                         <h2 class="font-display font-bold text-base">Usuarios</h2>
@@ -417,7 +407,7 @@
 
         <div class="space-y-3">
             @forelse($empresas as $emp)
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+            <div class="card overflow-hidden">
 
                 {{-- Fila Matriz --}}
                 <div class="flex items-center justify-between px-5 py-4">
@@ -535,7 +525,7 @@
                 @endif
             </div>
             @empty
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-16 text-center">
+            <div class="card p-16 text-center">
                 <i class="fas fa-building text-4xl text-slate-700 mb-4 block"></i>
                 <p class="text-slate-400 font-medium">No hay empresas registradas</p>
                 <button @click="modal = 'empresa'"
@@ -554,12 +544,12 @@
             <p class="text-slate-500 text-sm">{{ $usuarios->total() }} usuario(s) en la plataforma</p>
         </div>
 
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+        <div class="card overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-[#1e2d47]">
-                            <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Usuario</th>
+                            <th class="table-th">Usuario</th>
                             <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">Email</th>
                             <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">Empresas asignadas</th>
                             <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Acciones</th>
@@ -567,7 +557,7 @@
                     </thead>
                     <tbody>
                         @forelse($usuarios as $u)
-                        <tr class="border-b border-[#1e2d47]/50 hover:bg-[#1a2235]/50 transition-colors">
+                        <tr class="table-row">
                             <td class="px-5 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm

@@ -18,7 +18,7 @@
     <form method="POST" action="{{ route('backoffice.empresas.admin.store', $empresa) }}">
         @csrf
 
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 space-y-5 mb-5">
+        <div class="card p-6 space-y-5 mb-5">
 
             <h2 class="font-display font-bold text-base flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
@@ -26,41 +26,34 @@
             </h2>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nombre completo *</label>
+                <label class="form-label">Nombre completo *</label>
                 <input type="text" name="name" value="{{ old('name') }}" required
                        placeholder="Juan Pérez"
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                              focus:outline-none focus:border-amber-500 transition-colors
-                              @error('name') border-red-500 @enderror">
+                       class="form-input @error('name') border-red-500 @enderror">
                 @error('name')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Correo electrónico *</label>
+                <label class="form-label">Correo electrónico *</label>
                 <input type="email" name="email" value="{{ old('email') }}" required
                        placeholder="admin@empresa.com"
-                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                              focus:outline-none focus:border-amber-500 transition-colors
-                              @error('email') border-red-500 @enderror">
+                       class="form-input @error('email') border-red-500 @enderror">
                 @error('email')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Contraseña * <span class="text-slate-600 normal-case">(mín. 8)</span></label>
+                    <label class="form-label">Contraseña * <span class="text-slate-600 normal-case">(mín. 8)</span></label>
                     <input type="password" name="password" required minlength="8"
                            placeholder="••••••••"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors
-                                  @error('password') border-red-500 @enderror">
+                           class="form-input @error('password') border-red-500 @enderror">
                     @error('password')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Confirmar *</label>
+                    <label class="form-label">Confirmar *</label>
                     <input type="password" name="password_confirmation" required
                            placeholder="••••••••"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm
-                                  focus:outline-none focus:border-amber-500 transition-colors">
+                           class="form-input">
                 </div>
             </div>
         </div>

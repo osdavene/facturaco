@@ -30,7 +30,7 @@
     </div>
 
     {{-- Estado --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5 mb-4">
+    <div class="card p-5 mb-4">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center
@@ -59,7 +59,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
         {{-- Cliente --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
                 <i class="fas fa-user mr-1"></i> Cliente
             </h3>
@@ -68,7 +68,7 @@
         </div>
 
         {{-- Detalles --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+        <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
                 <i class="fas fa-info-circle mr-1"></i> Detalles
             </h3>
@@ -102,7 +102,7 @@
     </div>
 
     {{-- Concepto --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5 mb-4">
+    <div class="card p-5 mb-4">
         <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Concepto</h3>
         <p class="text-sm" style="color:#e2e8f0">{{ $recibo->concepto }}</p>
         @if($recibo->observaciones)

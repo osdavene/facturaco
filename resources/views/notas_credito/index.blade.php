@@ -23,7 +23,7 @@
 
     {{-- Filtros --}}
     <form method="GET" action="{{ route('notas_credito.index') }}"
-          class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4 mb-4">
+          class="card p-4 mb-4">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
                 <input type="text" name="buscar" value="{{ request('buscar') }}"
@@ -58,7 +58,7 @@
     </form>
 
     {{-- Tabla --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
         @if($notas->isEmpty())
         <div class="py-16 flex flex-col items-center text-slate-500">
             <i class="fas fa-file-invoice text-5xl mb-4 opacity-20"></i>

@@ -29,7 +29,7 @@
 
         {{-- Tarjeta principal --}}
         <div class="lg:col-span-1">
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 text-center">
+            <div class="card p-6 text-center">
                 <div class="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center
                             font-bold text-3xl text-white
                             {{ $cliente->tipo_persona == 'juridica'
@@ -88,7 +88,7 @@
         <div class="lg:col-span-2 space-y-4">
 
             {{-- Tributario --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h3 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <i class="fas fa-percent text-amber-500 text-sm"></i>
                     Información Tributaria
@@ -129,7 +129,7 @@
             </div>
 
             {{-- Comercial --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6">
+            <div class="card p-6">
                 <h3 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <i class="fas fa-handshake text-amber-500 text-sm"></i>
                     Condiciones Comerciales
@@ -157,7 +157,7 @@
             </div>
 
             {{-- Fechas --}}
-            <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-4">
+            <div class="card p-4">
                 <div class="grid grid-cols-2 gap-4 text-sm">
                     <div>
                         <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Creado</div>

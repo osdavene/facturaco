@@ -32,7 +32,7 @@
             <div class="lg:col-span-2 space-y-4">
 
                 {{-- Cliente --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                         <i class="fas fa-user text-amber-500"></i> Cliente
                     </h2>
@@ -77,7 +77,7 @@
                 </div>
 
                 {{-- Items --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="font-display font-bold text-sm flex items-center gap-2">
                             <i class="fas fa-list text-amber-500"></i> Productos / Servicios
@@ -130,15 +130,13 @@
                 </div>
 
                 {{-- Observaciones --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-3 flex items-center gap-2">
                         <i class="fas fa-comment text-amber-500"></i> Observaciones
                     </h2>
                     <textarea name="observaciones" rows="2"
                               placeholder="Condiciones comerciales, notas adicionales..."
-                              class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                     text-sm text-slate-200 placeholder-slate-600
-                                     focus:outline-none focus:border-amber-500 resize-none">{{ old('observaciones', isset($factura) ? $factura->observaciones : '') }}</textarea>
+                              class="form-input resize-none">{{ old('observaciones', isset($factura) ? $factura->observaciones : '') }}</textarea>
                 </div>
             </div>
 
@@ -146,7 +144,7 @@
             <div class="space-y-4">
 
                 {{-- Datos factura --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                         <i class="fas fa-file-invoice text-amber-500"></i> Datos
                     </h2>
@@ -157,8 +155,7 @@
                             </label>
                             <input type="date" name="fecha_emision"
                                    value="{{ old('fecha_emision', date('Y-m-d')) }}"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                   class="form-input">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
@@ -167,16 +164,14 @@
                             <input type="date" name="fecha_vencimiento"
                                    value="{{ old('fecha_vencimiento', date('Y-m-d')) }}"
                                    id="fecha-vencimiento"
-                                   class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                          text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                   class="form-input">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
                                 Forma de Pago
                             </label>
                             <select name="forma_pago"
-                                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                           text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    class="form-input">
                                 <option value="contado">Contado</option>
                                 <option value="credito">Crédito</option>
                                 <option value="transferencia">Transferencia</option>
@@ -188,8 +183,7 @@
                                 Estado
                             </label>
                             <select name="estado"
-                                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                           text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    class="form-input">
                                 <option value="borrador">Borrador</option>
                                 <option value="emitida">Emitida</option>
                             </select>
@@ -198,7 +192,7 @@
                 </div>
 
                 {{-- Totales --}}
-                <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5">
+                <div class="card p-5">
                     <h2 class="font-display font-bold text-sm mb-4 flex items-center gap-2">
                         <i class="fas fa-calculator text-amber-500"></i> Totales
                     </h2>

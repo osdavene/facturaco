@@ -30,7 +30,7 @@
             </p>
         </div>
 
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-8">
+        <div class="card p-8">
 
             @if(session('status'))
             <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400

@@ -22,7 +22,7 @@
         @csrf
 
         {{-- SECCIÓN 1 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">1</span>
                 Tipo de Persona
@@ -53,10 +53,9 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Tipo Documento *</label>
+                    <label class="form-label">Tipo Documento *</label>
                     <select name="tipo_documento"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="CC"  {{ old('tipo_documento','CC')=='CC'  ? 'selected':'' }}>CC - Cédula de Ciudadanía</option>
                         <option value="NIT" {{ old('tipo_documento')=='NIT' ? 'selected':'' }}>NIT</option>
                         <option value="CE"  {{ old('tipo_documento')=='CE'  ? 'selected':'' }}>CE - Cédula Extranjería</option>
@@ -66,108 +65,94 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Número Documento *</label>
+                    <label class="form-label">Número Documento *</label>
                     <input type="text" name="numero_documento"
                            value="{{ old('numero_documento') }}"
                            placeholder="EJ: 900123456"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500
-                                  @error('numero_documento') border-red-500 @enderror">
+                           class="form-input @error('numero_documento') border-red-500 @enderror">
                     @error('numero_documento') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Dígito Verificación <span class="text-slate-600">(Solo NIT)</span>
                     </label>
                     <input type="text" name="digito_verificacion" maxlength="1"
                            value="{{ old('digito_verificacion') }}" placeholder="0-9"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
             </div>
         </div>
 
         {{-- SECCIÓN 2 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
                 Datos del Cliente
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Razón Social <span class="text-slate-600">(Jurídica)</span>
                     </label>
                     <input type="text" name="razon_social"
                            value="{{ old('razon_social') }}"
                            placeholder="NOMBRE DE LA EMPRESA"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Nombres <span class="text-slate-600">(Natural)</span>
                     </label>
                     <input type="text" name="nombres"
                            value="{{ old('nombres') }}"
                            placeholder="NOMBRES"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Apellidos <span class="text-slate-600">(Natural)</span>
                     </label>
                     <input type="text" name="apellidos"
                            value="{{ old('apellidos') }}"
                            placeholder="APELLIDOS"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
             </div>
         </div>
 
         {{-- SECCIÓN 3 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">3</span>
                 Información Tributaria
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Régimen Tributario *</label>
+                    <label class="form-label">Régimen Tributario *</label>
                     <select name="regimen"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="simple"          {{ old('regimen','simple')=='simple' ? 'selected':'' }}>Régimen Simple</option>
                         <option value="responsable_iva" {{ old('regimen')=='responsable_iva' ? 'selected':'' }}>Responsable de IVA</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">% ReteFuente</label>
+                    <label class="form-label">% ReteFuente</label>
                     <input type="text" inputmode="decimal" name="retefuente_pct"
                            value="{{ old('retefuente_pct', 0) }}"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">% ReteICA</label>
+                    <label class="form-label">% ReteICA</label>
                     <input type="text" inputmode="decimal" name="reteica_pct"
                            value="{{ old('reteica_pct', 0) }}"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
             </div>
             <div class="flex flex-wrap gap-5">
@@ -189,20 +174,17 @@
         </div>
 
         {{-- SECCIÓN 4 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-4">
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">4</span>
                 Contacto y Dirección
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Email</label>
+                    <label class="form-label">Email</label>
                     <input type="email" name="email" value="{{ old('email') }}"
                            placeholder="correo@empresa.com"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500
-                                  @error('email') border-red-500 @enderror">
+                           class="form-input @error('email') border-red-500 @enderror">
                     @error('email') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 @foreach([
@@ -213,49 +195,44 @@
                     ['direccion',    'Dirección',    'CRA 5 # 10-20'],
                 ] as [$name, $label, $ph])
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">{{ $label }}</label>
+                    <label class="form-label">{{ $label }}</label>
                     <input type="text" name="{{ $name }}"
                            value="{{ old($name) }}"
                            placeholder="{{ $ph }}"
                            data-uppercase
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 placeholder-slate-600
-                                  focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 @endforeach
             </div>
         </div>
 
         {{-- SECCIÓN 5 --}}
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-6">
+        <div class="card p-6 mb-6">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">5</span>
                 Condiciones Comerciales
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Plazo de Pago (días)</label>
+                    <label class="form-label">Plazo de Pago (días)</label>
                     <input type="text" inputmode="decimal" name="plazo_pago"
                            value="{{ old('plazo_pago', 0) }}"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Cupo de Crédito ($)</label>
+                    <label class="form-label">Cupo de Crédito ($)</label>
                     <input type="text" inputmode="decimal" name="cupo_credito"
                            value="{{ old('cupo_credito', 0) }}"
                            data-numeric
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                  text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                           class="form-input">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    <label class="form-label">
                         Lista de Precios
                     </label>
                     <select name="lista_precio"
-                            class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                   text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                            class="form-input">
                         <option value="general"   {{ old('lista_precio', 'general')   === 'general'   ? 'selected' : '' }}>
                             Lista General (Precio 1)
                         </option>
@@ -271,12 +248,10 @@
                     </p>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Observaciones</label>
+                    <label class="form-label">Observaciones</label>
                     <textarea name="observaciones" rows="1"                              placeholder="NOTAS ADICIONALES..."
                               data-uppercase
-                              class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5
-                                     text-sm text-slate-200 placeholder-slate-600
-                                     focus:outline-none focus:border-amber-500 resize-none">{{ old('observaciones') }}</textarea>
+                              class="form-input resize-none">{{ old('observaciones') }}</textarea>
                 </div>
             </div>
         </div>

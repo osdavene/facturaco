@@ -35,7 +35,7 @@
     </div>
 
     {{-- Tabla --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl overflow-hidden">
+    <div class="card overflow-hidden">
         @if($categorias->isEmpty())
         <div class="flex flex-col items-center justify-center py-16 text-slate-500">
             <i class="fas fa-tags text-5xl mb-4 opacity-20"></i>

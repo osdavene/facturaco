@@ -26,7 +26,7 @@
     </div>
 
     {{-- Features que tendrá --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-6 mb-6">
+    <div class="card p-6 mb-6">
         <h2 class="font-display font-bold text-sm text-slate-400 uppercase tracking-wider mb-5
                    flex items-center gap-2">
             <i class="fas fa-list-check text-{{ $color }}-500"></i>
@@ -46,7 +46,7 @@
     </div>
 
     {{-- Barra de progreso ficticia --}}
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl p-5 mb-6">
+    <div class="card p-5 mb-6">
         <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                 Progreso de desarrollo
