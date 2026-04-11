@@ -100,6 +100,13 @@ nav[role="navigation"] a:hover {
     .overflow-x-auto::-webkit-scrollbar { display: none; }
 
     main { padding: 1rem !important; }
+
+    /* Tap targets mínimos 44px para botones de icono en tablas */
+    .table-row td a.rounded-lg,
+    .table-row td button.rounded-lg {
+        min-width: 2.75rem !important;
+        min-height: 2.75rem !important;
+    }
 }
 
 /* ══ SIDEBAR MÓVIL ═══════════════════════════ */

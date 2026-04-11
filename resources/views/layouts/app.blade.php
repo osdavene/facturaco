@@ -736,5 +736,110 @@
 
     @stack('scripts')
 
+    {{-- ═══════════════════════════════════════
+         TOAST NOTIFICATIONS
+    ═══════════════════════════════════════ --}}
+    <div id="toast-container"
+         class="fixed top-20 right-4 z-[300] flex flex-col gap-2 w-80 max-w-[calc(100vw-2rem)]
+                pointer-events-none">
+    </div>
+
+    <script>
+    (function() {
+        const cfg = {
+            success: { icon: 'fa-check-circle',        color: '#10b981', label: 'Éxito'  },
+            error:   { icon: 'fa-times-circle',         color: '#ef4444', label: 'Error'  },
+            warning: { icon: 'fa-exclamation-triangle', color: '#f59e0b', label: 'Aviso'  },
+            info:    { icon: 'fa-info-circle',           color: '#3b82f6', label: 'Info'   },
+        };
+
+        window.toast = function(message, type, duration) {
+            type     = type     || 'success';
+            duration = duration || 4500;
+
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const c  = cfg[type] || cfg.info;
+            const id = 'toast-' + Date.now() + Math.random().toString(36).slice(2);
+            const el = document.createElement('div');
+            el.id    = id;
+            el.style.pointerEvents = 'auto';
+
+            el.innerHTML = `
+                <div class="relative overflow-hidden rounded-xl shadow-xl
+                            flex items-start gap-3 px-4 py-3.5 pr-9"
+                     style="background:#141c2efa;
+                            border:1px solid ${c.color}40;
+                            border-left:3px solid ${c.color};
+                            backdrop-filter:blur(12px);
+                            transform:translateX(calc(100% + 1rem));
+                            opacity:0;
+                            transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                                       opacity 0.25s ease;">
+                    <i class="fas ${c.icon} flex-shrink-0 mt-0.5 text-base"
+                       style="color:${c.color}"></i>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[10px] font-bold uppercase tracking-widest mb-0.5"
+                             style="color:${c.color}">${c.label}</div>
+                        <div class="text-xs text-slate-300 leading-relaxed break-words">
+                            ${message}
+                        </div>
+                    </div>
+                    <button onclick="window.closeToast('${id}')"
+                            style="position:absolute;top:0.5rem;right:0.5rem"
+                            class="text-slate-600 hover:text-slate-300 transition-colors p-1">
+                        <i class="fas fa-times text-[10px]"></i>
+                    </button>
+                    <div style="position:absolute;bottom:0;left:0;height:2px;
+                                background:${c.color};width:100%;
+                                transition:width ${duration}ms linear;"
+                         class="toast-bar"></div>
+                </div>`;
+
+            container.appendChild(el);
+            const inner = el.firstElementChild;
+
+            // Animate in
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                inner.style.transform = 'translateX(0)';
+                inner.style.opacity   = '1';
+                // Start progress bar drain
+                const bar = inner.querySelector('.toast-bar');
+                if (bar) setTimeout(() => { bar.style.width = '0%'; }, 60);
+            }));
+
+            // Auto dismiss
+            el._dismissTimer = setTimeout(() => window.closeToast(id), duration);
+        };
+
+        window.closeToast = function(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            clearTimeout(el._dismissTimer);
+            const inner = el.firstElementChild;
+            inner.style.transform = 'translateX(calc(100% + 1rem))';
+            inner.style.opacity   = '0';
+            setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 350);
+        };
+
+        // Lanzar mensajes flash del servidor
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                window.toast(@json(session('success')), 'success');
+            @endif
+            @if(session('error'))
+                window.toast(@json(session('error')), 'error');
+            @endif
+            @if(session('warning'))
+                window.toast(@json(session('warning')), 'warning');
+            @endif
+            @if(session('info'))
+                window.toast(@json(session('info')), 'info');
+            @endif
+        });
+    })();
+    </script>
+
 </body>
 </html>

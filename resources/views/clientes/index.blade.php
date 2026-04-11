@@ -70,18 +70,18 @@
 
     {{-- Stats --}}
     <div class="grid grid-cols-3 border-b border-[#1e2d47]">
-        <div class="px-5 py-3 text-center border-r border-[#1e2d47]">
-            <div class="font-display font-bold text-lg">{{ $clientes->total() }}</div>
+        <div class="px-3 sm:px-5 py-3 text-center border-r border-[#1e2d47]">
+            <div class="font-display font-bold text-base sm:text-lg">{{ $clientes->total() }}</div>
             <div class="text-xs text-slate-500">Total</div>
         </div>
-        <div class="px-5 py-3 text-center border-r border-[#1e2d47]">
-            <div class="font-display font-bold text-lg text-emerald-500">
+        <div class="px-3 sm:px-5 py-3 text-center border-r border-[#1e2d47]">
+            <div class="font-display font-bold text-base sm:text-lg text-emerald-500">
                 {{ $clientes->where('activo', true)->count() }}
             </div>
             <div class="text-xs text-slate-500">Activos</div>
         </div>
-        <div class="px-5 py-3 text-center">
-            <div class="font-display font-bold text-lg text-amber-500">
+        <div class="px-3 sm:px-5 py-3 text-center">
+            <div class="font-display font-bold text-base sm:text-lg text-amber-500">
                 {{ $clientes->where('tipo_persona', 'juridica')->count() }}
             </div>
             <div class="text-xs text-slate-500">Jurídicas</div>

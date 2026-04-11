@@ -3,7 +3,7 @@
 @section('page-title', 'Remisiones · Nueva')
 
 @section('content')
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto pb-36 lg:pb-0">
 
     <div class="flex items-center gap-4 mb-6">
         <a href="{{ route('remisiones.index') }}"
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('remisiones.store') }}">
+    <form method="POST" action="{{ route('remisiones.store') }}" id="form-remision">
         @csrf
 
         <x-form-errors class="mb-4" />
@@ -259,6 +259,21 @@
             </div>
         </div>
     </form>
+
+    {{-- Barra flotante móvil: total + guardar --}}
+    <div class="lg:hidden fixed bottom-16 left-0 right-0 z-[95]
+                bg-[#0d1526]/95 backdrop-blur border-t border-[#1e2d47]
+                px-4 py-3 flex items-center gap-3">
+        <div class="flex-1">
+            <div class="text-xs text-slate-500 uppercase tracking-wider">Total</div>
+            <div id="mobile-total" class="font-display font-bold text-lg text-amber-500">$0</div>
+        </div>
+        <button form="form-remision" type="submit"
+                class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-black
+                       font-bold rounded-xl transition-colors flex items-center gap-2 text-sm">
+            <i class="fas fa-save"></i> Guardar
+        </button>
+    </div>
 </div>
 
 @push('scripts')
@@ -437,6 +452,8 @@ function renderItems() {
 function calcularTotal() {
     const total = items.reduce((s, i) => s + (i.cantidad * i.precio_unitario), 0);
     document.getElementById('display-total').textContent = fmt(total);
+    const mt = document.getElementById('mobile-total');
+    if (mt) mt.textContent = fmt(total);
 }
 
 document.addEventListener('click', e => {

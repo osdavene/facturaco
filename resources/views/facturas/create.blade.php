@@ -3,7 +3,7 @@
 @section('page-title', 'Facturación · Nueva Factura')
 
 @section('content')
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto pb-36 lg:pb-0">
 
     <div class="flex items-center gap-4 mb-6">
         <a href="{{ route('facturas.index') }}"
@@ -112,7 +112,7 @@
                                     <th class="text-left text-[10px] font-semibold text-slate-500 uppercase pb-2 pr-2">Descripción</th>
                                     <th class="text-center text-[10px] font-semibold text-slate-500 uppercase pb-2 px-2 w-20">Cant.</th>
                                     <th class="text-right text-[10px] font-semibold text-slate-500 uppercase pb-2 px-2 w-28">Precio</th>
-                                    <th class="text-center text-[10px] font-semibold text-slate-500 uppercase pb-2 px-2 w-16">%Desc</th>
+                                    <th class="text-center text-[10px] font-semibold text-slate-500 uppercase pb-2 px-2 w-16 hidden sm:table-cell">%Desc</th>
                                     <th class="text-center text-[10px] font-semibold text-slate-500 uppercase pb-2 px-2 w-16">%IVA</th>
                                     <th class="text-right text-[10px] font-semibold text-slate-500 uppercase pb-2 pl-2 w-28">Total</th>
                                     <th class="w-8"></th>
@@ -244,6 +244,21 @@
             </div>
         </div>
     </form>
+
+    {{-- Barra flotante móvil: total + guardar (se posiciona sobre el bottom-nav) --}}
+    <div class="lg:hidden fixed bottom-16 left-0 right-0 z-[95]
+                bg-[#0d1526]/95 backdrop-blur border-t border-[#1e2d47]
+                px-4 py-3 flex items-center gap-3">
+        <div class="flex-1">
+            <div class="text-xs text-slate-500 uppercase tracking-wider">Total</div>
+            <div id="mobile-total" class="font-display font-bold text-lg text-amber-500">$0</div>
+        </div>
+        <button form="form-factura" type="submit"
+                class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-black
+                       font-bold rounded-xl transition-colors flex items-center gap-2 text-sm">
+            <i class="fas fa-save"></i> Guardar
+        </button>
+    </div>
 </div>
 
 @push('scripts')
@@ -479,7 +494,7 @@ function renderItems() {
                        class="w-full bg-transparent border-b border-[#1e2d47] text-sm text-slate-200
                               text-right py-1 focus:outline-none focus:border-amber-500">
             </td>
-            <td class="py-2 px-2 w-16">
+            <td class="py-2 px-2 w-16 hidden sm:table-cell">
                 <input type="text"
                        inputmode="decimal"
                        name="items[${idx}][descuento_pct]"
@@ -538,6 +553,8 @@ function calcularTotales() {
     document.getElementById('display-retefuente').textContent = '-' + fmt(retefuente);
     document.getElementById('display-reteica').textContent    = '-' + fmt(reteica);
     document.getElementById('display-total').textContent      = fmt(total);
+    const mt = document.getElementById('mobile-total');
+    if (mt) mt.textContent = fmt(total);
 }
 
 // ── Cerrar dropdowns al hacer click fuera ─────

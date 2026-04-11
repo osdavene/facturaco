@@ -6,7 +6,9 @@
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
       "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm run:*)",
+      "Bash(grep -n \"buscar\\\\|search\\\\|q=\" C:\\\\\\\\Proyectos\\\\\\\\facturaco\\\\\\\\resources\\\\\\\\views\\\\\\\\layouts\\\\\\\\app.blade.php)"
     ]
   }
 }
