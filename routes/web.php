@@ -75,84 +75,104 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         $empresa = \App\Models\Empresa::obtener();
 
-        $ventasHoy   = \App\Models\Factura::whereDate('fecha_emision', today())
-                        ->where('estado', '!=', 'anulada')->sum('total');
-        $ventasMes   = \App\Models\Factura::whereMonth('fecha_emision', now()->month)
-                        ->whereYear('fecha_emision', now()->year)
-                        ->where('estado', '!=', 'anulada')->sum('total');
-        $ventasAno   = \App\Models\Factura::whereYear('fecha_emision', now()->year)
-                        ->where('estado', '!=', 'anulada')->sum('total');
-        $cartera     = \App\Models\Factura::whereIn('estado', ['emitida', 'vencida'])
-                        ->sum(\Illuminate\Support\Facades\DB::raw('total - total_pagado'));
-        $facturasMes = \App\Models\Factura::whereMonth('fecha_emision', now()->month)
-                        ->whereYear('fecha_emision', now()->year)->count();
+        try {
+            $ventasHoy   = \App\Models\Factura::whereDate('fecha_emision', today())
+                            ->where('estado', '!=', 'anulada')->sum('total');
+            $ventasMes   = \App\Models\Factura::whereMonth('fecha_emision', now()->month)
+                            ->whereYear('fecha_emision', now()->year)
+                            ->where('estado', '!=', 'anulada')->sum('total');
+            $ventasAno   = \App\Models\Factura::whereYear('fecha_emision', now()->year)
+                            ->where('estado', '!=', 'anulada')->sum('total');
+            $cartera     = \App\Models\Factura::whereIn('estado', ['emitida', 'vencida'])
+                            ->sum(\Illuminate\Support\Facades\DB::raw('total - total_pagado'));
+            $facturasMes = \App\Models\Factura::whereMonth('fecha_emision', now()->month)
+                            ->whereYear('fecha_emision', now()->year)->count();
 
-        $facturasVencidas   = \App\Models\Factura::where('estado', 'vencida')->count();
-        $productosStockBajo = \App\Models\Producto::where('activo', true)
-                               ->where('es_servicio', false)
-                               ->whereColumn('stock_actual', '<=', 'stock_minimo')->count();
-        $cotizacionesPend   = \App\Models\Cotizacion::whereIn('estado', ['enviada', 'aceptada'])->count();
-        $ordenesPend        = \App\Models\OrdenCompra::where('estado', 'aprobada')->count();
+            $facturasVencidas = \App\Models\Factura::where('estado', 'vencida')->count();
+            $ultimasFacturas  = \App\Models\Factura::orderByDesc('created_at')->limit(6)->get();
 
-        $ultimasFacturas = \App\Models\Factura::orderByDesc('created_at')->limit(6)->get();
+            $ventasPorMes = collect();
+            for ($i = 11; $i >= 0; $i--) {
+                $fecha = now()->subMonths($i);
+                $total = \App\Models\Factura::whereMonth('fecha_emision', $fecha->month)
+                          ->whereYear('fecha_emision', $fecha->year)
+                          ->where('estado', '!=', 'anulada')->sum('total');
+                $ventasPorMes->push([
+                    'mes'   => $fecha->locale('es')->isoFormat('MMM'),
+                    'anio'  => $fecha->year,
+                    'total' => (float) $total,
+                ]);
+            }
 
-        $ventasPorMes = collect();
-        for ($i = 11; $i >= 0; $i--) {
-            $fecha = now()->subMonths($i);
-            $total = \App\Models\Factura::whereMonth('fecha_emision', $fecha->month)
-                      ->whereYear('fecha_emision', $fecha->year)
-                      ->where('estado', '!=', 'anulada')->sum('total');
-            $ventasPorMes->push([
-                'mes'   => $fecha->locale('es')->isoFormat('MMM'),
-                'anio'  => $fecha->year,
-                'total' => (float) $total,
-            ]);
-        }
+            $ventasSemana = collect();
+            for ($i = 6; $i >= 0; $i--) {
+                $dia   = now()->subDays($i);
+                $total = \App\Models\Factura::whereDate('fecha_emision', $dia)
+                          ->where('estado', '!=', 'anulada')->sum('total');
+                $ventasSemana->push([
+                    'dia'   => $dia->locale('es')->isoFormat('ddd D'),
+                    'total' => (float) $total,
+                ]);
+            }
 
-        $ventasSemana = collect();
-        for ($i = 6; $i >= 0; $i--) {
-            $dia   = now()->subDays($i);
-            $total = \App\Models\Factura::whereDate('fecha_emision', $dia)
-                      ->where('estado', '!=', 'anulada')->sum('total');
-            $ventasSemana->push([
-                'dia'   => $dia->locale('es')->isoFormat('ddd D'),
-                'total' => (float) $total,
-            ]);
-        }
-
-        $topClientes = \App\Models\Factura::select(
-                            'cliente_nombre',
-                            \Illuminate\Support\Facades\DB::raw('SUM(total) as total_mes')
-                        )
-                        ->whereMonth('fecha_emision', now()->month)
-                        ->whereYear('fecha_emision', now()->year)
-                        ->where('estado', '!=', 'anulada')
-                        ->groupBy('cliente_nombre')
-                        ->orderByDesc('total_mes')
-                        ->limit(5)->get();
-
-        $topProductos = \App\Models\FacturaItem::select(
-                            'descripcion',
-                            \Illuminate\Support\Facades\DB::raw('SUM(cantidad) as total_qty'),
-                            \Illuminate\Support\Facades\DB::raw('SUM(total) as total_valor')
-                        )
-                        ->whereHas('factura', fn($q) =>
-                            $q->whereMonth('fecha_emision', now()->month)
-                              ->whereYear('fecha_emision', now()->year)
-                              ->where('estado', '!=', 'anulada')
-                        )
-                        ->groupBy('descripcion')
-                        ->orderByDesc('total_valor')
-                        ->limit(5)->get();
-
-        $ventasPorEstado = \App\Models\Factura::select(
-                                'estado',
-                                \Illuminate\Support\Facades\DB::raw('COUNT(*) as cantidad')
+            $topClientes = \App\Models\Factura::select(
+                                'cliente_nombre',
+                                \Illuminate\Support\Facades\DB::raw('SUM(total) as total_mes')
                             )
                             ->whereMonth('fecha_emision', now()->month)
                             ->whereYear('fecha_emision', now()->year)
-                            ->groupBy('estado')->get()
-                            ->keyBy('estado');
+                            ->where('estado', '!=', 'anulada')
+                            ->groupBy('cliente_nombre')
+                            ->orderByDesc('total_mes')
+                            ->limit(5)->get();
+
+            $topProductos = \App\Models\FacturaItem::select(
+                                'descripcion',
+                                \Illuminate\Support\Facades\DB::raw('SUM(cantidad) as total_qty'),
+                                \Illuminate\Support\Facades\DB::raw('SUM(total) as total_valor')
+                            )
+                            ->whereHas('factura', fn($q) =>
+                                $q->whereMonth('fecha_emision', now()->month)
+                                  ->whereYear('fecha_emision', now()->year)
+                                  ->where('estado', '!=', 'anulada')
+                            )
+                            ->groupBy('descripcion')
+                            ->orderByDesc('total_valor')
+                            ->limit(5)->get();
+
+            $ventasPorEstado = \App\Models\Factura::select(
+                                    'estado',
+                                    \Illuminate\Support\Facades\DB::raw('COUNT(*) as cantidad')
+                                )
+                                ->whereMonth('fecha_emision', now()->month)
+                                ->whereYear('fecha_emision', now()->year)
+                                ->groupBy('estado')->get()
+                                ->keyBy('estado');
+        } catch (\Throwable) {
+            $ventasHoy = $ventasMes = $ventasAno = $cartera = $facturasMes = $facturasVencidas = 0;
+            $ultimasFacturas = $ventasPorMes = $ventasSemana = $topClientes = $topProductos = collect();
+            $ventasPorEstado = collect();
+        }
+
+        try {
+            $productosStockBajo = \App\Models\Producto::where('activo', true)
+                                   ->where('es_servicio', false)
+                                   ->whereColumn('stock_actual', '<=', 'stock_minimo')->count();
+        } catch (\Throwable) {
+            $productosStockBajo = 0;
+        }
+
+        try {
+            $cotizacionesPend = \App\Models\Cotizacion::whereIn('estado', ['enviada', 'aceptada'])->count();
+        } catch (\Throwable) {
+            $cotizacionesPend = 0;
+        }
+
+        try {
+            $ordenesPend = \App\Models\OrdenCompra::where('estado', 'aprobada')->count();
+        } catch (\Throwable) {
+            $ordenesPend = 0;
+        }
 
         return view('dashboard', compact(
             'empresa', 'ventasHoy', 'ventasMes', 'ventasAno', 'cartera', 'facturasMes',
