@@ -510,6 +510,7 @@
                 </h2>
                 <p class="text-xs text-slate-500 mb-5">
                     Configura el servidor SMTP para enviar facturas por email directamente desde el sistema.
+                    Cada empresa puede tener su propio correo de envío.
                 </p>
 
                 {{-- Estado actual --}}
@@ -517,47 +518,64 @@
                 <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
                             rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm">
                     <i class="fas fa-check-circle"></i>
-                    Correo configurado correctamente · Remitente: <strong>{{ $empresa->mail_from_address }}</strong>
+                    Correo configurado · Servidor: <strong>{{ $empresa->mail_host }}</strong>
+                    · Remitente: <strong>{{ $empresa->mail_from_address ?: $empresa->email }}</strong>
                 </div>
                 @else
                 <div class="bg-amber-500/10 border border-amber-500/30 text-amber-400
                             rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm">
                     <i class="fas fa-exclamation-triangle"></i>
-                    El correo no está configurado. Sin esto no podrás enviar facturas por email.
+                    Correo no configurado. Sin esto no podrás enviar facturas por email.
                 </div>
                 @endif
 
-                {{-- Proveedor recomendado --}}
-                <div class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-3 mb-4">
-                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                        Proveedores recomendados
+                {{-- Selector de proveedor --}}
+                <div class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-4 mb-4">
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                        Preconfigurar proveedor
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="precargarResend()"
-                                class="text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/50
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <button type="button" onclick="precargarProveedor('resend')"
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
                                     text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fas fa-bolt mr-1 text-amber-400"></i> Resend (recomendado · gratis)
+                            <i class="fas fa-bolt mr-1 text-amber-400"></i> Resend
                         </button>
-                        <button type="button" onclick="precargarGmail()"
-                                class="text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/50
+                        <button type="button" onclick="precargarProveedor('gmail')"
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
                                     text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fab fa-google mr-1 text-blue-400"></i> Gmail
+                            <i class="fab fa-google mr-1 text-red-400"></i> Gmail
                         </button>
-                        <button type="button" onclick="precargarOutlook()"
-                                class="text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/50
+                        <button type="button" onclick="precargarProveedor('outlook')"
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
                                     text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
                             <i class="fab fa-microsoft mr-1 text-blue-300"></i> Outlook / Hotmail
                         </button>
+                        <button type="button" onclick="precargarProveedor('yahoo')"
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
+                                    text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fab fa-yahoo mr-1 text-purple-400"></i> Yahoo
+                        </button>
+                        <button type="button" onclick="precargarProveedor('mailgun')"
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
+                                    text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fas fa-envelope mr-1 text-slate-400"></i> Mailgun
+                        </button>
+                        <button type="button" onclick="precargarProveedor('sendgrid')"
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
+                                    text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fas fa-paper-plane mr-1 text-blue-400"></i> SendGrid
+                        </button>
                     </div>
+
+                    {{-- Panel de instrucciones dinámico --}}
+                    <div id="mail-instrucciones" class="hidden text-xs leading-relaxed"></div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                     {{-- Host --}}
                     <div>
-                        <label class="form-label">
-                            Servidor SMTP (Host)
-                        </label>
+                        <label class="form-label">Servidor SMTP (Host)</label>
                         <input type="text" name="mail_host" id="mail_host"
                             value="{{ old('mail_host', $empresa->mail_host) }}"
                             placeholder="smtp.resend.com"
@@ -566,37 +584,40 @@
 
                     {{-- Puerto --}}
                     <div>
-                        <label class="form-label">
-                            Puerto
-                        </label>
-                        <select name="mail_port" id="mail_port"
-                                class="form-input">
-                            <option value="587" {{ old('mail_port', $empresa->mail_port) == 587 ? 'selected' : '' }}>587 — TLS (recomendado)</option>
+                        <label class="form-label">Puerto</label>
+                        <select name="mail_port" id="mail_port" class="form-input">
+                            <option value="587" {{ old('mail_port', $empresa->mail_port ?? 587) == 587 ? 'selected' : '' }}>587 — TLS / STARTTLS (recomendado)</option>
                             <option value="465" {{ old('mail_port', $empresa->mail_port) == 465 ? 'selected' : '' }}>465 — SSL</option>
                             <option value="25"  {{ old('mail_port', $empresa->mail_port) == 25  ? 'selected' : '' }}>25 — Sin cifrado</option>
                         </select>
                     </div>
 
+                    {{-- Cifrado --}}
+                    <div>
+                        <label class="form-label">Cifrado</label>
+                        <select name="mail_encryption" id="mail_encryption" class="form-input">
+                            <option value="tls" {{ old('mail_encryption', $empresa->mail_encryption ?? 'tls') == 'tls' ? 'selected' : '' }}>TLS / STARTTLS</option>
+                            <option value="ssl" {{ old('mail_encryption', $empresa->mail_encryption) == 'ssl' ? 'selected' : '' }}>SSL</option>
+                            <option value=""    {{ old('mail_encryption', $empresa->mail_encryption) == ''    ? 'selected' : '' }}>Ninguno</option>
+                        </select>
+                    </div>
+
                     {{-- Usuario --}}
                     <div>
-                        <label class="form-label">
-                            Usuario SMTP
-                        </label>
+                        <label class="form-label">Usuario SMTP</label>
                         <input type="text" name="mail_username" id="mail_username"
                             value="{{ old('mail_username', $empresa->mail_username) }}"
-                            placeholder="resend o tucorreo@gmail.com"
+                            placeholder="tucorreo@gmail.com"
                             autocomplete="off"
                             class="form-input">
                     </div>
 
                     {{-- Contraseña --}}
-                    <div>
-                        <label class="form-label">
-                            Contraseña / API Key
-                        </label>
+                    <div class="sm:col-span-2">
+                        <label class="form-label" id="mail_password_label">Contraseña / API Key</label>
                         <div class="relative">
                             <input type="password" name="mail_password" id="mail_password"
-                                placeholder="{{ $empresa->mail_password ? '••••••••••••••• (guardada)' : 'API key o contraseña de app' }}"
+                                placeholder="{{ $empresa->mail_password ? '••••••••••••••• (guardada — deja vacío para no cambiar)' : 'Contraseña de aplicación o API key' }}"
                                 autocomplete="new-password"
                                 class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 pr-10
                                         text-sm text-slate-200 placeholder-slate-600
@@ -606,55 +627,39 @@
                                 <i class="fas fa-eye text-xs" id="eye-icon"></i>
                             </button>
                         </div>
-                        <p class="text-xs text-slate-600 mt-1">
-                            Déjalo vacío para conservar la contraseña guardada.
+                        <p class="text-xs text-slate-600 mt-1" id="mail_password_hint">
+                            Deja vacío para conservar la contraseña guardada.
                         </p>
-                    </div>
-
-                    {{-- Cifrado --}}
-                    <div>
-                        <label class="form-label">
-                            Cifrado
-                        </label>
-                        <select name="mail_encryption" id="mail_encryption"
-                                class="form-input">
-                            <option value="tls" {{ old('mail_encryption', $empresa->mail_encryption) == 'tls' ? 'selected' : '' }}>TLS</option>
-                            <option value="ssl" {{ old('mail_encryption', $empresa->mail_encryption) == 'ssl' ? 'selected' : '' }}>SSL</option>
-                            <option value=""    {{ old('mail_encryption', $empresa->mail_encryption) == ''    ? 'selected' : '' }}>Ninguno</option>
-                        </select>
                     </div>
 
                     {{-- From address --}}
                     <div>
-                        <label class="form-label">
-                            Correo remitente
-                        </label>
+                        <label class="form-label">Correo remitente (From)</label>
                         <input type="email" name="mail_from_address" id="mail_from_address"
-                            value="{{ old('mail_from_address', $empresa->mail_from_address ?? $empresa->email) }}"
+                            value="{{ old('mail_from_address', $empresa->mail_from_address ?: $empresa->email) }}"
                             placeholder="facturacion@miempresa.com"
                             class="form-input">
                         <p class="text-xs text-slate-600 mt-1">El correo que verá el cliente como remitente.</p>
                     </div>
 
                     {{-- From name --}}
-                    <div class="sm:col-span-2">
-                        <label class="form-label">
-                            Nombre remitente
-                        </label>
+                    <div>
+                        <label class="form-label">Nombre remitente</label>
                         <input type="text" name="mail_from_name" id="mail_from_name"
-                            value="{{ old('mail_from_name', $empresa->mail_from_name ?? $empresa->razon_social) }}"
-                            placeholder="Nombre que verá el cliente al recibir el correo"
+                            value="{{ old('mail_from_name', $empresa->mail_from_name ?: $empresa->razon_social) }}"
+                            placeholder="Mi Empresa S.A.S."
                             class="form-input">
+                        <p class="text-xs text-slate-600 mt-1">El nombre que verá el cliente al recibir el correo.</p>
                     </div>
 
                 </div>
 
-                {{-- Botón probar correo --}}
-                @if($empresa->mail_configurado)
-                <div class="mt-4 pt-4 border-t border-[#1e2d47]">
+                {{-- Probar correo --}}
+                <div class="mt-5 pt-4 border-t border-[#1e2d47]">
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
                         Probar configuración
                     </p>
+                    @if($empresa->mail_configurado)
                     <form method="POST" action="{{ route('empresa.probarMail') }}" class="flex gap-3 flex-wrap">
                         @csrf
                         <input type="email" name="email_prueba"
@@ -669,8 +674,12 @@
                             <i class="fas fa-paper-plane text-xs"></i> Enviar correo de prueba
                         </button>
                     </form>
+                    @else
+                    <p class="text-xs text-slate-600">
+                        Guarda la configuración SMTP primero para poder probar el envío.
+                    </p>
+                    @endif
                 </div>
-                @endif
 
             </div>
 

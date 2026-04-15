@@ -7,11 +7,11 @@ use App\Models\Factura;
 use App\Services\PdfService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Config;
 
 class FacturaMail extends Mailable
 {
@@ -22,22 +22,19 @@ class FacturaMail extends Mailable
         public Empresa $empresa,
         public string  $mensaje = '',
     ) {
-        if ($empresa->mail_host && $empresa->mail_username && $empresa->mail_password) {
-            Config::set('mail.mailers.smtp.host',       $empresa->mail_host);
-            Config::set('mail.mailers.smtp.port',       $empresa->mail_port ?? 587);
-            Config::set('mail.mailers.smtp.username',   $empresa->mail_username);
-            Config::set('mail.mailers.smtp.password',   $empresa->mail_password);
-            Config::set('mail.mailers.smtp.encryption', $empresa->mail_encryption ?? 'tls');
-            Config::set('mail.from.address',            $empresa->mail_from_address ?? $empresa->email);
-            Config::set('mail.from.name',               $empresa->mail_from_name    ?? $empresa->razon_social);
-            Config::set('mail.default', 'smtp');
-        }
+        // NADA aquí — Config::set en el constructor no afecta al transport
+        // ya instanciado en el queue worker. El mailer se configura en
+        // EnviarFacturaJob usando MailService::paraEmpresa().
     }
 
     public function envelope(): Envelope
     {
+        $fromAddress = $this->empresa->mail_from_address ?: $this->empresa->email;
+        $fromName    = $this->empresa->mail_from_name    ?: $this->empresa->razon_social;
+
         return new Envelope(
-            subject: 'Factura '.$this->factura->numero.' — '.$this->empresa->razon_social,
+            from:    new Address($fromAddress, $fromName),
+            subject: 'Factura ' . $this->factura->numero . ' — ' . $this->empresa->razon_social,
         );
     }
 
@@ -48,7 +45,7 @@ class FacturaMail extends Mailable
 
     public function attachments(): array
     {
-        $this->factura->load(['items', 'cliente']);
+        $this->factura->loadMissing(['items', 'cliente']);
 
         $pdf      = app(PdfService::class);
         $factura  = $this->factura;
@@ -64,7 +61,7 @@ class FacturaMail extends Mailable
         return [
             Attachment::fromData(
                 fn () => $pdf->output('facturas.pdf', compact('factura', 'empresa', 'qrBase64')),
-                'Factura-'.$factura->numero.'.pdf',
+                'Factura-' . $factura->numero . '.pdf',
             )->withMime('application/pdf'),
         ];
     }

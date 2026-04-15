@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empresa;
+use App\Services\MailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Config;
 
 class EmpresaController extends Controller
 {
@@ -107,7 +106,7 @@ class EmpresaController extends Controller
         return back()->with('success', 'Logo eliminado.');
     }
 
-    public function probarMail(Request $request)
+    public function probarMail(Request $request, MailService $mail)
     {
         $request->validate([
             'email_prueba' => 'required|email',
@@ -118,28 +117,25 @@ class EmpresaController extends Controller
 
         $empresa = Empresa::obtener();
 
-        if (!$empresa->mail_configurado) {
+        if (! $mail->estaConfigurado($empresa)) {
             return back()->with('error', 'Primero guarda la configuración de correo antes de probar.');
         }
 
-        Config::set('mail.mailers.smtp.host',       $empresa->mail_host);
-        Config::set('mail.mailers.smtp.port',       $empresa->mail_port);
-        Config::set('mail.mailers.smtp.username',   $empresa->mail_username);
-        Config::set('mail.mailers.smtp.password',   $empresa->mail_password);
-        Config::set('mail.mailers.smtp.encryption', $empresa->mail_encryption);
-        Config::set('mail.from.address',            $empresa->mail_from_address ?? $empresa->email);
-        Config::set('mail.from.name',               $empresa->mail_from_name    ?? $empresa->razon_social);
-
         try {
-            Mail::raw(
-                "Correo de prueba de FacturaCO.\n\nSi recibes este mensaje, la configuración de correo de {$empresa->razon_social} está funcionando correctamente.",
-                function ($message) use ($request, $empresa) {
-                    $message->to($request->email_prueba)
-                            ->subject('Prueba de correo — ' . $empresa->razon_social);
-                }
-            );
+            $fromAddress = $empresa->mail_from_address ?: $empresa->email;
+            $fromName    = $empresa->mail_from_name    ?: $empresa->razon_social;
 
-            return back()->with('success', '¡Correo de prueba enviado correctamente a ' . $request->email_prueba . '!');
+            $mail->paraEmpresa($empresa)
+                 ->raw(
+                     "Correo de prueba de FacturaCO.\n\nSi recibes este mensaje, la configuración de correo de {$empresa->razon_social} está funcionando correctamente.\n\nServidor: {$empresa->mail_host}:{$empresa->mail_port}\nRemitente: {$fromAddress}",
+                     function ($message) use ($request, $empresa, $fromAddress, $fromName) {
+                         $message->to($request->email_prueba)
+                                 ->from($fromAddress, $fromName)
+                                 ->subject('Prueba de correo — ' . $empresa->razon_social);
+                     }
+                 );
+
+            return back()->with('success', "¡Correo de prueba enviado correctamente a {$request->email_prueba}!");
 
         } catch (\Exception $e) {
             return back()->with('error', 'Error al enviar: ' . $e->getMessage());
