@@ -833,8 +833,10 @@ function precargarResend() {
     document.getElementById('mail_port').value       = '465';
     document.getElementById('mail_encryption').value = 'ssl';
     document.getElementById('mail_username').value   = 'resend';
+    document.getElementById('mail_username').placeholder = 'resend';
     document.getElementById('mail_password').focus();
 }
+
 function precargarGmail() {
     document.getElementById('mail_host').value       = 'smtp.gmail.com';
     document.getElementById('mail_port').value       = '587';
@@ -843,6 +845,7 @@ function precargarGmail() {
     document.getElementById('mail_username').placeholder = 'tucorreo@gmail.com';
     document.getElementById('mail_username').focus();
 }
+
 function precargarOutlook() {
     document.getElementById('mail_host').value       = 'smtp-mail.outlook.com';
     document.getElementById('mail_port').value       = '587';
@@ -850,6 +853,56 @@ function precargarOutlook() {
     document.getElementById('mail_username').value   = '';
     document.getElementById('mail_username').placeholder = 'tucorreo@hotmail.com';
     document.getElementById('mail_username').focus();
+}
+
+function precargarYahoo() {
+    document.getElementById('mail_host').value       = 'smtp.mail.yahoo.com';
+    document.getElementById('mail_port').value       = '587';
+    document.getElementById('mail_encryption').value = 'tls';
+    document.getElementById('mail_username').value   = '';
+    document.getElementById('mail_username').placeholder = 'tucorreo@yahoo.com';
+    document.getElementById('mail_username').focus();
+}
+
+function precargarMailgun() {
+    document.getElementById('mail_host').value       = 'smtp.mailgun.org';
+    document.getElementById('mail_port').value       = '587';
+    document.getElementById('mail_encryption').value = 'tls';
+    document.getElementById('mail_username').value   = '';
+    document.getElementById('mail_username').placeholder = 'postmaster@tu-dominio.mailgun.org';
+    document.getElementById('mail_username').focus();
+}
+
+function precargarSendgrid() {
+    document.getElementById('mail_host').value       = 'smtp.sendgrid.net';
+    document.getElementById('mail_port').value       = '587';
+    document.getElementById('mail_encryption').value = 'tls';
+    document.getElementById('mail_username').value   = 'apikey';
+    document.getElementById('mail_username').placeholder = 'apikey';
+    document.getElementById('mail_password').focus();
+}
+
+function precargarProveedor(tipo) {
+    switch (tipo) {
+        case 'resend':
+            precargarResend();
+            break;
+        case 'gmail':
+            precargarGmail();
+            break;
+        case 'outlook':
+            precargarOutlook();
+            break;
+        case 'yahoo':
+            precargarYahoo();
+            break;
+        case 'mailgun':
+            precargarMailgun();
+            break;
+        case 'sendgrid':
+            precargarSendgrid();
+            break;
+    }
 }
 function togglePassword() {
     const input = document.getElementById('mail_password');
