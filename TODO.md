@@ -1,14 +1,9 @@
-# TODO - Modularización Fase 2 (completada)
+# TODO - Modularización Fase 3 (Backoffice módulos por empresa)
 
-- [x] Revisar estado real de Fase 2 en código (rutas + seeders)
-- [x] Crear/ajustar `database/seeders/ModuloSeeder.php` con módulos base
-- [x] Registrar `ModuloSeeder` en `database/seeders/DatabaseSeeder.php`
-- [x] Proteger rutas en `routes/web.php` con `modulo:*` por dominio funcional
-- [x] Verificar que no se rompan middlewares existentes (`auth`, `empresa`, `can:*`)
-- [x] Ejecutar validación de rutas (`php artisan route:list -v`)
-- [x] Ejecutar migraciones faltantes (`php artisan migrate`)
-- [x] Ejecutar seeder de módulos (`php artisan db:seed --class=ModuloSeeder`)
-- [x] Marcar pendientes finales de Fase 2
-
-## Resultado
-Fase 2 de modularización completada al 100% en backend (rutas web + catálogo de módulos base).
+- [x] Revisar `BackofficeController` y vistas actuales de empresas
+- [x] Agregar métodos `modulos()` y `modulosUpdate()` en `BackofficeController`
+- [x] Agregar rutas backoffice para gestionar módulos de empresa en `routes/web.php`
+- [x] Crear vista `resources/views/backoffice/empresas/modulos.blade.php`
+- [x] Integrar acceso a gestión de módulos desde listado/edición de empresas (si aplica)
+- [ ] Probar flujo: asignar/quitar módulos y persistencia en `empresa_modulo`
+- [ ] Probar efecto funcional: acceso permitido/403 según módulo activo

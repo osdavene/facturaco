@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empresa;
+use App\Models\Modulo;
 use App\Models\User;
 use App\Http\Controllers\EmpresaSelectorController;
 use Illuminate\Http\Request;
@@ -93,6 +94,46 @@ class BackofficeController extends Controller
         $adminUsuarios = $empresa->usuarios()->wherePivot('rol', 'admin')->get();
 
         return view('backoffice.empresas.editar', compact('empresa', 'matrices', 'adminUsuarios'));
+    }
+
+    public function modulos(Empresa $empresa)
+    {
+        $modulos = Modulo::where('activo', true)
+            ->orderBy('orden')
+            ->orderBy('nombre')
+            ->get();
+
+        $modulosActivos = $empresa->modulos()
+            ->wherePivot('activo', true)
+            ->pluck('modulos.id')
+            ->toArray();
+
+        return view('backoffice.empresas.modulos', compact('empresa', 'modulos', 'modulosActivos'));
+    }
+
+    public function modulosUpdate(Request $request, Empresa $empresa)
+    {
+        $data = $request->validate([
+            'modulos'   => 'nullable|array',
+            'modulos.*' => 'integer|exists:modulos,id',
+        ]);
+
+        $modulosIds = collect($data['modulos'] ?? [])->map(fn ($id) => (int) $id)->unique()->values();
+
+        $modulosDisponibles = Modulo::where('activo', true)
+            ->whereIn('id', $modulosIds)
+            ->pluck('id');
+
+        $syncData = [];
+        foreach ($modulosDisponibles as $moduloId) {
+            $syncData[$moduloId] = ['activo' => true];
+        }
+
+        $empresa->modulos()->sync($syncData);
+
+        return redirect()
+            ->route('backoffice.empresas.modulos', $empresa)
+            ->with('success', 'Módulos actualizados correctamente para ' . $empresa->razon_social . '.');
     }
 
     public function empresasUpdate(Request $request, Empresa $empresa)

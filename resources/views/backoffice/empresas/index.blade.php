@@ -56,6 +56,13 @@
                         <i class="fas fa-eye text-xs"></i>
                     </button>
                 </form>
+                <a href="{{ route('backoffice.empresas.modulos', $emp) }}"
+                   class="w-8 h-8 bg-[#1a2235] border border-[#1e2d47] rounded-lg
+                          flex items-center justify-center text-slate-400
+                          hover:text-blue-400 hover:border-blue-500/50 transition-colors"
+                   title="Módulos">
+                    <i class="fas fa-puzzle-piece text-xs"></i>
+                </a>
                 <a href="{{ route('backoffice.empresas.editar', $emp) }}"
                    class="w-8 h-8 bg-[#1a2235] border border-[#1e2d47] rounded-lg
                           flex items-center justify-center text-slate-400
@@ -110,6 +117,13 @@
                             <i class="fas fa-eye text-[10px]"></i>
                         </button>
                     </form>
+                    <a href="{{ route('backoffice.empresas.modulos', $filial) }}"
+                       class="w-7 h-7 bg-[#1a2235] border border-[#1e2d47] rounded-lg
+                              flex items-center justify-center text-slate-400
+                              hover:text-blue-400 hover:border-blue-500/50 transition-colors"
+                       title="Módulos">
+                        <i class="fas fa-puzzle-piece text-[10px]"></i>
+                    </a>
                     <a href="{{ route('backoffice.empresas.editar', $filial) }}"
                        class="w-7 h-7 bg-[#1a2235] border border-[#1e2d47] rounded-lg
                               flex items-center justify-center text-slate-400

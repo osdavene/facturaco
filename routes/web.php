@@ -500,6 +500,8 @@ Route::middleware(['auth', 'backoffice'])->prefix('backoffice')->name('backoffic
     Route::get('/empresas/crear',                   [BackofficeController::class, 'empresasCrear']) ->name('empresas.crear');
     Route::post('/empresas',                        [BackofficeController::class, 'empresasStore']) ->name('empresas.store');
     Route::get('/empresas/{empresa}/editar',        [BackofficeController::class, 'empresasEditar'])->name('empresas.editar');
+    Route::get('/empresas/{empresa}/modulos',       [BackofficeController::class, 'modulos'])      ->name('empresas.modulos');
+    Route::put('/empresas/{empresa}/modulos',       [BackofficeController::class, 'modulosUpdate'])->name('empresas.modulos.update');
     Route::put('/empresas/{empresa}',               [BackofficeController::class, 'empresasUpdate'])->name('empresas.update');
     Route::delete('/empresas/{empresa}',            [BackofficeController::class, 'empresasDestroy'])->name('empresas.destroy');
     Route::get('/empresas/{empresa}/crear-admin',   [BackofficeController::class, 'crearAdmin'])   ->name('empresas.admin.crear');
