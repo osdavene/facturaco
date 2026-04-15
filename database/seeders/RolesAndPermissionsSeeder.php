@@ -107,10 +107,14 @@ class RolesAndPermissionsSeeder extends Seeder
         $usuario = User::firstOrCreate(
             ['email' => 'admin@facturaco.com'],
             [
-                'name'     => 'Administrador',
-                'password' => Hash::make('Admin2026*'),
+                'name'         => 'Administrador',
+                'password'     => Hash::make('Admin2026*'),
+                'is_superadmin'=> true,
             ]
         );
+
+        // Asegurar que siempre tenga is_superadmin=true (por si ya existía con false)
+        $usuario->update(['is_superadmin' => true]);
 
         $usuario->syncRoles(['super-admin']);
 
