@@ -9,6 +9,7 @@ use App\Models\Producto;
 use App\Models\Proveedor;
 use App\Models\UnidadMedida;
 use App\Observers\AuditoriaObserver;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
@@ -28,6 +29,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Super-admin bypasses ALL permission checks regardless of cache state
+        Gate::before(function ($user, $ability) {
+            if ($user->hasRole('super-admin')) {
+                return true;
+            }
+        });
+
         Sanctum::usePersonalAccessTokenModel(ApiToken::class);
 
         if (config('app.env') === 'production') {

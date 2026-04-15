@@ -196,7 +196,7 @@
                 </x-nav-section>
 
                 {{-- NÓMINA --}}
-                @if(auth()->user()->can('ver nomina') || auth()->user()->is_superadmin)
+                @can('ver nomina')
                 <x-nav-section label="Nómina">
                     <x-nav-item href="{{ route('nomina.index') }}"
                                 icon="fa-file-invoice-dollar"
@@ -209,10 +209,10 @@
                         Empleados
                     </x-nav-item>
                 </x-nav-section>
-                @endif
+                @endcan
 
                 {{-- GESTIÓN --}}
-                @if(auth()->user()->can('ver inventario') || auth()->user()->can('ver clientes') || auth()->user()->can('ver proveedores') || auth()->user()->can('ver compras'))
+                @canany(['ver inventario','ver clientes','ver proveedores','ver compras'])
                 <x-nav-section label="Gestión">
                     @can('ver inventario')
                     <x-nav-item href="{{ route('inventario.index') }}"
@@ -243,10 +243,10 @@
                     </x-nav-item>
                     @endcan
                 </x-nav-section>
-                @endif
+                @endcanany
 
                 {{-- FINANZAS --}}
-                @if(auth()->user()->can('ver facturas') || auth()->user()->can('ver reportes') || auth()->user()->can('ver configuracion'))
+                @canany(['ver facturas','ver reportes','ver configuracion'])
                 <x-nav-section label="Finanzas">
                     @can('ver facturas')
                     <x-nav-item href="{{ route('recibos.index') }}"
@@ -270,7 +270,7 @@
                     </x-nav-item>
                     @endcan
                 </x-nav-section>
-                @endif
+                @endcanany
 
                 {{-- CONFIGURACIÓN --}}
                 @can('ver usuarios')
