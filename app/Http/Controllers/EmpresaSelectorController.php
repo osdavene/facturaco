@@ -77,6 +77,12 @@ class EmpresaSelectorController extends Controller
             'activo' => true,
         ]);
 
+        // Activar todos los módulos disponibles para la nueva empresa
+        $modulos = \App\Models\Modulo::where('activo', true)->get();
+        foreach ($modulos as $modulo) {
+            $empresa->modulos()->attach($modulo->id, ['activo' => true]);
+        }
+
         $this->establecerSesionEmpresa($empresa);
 
         return redirect()->route('dashboard')
