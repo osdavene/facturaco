@@ -245,16 +245,20 @@
                 </x-nav-section>
                 @endcanany
 
-                {{-- FINANZAS --}}
-                @canany(['ver facturas','ver reportes','ver configuracion'])
-                <x-nav-section label="Finanzas">
-                    @can('ver facturas')
+                {{-- CONTABLE --}}
+                @can('ver recibos')
+                <x-nav-section label="Contable">
                     <x-nav-item href="{{ route('recibos.index') }}"
                                 icon="fa-hand-holding-usd"
                                 :active="request()->routeIs('recibos.*')">
                         Recibos de Caja
                     </x-nav-item>
-                    @endcan
+                </x-nav-section>
+                @endcan
+
+                {{-- REPORTES --}}
+                @canany(['ver reportes','ver configuracion'])
+                <x-nav-section label="Reportes">
                     @can('ver reportes')
                     <x-nav-item href="{{ route('reportes.index') }}"
                                 icon="fa-chart-bar"

@@ -29,6 +29,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'ver inventario', 'crear inventario', 'editar inventario',
             // Compras
             'ver compras', 'crear compras', 'aprobar compras',
+            // Contable
+            'ver recibos', 'crear recibos',
             // Reportes
             'ver reportes', 'exportar reportes',
             // Usuarios
@@ -43,7 +45,7 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permiso]);
         }
 
-        // ── ROLES ─────────────────────────────────
+        // ── ROLES (syncPermissions = idempotente, reemplaza siempre) ──────
         $superAdmin = Role::firstOrCreate(['name' => 'super-admin']);
         $admin      = Role::firstOrCreate(['name' => 'admin']);
         $vendedor   = Role::firstOrCreate(['name' => 'vendedor']);
@@ -52,24 +54,25 @@ class RolesAndPermissionsSeeder extends Seeder
         $lectura    = Role::firstOrCreate(['name' => 'solo-lectura']);
 
         // Super Admin — todo
-        $superAdmin->givePermissionTo(Permission::all());
+        $superAdmin->syncPermissions(Permission::all());
 
         // Admin — casi todo menos eliminar usuarios
-        $admin->givePermissionTo([
+        $admin->syncPermissions([
             'ver facturas','crear facturas','editar facturas','anular facturas',
             'ver cotizaciones','crear cotizaciones','editar cotizaciones',
             'ver clientes','crear clientes','editar clientes',
             'ver proveedores','crear proveedores','editar proveedores',
             'ver inventario','crear inventario','editar inventario',
             'ver compras','crear compras','aprobar compras',
+            'ver recibos','crear recibos',
             'ver reportes','exportar reportes',
             'ver usuarios','crear usuarios','editar usuarios',
             'ver configuracion',
-            'ver nomina', 'gestionar nomina',
+            'ver nomina','gestionar nomina',
         ]);
 
         // Vendedor
-        $vendedor->givePermissionTo([
+        $vendedor->syncPermissions([
             'ver facturas','crear facturas',
             'ver cotizaciones','crear cotizaciones','editar cotizaciones',
             'ver clientes','crear clientes','editar clientes',
@@ -78,23 +81,24 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         // Bodeguero
-        $bodeguero->givePermissionTo([
+        $bodeguero->syncPermissions([
             'ver inventario','crear inventario','editar inventario',
             'ver compras','crear compras',
             'ver proveedores',
         ]);
 
         // Contador
-        $contador->givePermissionTo([
+        $contador->syncPermissions([
             'ver facturas','anular facturas',
+            'ver recibos','crear recibos',
             'ver reportes','exportar reportes',
             'ver clientes','ver proveedores',
             'ver compras',
-            'ver nomina', 'gestionar nomina',
+            'ver nomina','gestionar nomina',
         ]);
 
         // Solo lectura
-        $lectura->givePermissionTo([
+        $lectura->syncPermissions([
             'ver facturas','ver cotizaciones','ver clientes',
             'ver proveedores','ver inventario','ver reportes',
         ]);
@@ -108,8 +112,10 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
 
-        $usuario->assignRole('super-admin');
+        $usuario->syncRoles(['super-admin']);
 
-        $this->command->info('✅ Roles, permisos y usuario admin creados correctamente.');
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        $this->command->info('✅ Roles, permisos y usuario admin sincronizados correctamente.');
     }
 }
