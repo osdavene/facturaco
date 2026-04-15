@@ -9,6 +9,7 @@ use App\Http\Controllers\EmpresaSelectorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class BackofficeController extends Controller
 {
@@ -184,30 +185,37 @@ class BackofficeController extends Controller
             'name'     => 'required|string|max:100',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'rol'      => 'required|exists:roles,name',
         ]);
 
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
+            'name'     => strtoupper($data['name']),
+            'email'    => strtolower($data['email']),
             'password' => Hash::make($data['password']),
             'activo'   => true,
         ]);
 
-        // Vincular a la empresa como admin
-        $empresa->usuarios()->attach($user->id, ['rol' => 'admin', 'activo' => true]);
+        // Asignar rol Spatie (controla permisos en toda la app)
+        $user->assignRole($data['rol']);
+
+        // Rol en el pivot: admin si es admin/super-admin, operador en cualquier otro caso
+        $rolPivot = in_array($data['rol'], ['admin', 'super-admin']) ? 'admin' : 'operador';
+
+        // Vincular a la empresa
+        $empresa->usuarios()->attach($user->id, ['rol' => $rolPivot, 'activo' => true]);
 
         // Si la empresa es una filial, también vincular a la matriz
         if ($empresa->empresa_padre_id) {
             $matriz = $empresa->padre;
             if ($matriz && !$matriz->usuarios()->where('user_id', $user->id)->exists()) {
-                $matriz->usuarios()->attach($user->id, ['rol' => 'admin', 'activo' => true]);
+                $matriz->usuarios()->attach($user->id, ['rol' => $rolPivot, 'activo' => true]);
             }
         }
 
         // Si la empresa es matriz, vincular a todas sus filiales
         foreach ($empresa->filiales as $filial) {
             if (!$filial->usuarios()->where('user_id', $user->id)->exists()) {
-                $filial->usuarios()->attach($user->id, ['rol' => 'admin', 'activo' => true]);
+                $filial->usuarios()->attach($user->id, ['rol' => $rolPivot, 'activo' => true]);
             }
         }
 

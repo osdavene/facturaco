@@ -1,5 +1,6 @@
 @extends('backoffice.layout')
 @section('title', 'Crear administrador')
+@php use Spatie\Permission\Models\Role; @endphp
 
 @section('content')
 
@@ -39,6 +40,21 @@
                        placeholder="admin@empresa.com"
                        class="form-input @error('email') border-red-500 @enderror">
                 @error('email')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label class="form-label">Rol del usuario *</label>
+                <select name="rol" required
+                        class="form-input @error('rol') border-red-500 @enderror">
+                    <option value="">— Selecciona un rol —</option>
+                    @foreach(Role::orderBy('name')->get() as $rol)
+                    <option value="{{ $rol->name }}"
+                        {{ old('rol', 'admin') === $rol->name ? 'selected' : '' }}>
+                        {{ $rol->name }}
+                    </option>
+                    @endforeach
+                </select>
+                @error('rol')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div class="grid grid-cols-2 gap-4">
