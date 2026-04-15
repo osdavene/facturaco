@@ -196,7 +196,7 @@
                 </x-nav-section>
 
                 {{-- NÓMINA --}}
-                @can('ver nomina')
+                @if(auth()->user()->can('ver nomina') || auth()->user()->is_superadmin)
                 <x-nav-section label="Nómina">
                     <x-nav-item href="{{ route('nomina.index') }}"
                                 icon="fa-file-invoice-dollar"
@@ -209,7 +209,7 @@
                         Empleados
                     </x-nav-item>
                 </x-nav-section>
-                @endcan
+                @endif
 
                 {{-- GESTIÓN --}}
                 @if(auth()->user()->can('ver inventario') || auth()->user()->can('ver clientes') || auth()->user()->can('ver proveedores') || auth()->user()->can('ver compras'))
