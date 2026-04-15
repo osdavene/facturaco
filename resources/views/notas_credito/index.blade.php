@@ -59,6 +59,7 @@
             title="No hay notas de crédito"
             subtitle="Las notas de crédito se generan desde el detalle de una factura emitida." />
         @else
+        <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-[#1e2d47] text-xs text-slate-500 uppercase tracking-wider">
@@ -122,6 +123,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
         @if($notas->hasPages())
         <div class="px-5 py-4 border-t border-[#1e2d47]">
             {{ $notas->links() }}

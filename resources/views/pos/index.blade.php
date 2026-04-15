@@ -8,8 +8,15 @@
     <title>POS — {{ config('app.name') }}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        /* POS — Layout responsivo móvil */
+        @media (max-width: 1023px) {
+            #panel-carrito  { display: none; width: 100%; flex-shrink: 1; }
+            #panel-productos { width: 100%; }
+        }
+    </style>
 </head>
-<body class="bg-[#0b0f1a] text-slate-200 font-sans overflow-hidden" style="height:100vh;">
+<body class="bg-[#0b0f1a] text-slate-200 font-sans overflow-hidden" style="height:100dvh;height:100vh;">
 
 <div class="flex flex-col h-screen">
 
@@ -23,20 +30,40 @@
         </a>
         <div class="font-display font-black text-xl text-white">
             Factura<span class="text-amber-500">CO</span>
-            <span class="text-slate-400 font-normal text-sm ml-2">Punto de Venta</span>
+            <span class="hidden sm:inline text-slate-400 font-normal text-sm ml-2">Punto de Venta</span>
         </div>
         <div class="ml-auto flex items-center gap-3">
-            <div class="text-xs text-slate-500">
+            <div class="hidden sm:block text-xs text-slate-500">
                 <i class="fas fa-user mr-1"></i>{{ auth()->user()->name }}
             </div>
-            <div class="text-xs text-slate-500">
+            <div class="hidden sm:block text-xs text-slate-500">
                 <i class="fas fa-calendar mr-1"></i>{{ now()->locale('es')->isoFormat('D MMM YYYY') }}
             </div>
-            <div class="text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg">
+            <div class="text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg max-w-[120px] sm:max-w-none truncate">
                 {{ $empresa->nombre_comercial ?: $empresa->razon_social }}
             </div>
         </div>
     </header>
+
+    {{-- ── TABS MÓVIL ──────────────────────────────────── --}}
+    <div class="lg:hidden flex flex-shrink-0 bg-[#111827] border-b border-[#1e2d47]">
+        <button id="tab-btn-productos" onclick="mostrarTabPOS('productos')"
+                class="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold
+                       text-amber-400 border-b-2 border-amber-500 transition-colors">
+            <i class="fas fa-box-open"></i>
+            <span>Productos</span>
+        </button>
+        <button id="tab-btn-carrito" onclick="mostrarTabPOS('carrito')"
+                class="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold
+                       text-slate-500 border-b-2 border-transparent transition-colors relative">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Carrito</span>
+            <span id="carrito-badge-tab"
+                  class="hidden absolute top-1.5 right-6 min-w-[18px] h-[18px]
+                         bg-amber-500 text-black text-[9px] font-black rounded-full
+                         flex items-center justify-center px-1">0</span>
+        </button>
+    </div>
 
     {{-- ── CUERPO PRINCIPAL ────────────────────────── --}}
     <div class="flex flex-1 overflow-hidden">
@@ -44,7 +71,7 @@
         {{-- ════════════════════════════════════════
              PANEL IZQUIERDO — PRODUCTOS
         ════════════════════════════════════════ --}}
-        <div class="flex flex-col flex-1 overflow-hidden border-r border-[#1e2d47]">
+        <div id="panel-productos" class="flex flex-col flex-1 overflow-hidden border-r border-[#1e2d47] lg:border-r">
 
             {{-- Barra de búsqueda + categorías --}}
             <div class="flex-shrink-0 px-4 pt-3 pb-2 space-y-2 bg-[#111827]">
@@ -145,7 +172,7 @@
         {{-- ════════════════════════════════════════
              PANEL DERECHO — CARRITO
         ════════════════════════════════════════ --}}
-        <div class="w-80 xl:w-96 flex flex-col bg-[#111827] flex-shrink-0">
+        <div id="panel-carrito" class="flex flex-col bg-[#111827] lg:flex-shrink-0 lg:w-80 xl:w-96">
 
             {{-- Cliente --}}
             <div class="px-4 pt-3 pb-2 border-b border-[#1e2d47] flex-shrink-0">
@@ -444,6 +471,7 @@ function confirmarCantidad() {
     cerrarModalCantidad();
     renderizarCarrito();
     mostrarToast(p.nombre + ' agregado', 'ok');
+    if (window.innerWidth < 1024) mostrarTabPOS('carrito');
 }
 
 document.getElementById('modal-cantidad-input').addEventListener('keydown', e => {
@@ -481,6 +509,7 @@ function renderizarCarrito() {
         vacio.classList.remove('hidden');
         btnCobrar.disabled = true;
         actualizarTotales(0, 0, 0);
+        actualizarBadgeCarrito();
         return;
     }
 
@@ -525,6 +554,7 @@ function renderizarCarrito() {
     }).join('');
 
     actualizarTotales(subtotalTotal, ivaTotal, descTotal);
+    actualizarBadgeCarrito();
     btnCobrar.disabled = false;
     calcularVuelto();
 }
@@ -689,6 +719,57 @@ function mostrarToast(texto, tipo = 'ok') {
     clearTimeout(window._toastTimer);
     window._toastTimer = setTimeout(() => toast.classList.add('hidden'), 2500);
 }
+
+// ── Tabs POS (móvil) ─────────────────────────────────
+function mostrarTabPOS(tab) {
+    if (window.innerWidth >= 1024) return;
+    const panelProd  = document.getElementById('panel-productos');
+    const panelCart  = document.getElementById('panel-carrito');
+    const btnProd    = document.getElementById('tab-btn-productos');
+    const btnCart    = document.getElementById('tab-btn-carrito');
+
+    if (tab === 'productos') {
+        panelProd.style.display = 'flex';
+        panelCart.style.display  = 'none';
+        btnProd.classList.add('text-amber-400','border-amber-500');
+        btnProd.classList.remove('text-slate-500','border-transparent');
+        btnCart.classList.add('text-slate-500','border-transparent');
+        btnCart.classList.remove('text-amber-400','border-amber-500');
+    } else {
+        panelProd.style.display = 'none';
+        panelCart.style.display  = 'flex';
+        btnCart.classList.add('text-amber-400','border-amber-500');
+        btnCart.classList.remove('text-slate-500','border-transparent');
+        btnProd.classList.add('text-slate-500','border-transparent');
+        btnProd.classList.remove('text-amber-400','border-amber-500');
+    }
+}
+
+function actualizarBadgeCarrito() {
+    const badge = document.getElementById('carrito-badge-tab');
+    if (!badge) return;
+    const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0);
+    const n = Math.round(totalItems * 10) / 10;
+    if (n > 0) {
+        badge.textContent = n > 99 ? '99+' : (Number.isInteger(n) ? n : n.toFixed(1));
+        badge.classList.remove('hidden');
+        badge.style.display = 'flex';
+    } else {
+        badge.classList.add('hidden');
+        badge.style.display = '';
+    }
+}
+
+// Al agregar producto en móvil → cambiar al tab carrito automáticamente
+const _confirmarCantidadOrig = confirmarCantidad;
+
+// Reset de panels al rotar dispositivo
+window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1024) {
+        document.getElementById('panel-productos').style.display = '';
+        document.getElementById('panel-carrito').style.display   = '';
+    }
+});
 
 // ── Teclado global ───────────────────────────────────
 document.addEventListener('keydown', e => {

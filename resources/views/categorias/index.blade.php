@@ -37,6 +37,7 @@
             </a>
         </div>
         @else
+        <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-[#1e2d47] text-xs text-slate-500 uppercase tracking-wider">
@@ -111,6 +112,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         {{-- Paginación --}}
         @if($categorias->hasPages())
