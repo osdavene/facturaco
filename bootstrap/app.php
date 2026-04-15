@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'empresa'           => \App\Http\Middleware\EnsureEmpresaSeleccionada::class,
             'backoffice'        => \App\Http\Middleware\EsBackoffice::class,
             'api.empresa'       => \App\Http\Middleware\SetEmpresaDesdeToken::class,
+            'modulo'            => \App\Http\Middleware\ModuloActivo::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

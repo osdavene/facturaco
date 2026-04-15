@@ -250,6 +250,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/proveedores',                 [ProveedorController::class, 'bulkDelete']) ->name('proveedores.bulk-delete');
 
     // ── Inventario ────────────────────────────────────────────
+    Route::middleware('modulo:inventario')->group(function () {
     Route::get('/inventario',                       [ProductoController::class, 'index'])       ->name('inventario.index');
     Route::get('/inventario/crear',                 [ProductoController::class, 'create'])      ->name('inventario.create');
     Route::post('/inventario',                      [ProductoController::class, 'store'])       ->name('inventario.store');
@@ -259,8 +260,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/inventario/{inventario}',       [ProductoController::class, 'destroy'])     ->name('inventario.destroy');
     Route::post('/inventario/{inventario}/ajustar', [ProductoController::class, 'ajustarStock'])->name('inventario.ajustar');
     Route::delete('/inventario',                    [ProductoController::class, 'bulkDelete'])  ->name('inventario.bulk-delete');
+    });
 
     // ── Facturación ───────────────────────────────────────────
+    Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/facturas',                    [FacturaController::class, 'index'])       ->name('facturas.index');
     Route::get('/facturas/crear',              [FacturaController::class, 'create'])      ->name('facturas.create');
     Route::post('/facturas',                   [FacturaController::class, 'store'])       ->name('facturas.store');
@@ -273,18 +276,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/facturas/{factura}/enviar',   [FacturaController::class, 'formEnviar'])  ->name('facturas.formEnviar');
     Route::post('/facturas/{factura}/enviar',  [FacturaController::class, 'enviar'])      ->name('facturas.enviar');
     Route::delete('/facturas',                 [FacturaController::class, 'bulkDelete'])  ->name('facturas.bulk-delete');
+    });
 
     // ── Wompi retorno ─────────────────────────────────────────
     Route::get('/facturas/{factura}/wompi/retorno', [WompiController::class, 'retorno'])->name('wompi.retorno');
 
     // ── Notas de Crédito ──────────────────────────────────────
+    Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/notas-credito',             [NotaCreditoController::class, 'index'])  ->name('notas_credito.index');
     Route::get('/notas-credito/crear',       [NotaCreditoController::class, 'create']) ->name('notas_credito.create');
     Route::post('/notas-credito',            [NotaCreditoController::class, 'store'])  ->name('notas_credito.store');
     Route::get('/notas-credito/{nota}',      [NotaCreditoController::class, 'show'])   ->name('notas_credito.show');
     Route::get('/notas-credito/{nota}/pdf',  [NotaCreditoController::class, 'pdf'])    ->name('notas_credito.pdf');
+    });
 
     // ── Cotizaciones ──────────────────────────────────────────
+    Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/cotizaciones',                        [CotizacionController::class, 'index'])        ->name('cotizaciones.index');
     Route::get('/cotizaciones/crear',                  [CotizacionController::class, 'create'])       ->name('cotizaciones.create');
     Route::post('/cotizaciones',                       [CotizacionController::class, 'store'])        ->name('cotizaciones.store');
@@ -294,8 +301,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/cotizaciones/{cotizacion}/convertir',[CotizacionController::class, 'convertir'])    ->name('cotizaciones.convertir');
     Route::get('/cotizaciones/{cotizacion}/pdf',       [CotizacionController::class, 'pdf'])          ->name('cotizaciones.pdf');
     Route::delete('/cotizaciones',                     [CotizacionController::class, 'bulkDelete'])   ->name('cotizaciones.bulk-delete');
+    });
 
     // ── Órdenes de Compra ─────────────────────────────────────
+    Route::middleware('modulo:inventario')->group(function () {
     Route::get('/ordenes',                      [OrdenCompraController::class, 'index'])        ->name('ordenes.index');
     Route::get('/ordenes/crear',                [OrdenCompraController::class, 'create'])       ->name('ordenes.create');
     Route::post('/ordenes',                     [OrdenCompraController::class, 'store'])        ->name('ordenes.store');
@@ -307,23 +316,30 @@ Route::middleware('auth')->group(function () {
     Route::post('/ordenes/{orden}/recibir',     [OrdenCompraController::class, 'recibir'])      ->name('ordenes.recibir');
     Route::get('/ordenes/{orden}/pdf',          [OrdenCompraController::class, 'pdf'])          ->name('ordenes.pdf');
     Route::delete('/ordenes',                   [OrdenCompraController::class, 'bulkDelete'])   ->name('ordenes.bulk-delete');
+    });
 
     // ── Recibos de Caja ───────────────────────────────────────
+    Route::middleware('modulo:contable')->group(function () {
     Route::get('/recibos',              [ReciboCajaController::class, 'index'])  ->name('recibos.index');
     Route::get('/recibos/crear',        [ReciboCajaController::class, 'create']) ->name('recibos.create');
     Route::post('/recibos',             [ReciboCajaController::class, 'store'])  ->name('recibos.store');
     Route::get('/recibos/{recibo}',     [ReciboCajaController::class, 'show'])   ->name('recibos.show');
     Route::delete('/recibos/{recibo}',  [ReciboCajaController::class, 'destroy'])->name('recibos.destroy');
     Route::get('/recibos/{recibo}/pdf', [ReciboCajaController::class, 'pdf'])    ->name('recibos.pdf');
+    });
 
     // ── Reportes ──────────────────────────────────────────────
     Route::get('/reportes',                [ReporteController::class, 'index'])        ->name('reportes.index');
+    Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/reportes/ventas',         [ReporteController::class, 'ventas'])       ->name('reportes.ventas');
-    Route::get('/reportes/inventario',     [ReporteController::class, 'inventario'])   ->name('reportes.inventario');
     Route::get('/reportes/cartera',        [ReporteController::class, 'cartera'])      ->name('reportes.cartera');
     Route::get('/reportes/ventas/pdf',     [ReporteController::class, 'ventasPdf'])    ->name('reportes.ventas.pdf');
-    Route::get('/reportes/inventario/pdf', [ReporteController::class, 'inventarioPdf'])->name('reportes.inventario.pdf');
     Route::get('/reportes/cartera/pdf',    [ReporteController::class, 'carteraPdf'])   ->name('reportes.cartera.pdf');
+    });
+    Route::middleware('modulo:inventario')->group(function () {
+    Route::get('/reportes/inventario',     [ReporteController::class, 'inventario'])   ->name('reportes.inventario');
+    Route::get('/reportes/inventario/pdf', [ReporteController::class, 'inventarioPdf'])->name('reportes.inventario.pdf');
+    });
 
     // ── Empresa ───────────────────────────────────────────────
     Route::get('/empresa',              [EmpresaController::class, 'index'])     ->name('empresa.index');
@@ -341,20 +357,24 @@ Route::middleware('auth')->group(function () {
     Route::patch('/usuarios/{usuario}/activo', [UsuarioController::class, 'toggleActivo'])->name('usuarios.activo');
 
     // ── Categorías (solo admin) ───────────────────────────────
+    Route::middleware('modulo:inventario')->group(function () {
     Route::get('/categorias',                    [CategoriaController::class, 'index'])  ->name('categorias.index')  ->middleware('can:ver usuarios');
     Route::get('/categorias/crear',              [CategoriaController::class, 'create']) ->name('categorias.create') ->middleware('can:ver usuarios');
     Route::post('/categorias',                   [CategoriaController::class, 'store'])  ->name('categorias.store')  ->middleware('can:ver usuarios');
     Route::get('/categorias/{categoria}/editar', [CategoriaController::class, 'edit'])   ->name('categorias.edit')   ->middleware('can:ver usuarios');
     Route::put('/categorias/{categoria}',        [CategoriaController::class, 'update']) ->name('categorias.update') ->middleware('can:ver usuarios');
     Route::delete('/categorias/{categoria}',     [CategoriaController::class, 'destroy'])->name('categorias.destroy')->middleware('can:ver usuarios');
+    });
 
     // ── Unidades de Medida (solo admin) ───────────────────────
+    Route::middleware('modulo:inventario')->group(function () {
     Route::get('/unidades',                  [UnidadMedidaController::class, 'index'])  ->name('unidades.index')  ->middleware('can:ver usuarios');
     Route::get('/unidades/crear',            [UnidadMedidaController::class, 'create']) ->name('unidades.create') ->middleware('can:ver usuarios');
     Route::post('/unidades',                 [UnidadMedidaController::class, 'store'])  ->name('unidades.store')  ->middleware('can:ver usuarios');
     Route::get('/unidades/{unidad}/editar',  [UnidadMedidaController::class, 'edit'])   ->name('unidades.edit')   ->middleware('can:ver usuarios');
     Route::put('/unidades/{unidad}',         [UnidadMedidaController::class, 'update']) ->name('unidades.update') ->middleware('can:ver usuarios');
     Route::delete('/unidades/{unidad}',      [UnidadMedidaController::class, 'destroy'])->name('unidades.destroy')->middleware('can:ver usuarios');
+    });
 
     // ── Sesiones activas (solo admin) ─────────────────────────
     Route::get('/sesiones',         [SesionController::class, 'index'])     ->name('sesiones.index')      ->middleware('can:ver usuarios');
@@ -372,6 +392,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/backup/csv', [BackupController::class, 'descargarCsv'])  ->name('backup.csv')   ->middleware('can:ver usuarios');
 
     // ── Remisiones ────────────────────────────────────────────
+    Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/remisiones',                        [RemisionController::class, 'index'])        ->name('remisiones.index');
     Route::get('/remisiones/crear',                  [RemisionController::class, 'create'])       ->name('remisiones.create');
     Route::post('/remisiones',                       [RemisionController::class, 'store'])        ->name('remisiones.store');
@@ -380,19 +401,26 @@ Route::middleware('auth')->group(function () {
     Route::patch('/remisiones/{remision}/estado',    [RemisionController::class, 'cambiarEstado'])->name('remisiones.estado');
     Route::post('/remisiones/{remision}/convertir',  [RemisionController::class, 'convertir'])    ->name('remisiones.convertir');
     Route::get('/remisiones/{remision}/pdf',         [RemisionController::class, 'pdf'])          ->name('remisiones.pdf');
+    });
 
     // ── Impuestos ─────────────────────────────────────────────
+    Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/impuestos',         [ImpuestosController::class, 'index'])->name('impuestos.index');
     Route::get('/impuestos/pdf',     [ImpuestosController::class, 'pdf'])  ->name('impuestos.pdf');
     Route::get('/impuestos/excel',   [ImpuestosController::class, 'excel'])->name('impuestos.excel');
+    });
 
     // ── Búsqueda ──────────────────────────────────────────────
     Route::get('/busqueda', [BusquedaController::class, 'buscar'])->name('busqueda');
 
     // ── Excel exports ─────────────────────────────────────────
+    Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/reportes/ventas/excel',     [ReporteController::class, 'ventasExcel'])    ->name('reportes.ventas.excel');
-    Route::get('/reportes/inventario/excel', [ReporteController::class, 'inventarioExcel'])->name('reportes.inventario.excel');
     Route::get('/reportes/cartera/excel',    [ReporteController::class, 'carteraExcel'])   ->name('reportes.cartera.excel');
+    });
+    Route::middleware('modulo:inventario')->group(function () {
+    Route::get('/reportes/inventario/excel', [ReporteController::class, 'inventarioExcel'])->name('reportes.inventario.excel');
+    });
 
     // ── APIs internas ─────────────────────────────────────────
 

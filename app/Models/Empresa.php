@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Empresa extends Model
 {
@@ -43,6 +44,21 @@ class Empresa extends Model
         return $this->belongsToMany(User::class, 'empresa_user')
                     ->withPivot('rol', 'activo')
                     ->withTimestamps();
+    }
+
+    public function modulos(): BelongsToMany
+    {
+        return $this->belongsToMany(Modulo::class, 'empresa_modulo')
+            ->withPivot(['activo'])
+            ->withTimestamps();
+    }
+
+    public function tieneModulo(string $slug): bool
+    {
+        return $this->modulos()
+            ->where('slug', $slug)
+            ->wherePivot('activo', true)
+            ->exists();
     }
 
     /** Empresa padre (null si es matriz raíz) */
