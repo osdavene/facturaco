@@ -178,10 +178,15 @@ echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
 echo "=== PHP-FPM iniciado (PID: $!) ==="
 
-# ── Migraciones en background (no bloquean el arranque) ───────────────────
+# ── Migraciones + seed de módulos en background (no bloquean el arranque) ─
 echo "=== Migraciones iniciando en background ==="
-(php artisan migrate --force 2>&1 && echo "=== Migraciones completadas ===") \
-    || echo "=== ADVERTENCIA: migración falló ===" &
+(
+    php artisan migrate --force 2>&1 \
+    && echo "=== Migraciones completadas ===" \
+    && echo "=== Seeder ModuloSeeder iniciando ===" \
+    && php artisan db:seed --class=ModuloSeeder --force 2>&1 \
+    && echo "=== Seeder ModuloSeeder completado ==="
+) || echo "=== ADVERTENCIA: migración/seed falló ===" &
 
 # ── Nginx en primer plano (mantiene el container vivo) ────────────────────
 echo "=== Nginx iniciando ==="
