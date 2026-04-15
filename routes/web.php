@@ -26,6 +26,7 @@ use App\Http\Controllers\NotaCreditoController;
 use App\Http\Controllers\WompiController;
 use App\Http\Controllers\EmpresaSelectorController;
 use App\Http\Controllers\BackofficeController;
+use App\Http\Controllers\PosController;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -260,6 +261,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/inventario/{inventario}',       [ProductoController::class, 'destroy'])     ->name('inventario.destroy') ->middleware('can:editar inventario');
     Route::post('/inventario/{inventario}/ajustar', [ProductoController::class, 'ajustarStock'])->name('inventario.ajustar') ->middleware('can:editar inventario');
     Route::delete('/inventario',                    [ProductoController::class, 'bulkDelete'])  ->name('inventario.bulk-delete') ->middleware('can:editar inventario');
+    });
+
+    // ── POS ───────────────────────────────────────────────────
+    Route::middleware(['modulo:facturacion', 'can:crear facturas'])->group(function () {
+    Route::get('/pos',              [PosController::class, 'index']) ->name('pos.index');
+    Route::post('/pos',             [PosController::class, 'store']) ->name('pos.store');
+    Route::get('/pos/ticket/{factura}', [PosController::class, 'ticket'])->name('pos.ticket');
     });
 
     // ── Facturación ───────────────────────────────────────────

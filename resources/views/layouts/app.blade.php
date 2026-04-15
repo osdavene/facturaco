@@ -160,6 +160,13 @@
                                 :active="request()->routeIs('dashboard')">
                         Dashboard
                     </x-nav-item>
+                    @can('crear facturas')
+                    <x-nav-item href="{{ route('pos.index') }}"
+                                icon="fa-cash-register"
+                                :active="request()->routeIs('pos.*')">
+                        Punto de Venta
+                    </x-nav-item>
+                    @endcan
                     @can('ver facturas')
                     <x-nav-item href="{{ route('facturas.index') }}"
                                 icon="fa-file-invoice"
