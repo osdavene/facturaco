@@ -219,10 +219,10 @@ class CotizacionController extends Controller
 
     public function destroy(Cotizacion $cotizacion)
     {
-        $cotizacion->delete();
+        $cotizacion->update(['estado' => 'anulada']);
 
         return redirect()->route('cotizaciones.index')
-            ->with('success', 'Cotización eliminada.');
+            ->with('success', 'Cotización anulada correctamente.');
     }
 
     public function bulkDelete(Request $request)
@@ -233,10 +233,11 @@ class CotizacionController extends Controller
             return back()->with('warning', 'No se seleccionó ningún elemento.');
         }
 
-        $count = Cotizacion::whereIn('id', $ids)->count();
-        Cotizacion::whereIn('id', $ids)->delete();
+        $count = Cotizacion::whereIn('id', $ids)->where('estado', '!=', 'anulada')->count();
+        Cotizacion::whereIn('id', $ids)->where('estado', '!=', 'anulada')
+            ->update(['estado' => 'anulada']);
 
         return redirect()->route('cotizaciones.index')
-            ->with('success', "{$count} cotización(es) eliminada(s) correctamente.");
+            ->with('success', "{$count} cotización(es) anulada(s) correctamente.");
     }
 }

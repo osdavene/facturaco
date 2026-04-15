@@ -79,15 +79,16 @@ class UnidadMedidaController extends Controller
     {
         if ($unidad->productos()->count() > 0) {
             return back()->with('error',
-                'No se puede eliminar la unidad "' . $unidad->nombre .
-                '" porque tiene ' . $unidad->productos()->count() . ' producto(s) asociado(s).'
+                'No se puede archivar la unidad "' . $unidad->nombre .
+                '" porque tiene ' . $unidad->productos()->count() . ' producto(s) asociado(s). Archiva primero los productos.'
             );
         }
 
         $nombre = $unidad->nombre;
-        $unidad->delete();
+        $unidad->update(['activo' => false]);
+        $unidad->delete(); // SoftDelete
 
         return redirect()->route('unidades.index')
-            ->with('success', 'Unidad "' . $nombre . '" eliminada correctamente.');
+            ->with('success', 'Unidad "' . $nombre . '" archivada. El registro se conserva.');
     }
 }

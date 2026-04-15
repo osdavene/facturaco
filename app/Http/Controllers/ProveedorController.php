@@ -113,9 +113,10 @@ class ProveedorController extends Controller
 
     public function destroy(Proveedor $proveedor)
     {
-        $proveedor->delete();
+        $proveedor->update(['activo' => false]);
+        $proveedor->delete(); // SoftDelete
         return redirect()->route('proveedores.index')
-            ->with('success', 'Proveedor eliminado correctamente.');
+            ->with('success', 'Proveedor archivado. El registro se conserva para trazabilidad.');
     }
 
     public function bulkDelete(Request $request)
@@ -125,8 +126,9 @@ class ProveedorController extends Controller
             return back()->with('warning', 'No se seleccionó ningún elemento.');
         }
         $count = Proveedor::whereIn('id', $ids)->count();
-        Proveedor::whereIn('id', $ids)->delete();
+        Proveedor::whereIn('id', $ids)->update(['activo' => false]);
+        Proveedor::whereIn('id', $ids)->delete(); // SoftDelete
         return redirect()->route('proveedores.index')
-            ->with('success', "{$count} proveedor(es) eliminado(s) correctamente.");
+            ->with('success', "{$count} proveedor(es) archivado(s) correctamente.");
     }
 }

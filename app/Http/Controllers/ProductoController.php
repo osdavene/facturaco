@@ -144,9 +144,10 @@ class ProductoController extends Controller
 
     public function destroy(Producto $inventario)
     {
-        $inventario->delete();
+        $inventario->update(['activo' => false]);
+        $inventario->delete(); // SoftDelete
         return redirect()->route('inventario.index')
-            ->with('success', 'Producto eliminado correctamente.');
+            ->with('success', 'Producto archivado. El registro se conserva para trazabilidad.');
     }
 
     public function bulkDelete(Request $request)
@@ -156,9 +157,10 @@ class ProductoController extends Controller
             return back()->with('warning', 'No se seleccionó ningún elemento.');
         }
         $count = Producto::whereIn('id', $ids)->count();
-        Producto::whereIn('id', $ids)->delete();
+        Producto::whereIn('id', $ids)->update(['activo' => false]);
+        Producto::whereIn('id', $ids)->delete(); // SoftDelete
         return redirect()->route('inventario.index')
-            ->with('success', "{$count} producto(s) eliminado(s) correctamente.");
+            ->with('success', "{$count} producto(s) archivado(s) correctamente.");
     }
 
     // Ajuste de stock

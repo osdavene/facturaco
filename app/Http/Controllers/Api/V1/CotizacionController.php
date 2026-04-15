@@ -110,8 +110,8 @@ class CotizacionController extends Controller
 
     public function destroy(Cotizacion $cotizacion): JsonResponse
     {
-        $cotizacion->delete();
+        $cotizacion->update(['estado' => 'anulada']);
 
-        return response()->json(['message' => 'Cotización eliminada.']);
+        return response()->json(['message' => 'Cotización anulada correctamente.']);
     }
 }

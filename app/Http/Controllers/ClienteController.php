@@ -121,9 +121,10 @@ class ClienteController extends Controller
 
     public function destroy(Cliente $cliente)
     {
-        $cliente->delete();
+        $cliente->update(['activo' => false]);
+        $cliente->delete(); // SoftDelete: solo marca deleted_at
         return redirect()->route('clientes.index')
-            ->with('success', 'Cliente eliminado correctamente.');
+            ->with('success', 'Cliente archivado. El registro se conserva para trazabilidad.');
     }
 
     public function bulkDelete(Request $request)
@@ -133,8 +134,9 @@ class ClienteController extends Controller
             return back()->with('warning', 'No se seleccionó ningún elemento.');
         }
         $count = Cliente::whereIn('id', $ids)->count();
-        Cliente::whereIn('id', $ids)->delete();
+        Cliente::whereIn('id', $ids)->update(['activo' => false]);
+        Cliente::whereIn('id', $ids)->delete(); // SoftDelete
         return redirect()->route('clientes.index')
-            ->with('success', "{$count} cliente(s) eliminado(s) correctamente.");
+            ->with('success', "{$count} cliente(s) archivado(s) correctamente.");
     }
 }

@@ -110,9 +110,13 @@ class ReciboCajaController extends Controller
 
     public function destroy(ReciboCaja $recibo)
     {
+        if ($recibo->estado === 'anulado') {
+            return back()->with('error', 'El recibo ya está anulado.');
+        }
+
         DB::transaction(function() use ($recibo) {
             // Revertir pago en factura si aplica
-            if ($recibo->factura_id && $recibo->estado === 'activo') {
+            if ($recibo->factura_id) {
                 $factura = Factura::find($recibo->factura_id);
                 if ($factura) {
                     $nuevoTotal  = max(0, $factura->total_pagado - $recibo->valor);
@@ -123,8 +127,8 @@ class ReciboCajaController extends Controller
                     ]);
                 }
             }
+            // Solo anular — nunca borrar
             $recibo->update(['estado' => 'anulado']);
-            $recibo->delete();
         });
 
         return redirect()->route('recibos.index')

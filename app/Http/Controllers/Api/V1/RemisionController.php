@@ -41,8 +41,8 @@ class RemisionController extends Controller
 
     public function destroy(Remision $remision): JsonResponse
     {
-        $remision->delete();
+        $remision->update(['estado' => 'anulada']);
 
-        return response()->json(['message' => 'Remisión eliminada.']);
+        return response()->json(['message' => 'Remisión anulada correctamente.']);
     }
 }

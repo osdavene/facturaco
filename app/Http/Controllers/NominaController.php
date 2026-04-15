@@ -166,11 +166,11 @@ class NominaController extends Controller
 
     public function destroy(Nomina $nomina)
     {
-        abort_if($nomina->estado === 'pagada', 403, 'No se puede eliminar una nómina pagada.');
+        abort_if($nomina->estado === 'pagada', 403, 'No se puede anular una nómina pagada.');
 
-        $nomina->delete();
+        $nomina->update(['estado' => 'anulada']);
 
         return redirect()->route('nomina.index')
-            ->with('success', 'Nómina eliminada.');
+            ->with('success', 'Nómina anulada correctamente.');
     }
 }

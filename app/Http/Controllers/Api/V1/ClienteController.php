@@ -92,8 +92,9 @@ class ClienteController extends Controller
 
     public function destroy(Cliente $cliente): JsonResponse
     {
-        $cliente->delete();
+        $cliente->update(['activo' => false]);
+        $cliente->delete(); // SoftDelete
 
-        return response()->json(['message' => 'Cliente eliminado.']);
+        return response()->json(['message' => 'Cliente archivado correctamente.']);
     }
 }

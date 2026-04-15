@@ -161,8 +161,7 @@ class FacturaController extends Controller
     public function destroy(Factura $factura): JsonResponse
     {
         $factura->update(['estado' => 'anulada']);
-        $factura->delete();
 
-        return response()->json(['message' => 'Factura anulada y eliminada.']);
+        return response()->json(['message' => 'Factura anulada correctamente.']);
     }
 }

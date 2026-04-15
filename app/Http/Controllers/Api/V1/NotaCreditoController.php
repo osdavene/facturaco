@@ -30,8 +30,8 @@ class NotaCreditoController extends Controller
 
     public function destroy(NotaCredito $notaCredito): JsonResponse
     {
-        $notaCredito->delete();
+        $notaCredito->update(['estado' => 'anulada']);
 
-        return response()->json(['message' => 'Nota crédito eliminada.']);
+        return response()->json(['message' => 'Nota crédito anulada correctamente.']);
     }
 }

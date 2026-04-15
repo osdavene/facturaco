@@ -61,15 +61,12 @@ class NominaEmpleadoController extends Controller
 
     public function destroy(Empleado $empleado)
     {
-        // Verificar si tiene liquidaciones
-        if ($empleado->liquidaciones()->exists()) {
-            return back()->with('error', 'No se puede eliminar: el empleado tiene nóminas registradas.');
-        }
-
-        $empleado->delete();
+        // Si tiene liquidaciones, solo desactivar — nunca borrar
+        $empleado->update(['activo' => false]);
+        $empleado->delete(); // SoftDelete
 
         return redirect()->route('nomina.empleados.index')
-            ->with('success', 'Empleado eliminado.');
+            ->with('success', 'Empleado archivado. El registro se conserva para trazabilidad.');
     }
 
     public function toggleActivo(Empleado $empleado)

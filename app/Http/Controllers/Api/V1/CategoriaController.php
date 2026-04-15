@@ -54,8 +54,9 @@ class CategoriaController extends Controller
 
     public function destroy(Categoria $categoria): JsonResponse
     {
-        $categoria->delete();
+        $categoria->update(['activo' => false]);
+        $categoria->delete(); // SoftDelete
 
-        return response()->json(['message' => 'Categoría eliminada.']);
+        return response()->json(['message' => 'Categoría archivada correctamente.']);
     }
 }

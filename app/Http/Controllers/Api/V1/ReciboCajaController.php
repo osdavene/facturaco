@@ -31,8 +31,8 @@ class ReciboCajaController extends Controller
 
     public function destroy(ReciboCaja $reciboCaja): JsonResponse
     {
-        $reciboCaja->delete();
+        $reciboCaja->update(['estado' => 'anulado']);
 
-        return response()->json(['message' => 'Recibo de caja eliminado.']);
+        return response()->json(['message' => 'Recibo de caja anulado correctamente.']);
     }
 }

@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\PertenecerGrupo;
 
 class Empleado extends Model
 {
-    use PertenecerGrupo;
+    use PertenecerGrupo, SoftDeletes;
 
     protected $table = 'empleados';
 

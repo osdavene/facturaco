@@ -215,11 +215,12 @@ class FacturaController extends Controller
             return back()->with('warning', 'No se seleccionó ningún elemento.');
         }
 
-        $count = Factura::whereIn('id', $ids)->where('estado', 'borrador')->count();
-        Factura::whereIn('id', $ids)->where('estado', 'borrador')->delete();
+        $count = Factura::whereIn('id', $ids)->where('estado', '!=', 'anulada')->count();
+        Factura::whereIn('id', $ids)->where('estado', '!=', 'anulada')
+            ->update(['estado' => 'anulada']);
 
         return redirect()->route('facturas.index')
-            ->with('success', "{$count} factura(s) eliminada(s) correctamente.");
+            ->with('success', "{$count} factura(s) anulada(s) correctamente.");
     }
 
     // ── CAMBIAR ESTADO ────────────────────────────────────────

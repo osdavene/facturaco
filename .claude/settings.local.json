@@ -19,7 +19,8 @@
       "Bash(grep -r \"can\\\\|authorize\\\\|role\" /c/Proyectos/facturaco/app/Http/Controllers/*.php)",
       "Bash(find:*)",
       "Bash(grep -r \"authorize\\\\|gate\\\\|can\\\\|permission\\\\|role\" /c/Proyectos/facturaco/app/Http/Controllers/Api/V1/*.php)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(xargs -I{} basename {})"
     ]
   }
 }

@@ -4,10 +4,11 @@ namespace App\Models;
 use App\Traits\PertenecerGrupo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Categoria extends Model
 {
-    use HasFactory, PertenecerGrupo;
+    use HasFactory, PertenecerGrupo, SoftDeletes;
 
     protected $table = 'categorias';
 

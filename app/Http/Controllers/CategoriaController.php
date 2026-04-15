@@ -79,15 +79,16 @@ class CategoriaController extends Controller
     {
         if ($categoria->productos()->count() > 0) {
             return back()->with('error',
-                'No se puede eliminar la categoría "' . $categoria->nombre .
-                '" porque tiene ' . $categoria->productos()->count() . ' producto(s) asociado(s).'
+                'No se puede archivar la categoría "' . $categoria->nombre .
+                '" porque tiene ' . $categoria->productos()->count() . ' producto(s) asociado(s). Archiva primero los productos.'
             );
         }
 
         $nombre = $categoria->nombre;
-        $categoria->delete();
+        $categoria->update(['activo' => false]);
+        $categoria->delete(); // SoftDelete
 
         return redirect()->route('categorias.index')
-            ->with('success', 'Categoría "' . $nombre . '" eliminada correctamente.');
+            ->with('success', 'Categoría "' . $nombre . '" archivada. El registro se conserva.');
     }
 }

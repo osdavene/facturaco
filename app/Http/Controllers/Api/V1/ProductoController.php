@@ -79,8 +79,9 @@ class ProductoController extends Controller
 
     public function destroy(Producto $producto): JsonResponse
     {
-        $producto->delete();
+        $producto->update(['activo' => false]);
+        $producto->delete(); // SoftDelete
 
-        return response()->json(['message' => 'Producto eliminado.']);
+        return response()->json(['message' => 'Producto archivado correctamente.']);
     }
 }

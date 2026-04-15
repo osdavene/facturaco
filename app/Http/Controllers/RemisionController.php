@@ -208,10 +208,9 @@ class RemisionController extends Controller
     public function destroy(Remision $remision)
     {
         $remision->update(['estado' => 'anulada']);
-        $remision->delete();
 
         return redirect()->route('remisiones.index')
-            ->with('success', 'Remisión anulada.');
+            ->with('success', 'Remisión anulada correctamente.');
     }
 
     public function pdf(Remision $remision)

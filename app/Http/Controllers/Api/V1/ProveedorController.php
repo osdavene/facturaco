@@ -80,8 +80,9 @@ class ProveedorController extends Controller
 
     public function destroy(Proveedor $proveedor): JsonResponse
     {
-        $proveedor->delete();
+        $proveedor->update(['activo' => false]);
+        $proveedor->delete(); // SoftDelete
 
-        return response()->json(['message' => 'Proveedor eliminado.']);
+        return response()->json(['message' => 'Proveedor archivado correctamente.']);
     }
 }

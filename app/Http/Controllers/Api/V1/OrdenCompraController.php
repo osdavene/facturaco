@@ -41,8 +41,8 @@ class OrdenCompraController extends Controller
 
     public function destroy(OrdenCompra $ordenCompra): JsonResponse
     {
-        $ordenCompra->delete();
+        $ordenCompra->update(['estado' => 'anulada']);
 
-        return response()->json(['message' => 'Orden de compra eliminada.']);
+        return response()->json(['message' => 'Orden de compra anulada correctamente.']);
     }
 }
