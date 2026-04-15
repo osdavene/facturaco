@@ -15,7 +15,11 @@
       "Bash(cat phpunit.xml)",
       "Bash(cat phpunit.xml.dist)",
       "Bash(PGPASSWORD=7420 psql -U postgres -h 127.0.0.1 -c \"SELECT 1 as ok\")",
-      "Bash(composer dump-autoload:*)"
+      "Bash(composer dump-autoload:*)",
+      "Bash(grep -r \"can\\\\|authorize\\\\|role\" /c/Proyectos/facturaco/app/Http/Controllers/*.php)",
+      "Bash(find:*)",
+      "Bash(grep -r \"authorize\\\\|gate\\\\|can\\\\|permission\\\\|role\" /c/Proyectos/facturaco/app/Http/Controllers/Api/V1/*.php)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

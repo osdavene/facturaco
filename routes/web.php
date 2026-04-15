@@ -230,52 +230,52 @@ Route::middleware('auth')->group(function () {
     })->middleware('verified')->name('dashboard');
 
     // ── Clientes ──────────────────────────────────────────────
-    Route::get('/clientes',                    [ClienteController::class, 'index'])  ->name('clientes.index');
-    Route::get('/clientes/crear',              [ClienteController::class, 'create']) ->name('clientes.create');
-    Route::post('/clientes',                   [ClienteController::class, 'store'])  ->name('clientes.store');
-    Route::get('/clientes/{cliente}',          [ClienteController::class, 'show'])   ->name('clientes.show');
-    Route::get('/clientes/{cliente}/editar',   [ClienteController::class, 'edit'])   ->name('clientes.edit');
-    Route::put('/clientes/{cliente}',          [ClienteController::class, 'update']) ->name('clientes.update');
-    Route::delete('/clientes/{cliente}',       [ClienteController::class, 'destroy'])     ->name('clientes.destroy');
-    Route::delete('/clientes',                 [ClienteController::class, 'bulkDelete'])  ->name('clientes.bulk-delete');
+    Route::get('/clientes',                    [ClienteController::class, 'index'])  ->name('clientes.index')       ->middleware('can:ver clientes');
+    Route::get('/clientes/crear',              [ClienteController::class, 'create']) ->name('clientes.create')      ->middleware('can:crear clientes');
+    Route::post('/clientes',                   [ClienteController::class, 'store'])  ->name('clientes.store')       ->middleware('can:crear clientes');
+    Route::get('/clientes/{cliente}',          [ClienteController::class, 'show'])   ->name('clientes.show')        ->middleware('can:ver clientes');
+    Route::get('/clientes/{cliente}/editar',   [ClienteController::class, 'edit'])   ->name('clientes.edit')        ->middleware('can:editar clientes');
+    Route::put('/clientes/{cliente}',          [ClienteController::class, 'update']) ->name('clientes.update')      ->middleware('can:editar clientes');
+    Route::delete('/clientes/{cliente}',       [ClienteController::class, 'destroy'])     ->name('clientes.destroy')     ->middleware('can:eliminar clientes');
+    Route::delete('/clientes',                 [ClienteController::class, 'bulkDelete'])  ->name('clientes.bulk-delete') ->middleware('can:eliminar clientes');
 
     // ── Proveedores ───────────────────────────────────────────
-    Route::get('/proveedores',                    [ProveedorController::class, 'index'])  ->name('proveedores.index');
-    Route::get('/proveedores/crear',              [ProveedorController::class, 'create']) ->name('proveedores.create');
-    Route::post('/proveedores',                   [ProveedorController::class, 'store'])  ->name('proveedores.store');
-    Route::get('/proveedores/{proveedor}',        [ProveedorController::class, 'show'])   ->name('proveedores.show');
-    Route::get('/proveedores/{proveedor}/editar', [ProveedorController::class, 'edit'])   ->name('proveedores.edit');
-    Route::put('/proveedores/{proveedor}',        [ProveedorController::class, 'update']) ->name('proveedores.update');
-    Route::delete('/proveedores/{proveedor}',     [ProveedorController::class, 'destroy'])    ->name('proveedores.destroy');
-    Route::delete('/proveedores',                 [ProveedorController::class, 'bulkDelete']) ->name('proveedores.bulk-delete');
+    Route::get('/proveedores',                    [ProveedorController::class, 'index'])  ->name('proveedores.index')       ->middleware('can:ver proveedores');
+    Route::get('/proveedores/crear',              [ProveedorController::class, 'create']) ->name('proveedores.create')      ->middleware('can:crear proveedores');
+    Route::post('/proveedores',                   [ProveedorController::class, 'store'])  ->name('proveedores.store')       ->middleware('can:crear proveedores');
+    Route::get('/proveedores/{proveedor}',        [ProveedorController::class, 'show'])   ->name('proveedores.show')        ->middleware('can:ver proveedores');
+    Route::get('/proveedores/{proveedor}/editar', [ProveedorController::class, 'edit'])   ->name('proveedores.edit')        ->middleware('can:editar proveedores');
+    Route::put('/proveedores/{proveedor}',        [ProveedorController::class, 'update']) ->name('proveedores.update')      ->middleware('can:editar proveedores');
+    Route::delete('/proveedores/{proveedor}',     [ProveedorController::class, 'destroy'])    ->name('proveedores.destroy')     ->middleware('can:editar proveedores');
+    Route::delete('/proveedores',                 [ProveedorController::class, 'bulkDelete']) ->name('proveedores.bulk-delete') ->middleware('can:editar proveedores');
 
     // ── Inventario ────────────────────────────────────────────
     Route::middleware('modulo:inventario')->group(function () {
-    Route::get('/inventario',                       [ProductoController::class, 'index'])       ->name('inventario.index');
-    Route::get('/inventario/crear',                 [ProductoController::class, 'create'])      ->name('inventario.create');
-    Route::post('/inventario',                      [ProductoController::class, 'store'])       ->name('inventario.store');
-    Route::get('/inventario/{inventario}',          [ProductoController::class, 'show'])        ->name('inventario.show');
-    Route::get('/inventario/{inventario}/editar',   [ProductoController::class, 'edit'])        ->name('inventario.edit');
-    Route::put('/inventario/{inventario}',          [ProductoController::class, 'update'])      ->name('inventario.update');
-    Route::delete('/inventario/{inventario}',       [ProductoController::class, 'destroy'])     ->name('inventario.destroy');
-    Route::post('/inventario/{inventario}/ajustar', [ProductoController::class, 'ajustarStock'])->name('inventario.ajustar');
-    Route::delete('/inventario',                    [ProductoController::class, 'bulkDelete'])  ->name('inventario.bulk-delete');
+    Route::get('/inventario',                       [ProductoController::class, 'index'])       ->name('inventario.index')   ->middleware('can:ver inventario');
+    Route::get('/inventario/crear',                 [ProductoController::class, 'create'])      ->name('inventario.create')  ->middleware('can:crear inventario');
+    Route::post('/inventario',                      [ProductoController::class, 'store'])       ->name('inventario.store')   ->middleware('can:crear inventario');
+    Route::get('/inventario/{inventario}',          [ProductoController::class, 'show'])        ->name('inventario.show')    ->middleware('can:ver inventario');
+    Route::get('/inventario/{inventario}/editar',   [ProductoController::class, 'edit'])        ->name('inventario.edit')    ->middleware('can:editar inventario');
+    Route::put('/inventario/{inventario}',          [ProductoController::class, 'update'])      ->name('inventario.update')  ->middleware('can:editar inventario');
+    Route::delete('/inventario/{inventario}',       [ProductoController::class, 'destroy'])     ->name('inventario.destroy') ->middleware('can:editar inventario');
+    Route::post('/inventario/{inventario}/ajustar', [ProductoController::class, 'ajustarStock'])->name('inventario.ajustar') ->middleware('can:editar inventario');
+    Route::delete('/inventario',                    [ProductoController::class, 'bulkDelete'])  ->name('inventario.bulk-delete') ->middleware('can:editar inventario');
     });
 
     // ── Facturación ───────────────────────────────────────────
     Route::middleware('modulo:facturacion')->group(function () {
-    Route::get('/facturas',                    [FacturaController::class, 'index'])       ->name('facturas.index');
-    Route::get('/facturas/crear',              [FacturaController::class, 'create'])      ->name('facturas.create');
-    Route::post('/facturas',                   [FacturaController::class, 'store'])       ->name('facturas.store');
-    Route::get('/facturas/{factura}',          [FacturaController::class, 'show'])        ->name('facturas.show');
-    Route::get('/facturas/{factura}/editar',   [FacturaController::class, 'edit'])        ->name('facturas.edit');
-    Route::put('/facturas/{factura}',          [FacturaController::class, 'update'])      ->name('facturas.update');
-    Route::delete('/facturas/{factura}',       [FacturaController::class, 'destroy'])     ->name('facturas.destroy');
-    Route::patch('/facturas/{factura}/estado', [FacturaController::class, 'cambiarEstado'])->name('facturas.estado');
-    Route::get('/facturas/{factura}/pdf',      [FacturaController::class, 'pdf'])         ->name('facturas.pdf');
-    Route::get('/facturas/{factura}/enviar',   [FacturaController::class, 'formEnviar'])  ->name('facturas.formEnviar');
-    Route::post('/facturas/{factura}/enviar',  [FacturaController::class, 'enviar'])      ->name('facturas.enviar');
-    Route::delete('/facturas',                 [FacturaController::class, 'bulkDelete'])  ->name('facturas.bulk-delete');
+    Route::get('/facturas',                    [FacturaController::class, 'index'])        ->name('facturas.index')       ->middleware('can:ver facturas');
+    Route::get('/facturas/crear',              [FacturaController::class, 'create'])       ->name('facturas.create')      ->middleware('can:crear facturas');
+    Route::post('/facturas',                   [FacturaController::class, 'store'])        ->name('facturas.store')       ->middleware('can:crear facturas');
+    Route::get('/facturas/{factura}',          [FacturaController::class, 'show'])         ->name('facturas.show')        ->middleware('can:ver facturas');
+    Route::get('/facturas/{factura}/editar',   [FacturaController::class, 'edit'])         ->name('facturas.edit')        ->middleware('can:editar facturas');
+    Route::put('/facturas/{factura}',          [FacturaController::class, 'update'])       ->name('facturas.update')      ->middleware('can:editar facturas');
+    Route::delete('/facturas/{factura}',       [FacturaController::class, 'destroy'])      ->name('facturas.destroy')     ->middleware('can:anular facturas');
+    Route::patch('/facturas/{factura}/estado', [FacturaController::class, 'cambiarEstado'])->name('facturas.estado')      ->middleware('can:anular facturas');
+    Route::get('/facturas/{factura}/pdf',      [FacturaController::class, 'pdf'])          ->name('facturas.pdf')         ->middleware('can:ver facturas');
+    Route::get('/facturas/{factura}/enviar',   [FacturaController::class, 'formEnviar'])   ->name('facturas.formEnviar')  ->middleware('can:ver facturas');
+    Route::post('/facturas/{factura}/enviar',  [FacturaController::class, 'enviar'])       ->name('facturas.enviar')      ->middleware('can:ver facturas');
+    Route::delete('/facturas',                 [FacturaController::class, 'bulkDelete'])   ->name('facturas.bulk-delete') ->middleware('can:anular facturas');
     });
 
     // ── Wompi retorno ─────────────────────────────────────────
@@ -283,97 +283,97 @@ Route::middleware('auth')->group(function () {
 
     // ── Notas de Crédito ──────────────────────────────────────
     Route::middleware('modulo:facturacion')->group(function () {
-    Route::get('/notas-credito',             [NotaCreditoController::class, 'index'])  ->name('notas_credito.index');
-    Route::get('/notas-credito/crear',       [NotaCreditoController::class, 'create']) ->name('notas_credito.create');
-    Route::post('/notas-credito',            [NotaCreditoController::class, 'store'])  ->name('notas_credito.store');
-    Route::get('/notas-credito/{nota}',      [NotaCreditoController::class, 'show'])   ->name('notas_credito.show');
-    Route::get('/notas-credito/{nota}/pdf',  [NotaCreditoController::class, 'pdf'])    ->name('notas_credito.pdf');
+    Route::get('/notas-credito',             [NotaCreditoController::class, 'index'])  ->name('notas_credito.index')  ->middleware('can:ver facturas');
+    Route::get('/notas-credito/crear',       [NotaCreditoController::class, 'create']) ->name('notas_credito.create') ->middleware('can:anular facturas');
+    Route::post('/notas-credito',            [NotaCreditoController::class, 'store'])  ->name('notas_credito.store')  ->middleware('can:anular facturas');
+    Route::get('/notas-credito/{nota}',      [NotaCreditoController::class, 'show'])   ->name('notas_credito.show')   ->middleware('can:ver facturas');
+    Route::get('/notas-credito/{nota}/pdf',  [NotaCreditoController::class, 'pdf'])    ->name('notas_credito.pdf')    ->middleware('can:ver facturas');
     });
 
     // ── Cotizaciones ──────────────────────────────────────────
     Route::middleware('modulo:facturacion')->group(function () {
-    Route::get('/cotizaciones',                        [CotizacionController::class, 'index'])        ->name('cotizaciones.index');
-    Route::get('/cotizaciones/crear',                  [CotizacionController::class, 'create'])       ->name('cotizaciones.create');
-    Route::post('/cotizaciones',                       [CotizacionController::class, 'store'])        ->name('cotizaciones.store');
-    Route::get('/cotizaciones/{cotizacion}',           [CotizacionController::class, 'show'])         ->name('cotizaciones.show');
-    Route::delete('/cotizaciones/{cotizacion}',        [CotizacionController::class, 'destroy'])      ->name('cotizaciones.destroy');
-    Route::patch('/cotizaciones/{cotizacion}/estado',  [CotizacionController::class, 'cambiarEstado'])->name('cotizaciones.estado');
-    Route::post('/cotizaciones/{cotizacion}/convertir',[CotizacionController::class, 'convertir'])    ->name('cotizaciones.convertir');
-    Route::get('/cotizaciones/{cotizacion}/pdf',       [CotizacionController::class, 'pdf'])          ->name('cotizaciones.pdf');
-    Route::delete('/cotizaciones',                     [CotizacionController::class, 'bulkDelete'])   ->name('cotizaciones.bulk-delete');
+    Route::get('/cotizaciones',                        [CotizacionController::class, 'index'])        ->name('cotizaciones.index')       ->middleware('can:ver cotizaciones');
+    Route::get('/cotizaciones/crear',                  [CotizacionController::class, 'create'])       ->name('cotizaciones.create')      ->middleware('can:crear cotizaciones');
+    Route::post('/cotizaciones',                       [CotizacionController::class, 'store'])        ->name('cotizaciones.store')       ->middleware('can:crear cotizaciones');
+    Route::get('/cotizaciones/{cotizacion}',           [CotizacionController::class, 'show'])         ->name('cotizaciones.show')        ->middleware('can:ver cotizaciones');
+    Route::delete('/cotizaciones/{cotizacion}',        [CotizacionController::class, 'destroy'])      ->name('cotizaciones.destroy')     ->middleware('can:editar cotizaciones');
+    Route::patch('/cotizaciones/{cotizacion}/estado',  [CotizacionController::class, 'cambiarEstado'])->name('cotizaciones.estado')      ->middleware('can:editar cotizaciones');
+    Route::post('/cotizaciones/{cotizacion}/convertir',[CotizacionController::class, 'convertir'])    ->name('cotizaciones.convertir')   ->middleware('can:crear facturas');
+    Route::get('/cotizaciones/{cotizacion}/pdf',       [CotizacionController::class, 'pdf'])          ->name('cotizaciones.pdf')         ->middleware('can:ver cotizaciones');
+    Route::delete('/cotizaciones',                     [CotizacionController::class, 'bulkDelete'])   ->name('cotizaciones.bulk-delete') ->middleware('can:editar cotizaciones');
     });
 
     // ── Órdenes de Compra ─────────────────────────────────────
     Route::middleware('modulo:inventario')->group(function () {
-    Route::get('/ordenes',                      [OrdenCompraController::class, 'index'])        ->name('ordenes.index');
-    Route::get('/ordenes/crear',                [OrdenCompraController::class, 'create'])       ->name('ordenes.create');
-    Route::post('/ordenes',                     [OrdenCompraController::class, 'store'])        ->name('ordenes.store');
-    Route::get('/ordenes/{orden}',              [OrdenCompraController::class, 'show'])         ->name('ordenes.show');
-    Route::get('/ordenes/{orden}/editar',       [OrdenCompraController::class, 'edit'])         ->name('ordenes.edit');
-    Route::put('/ordenes/{orden}',              [OrdenCompraController::class, 'update'])       ->name('ordenes.update');
-    Route::delete('/ordenes/{orden}',           [OrdenCompraController::class, 'destroy'])      ->name('ordenes.destroy');
-    Route::patch('/ordenes/{orden}/estado',     [OrdenCompraController::class, 'cambiarEstado'])->name('ordenes.estado');
-    Route::post('/ordenes/{orden}/recibir',     [OrdenCompraController::class, 'recibir'])      ->name('ordenes.recibir');
-    Route::get('/ordenes/{orden}/pdf',          [OrdenCompraController::class, 'pdf'])          ->name('ordenes.pdf');
-    Route::delete('/ordenes',                   [OrdenCompraController::class, 'bulkDelete'])   ->name('ordenes.bulk-delete');
+    Route::get('/ordenes',                      [OrdenCompraController::class, 'index'])        ->name('ordenes.index')        ->middleware('can:ver compras');
+    Route::get('/ordenes/crear',                [OrdenCompraController::class, 'create'])       ->name('ordenes.create')       ->middleware('can:crear compras');
+    Route::post('/ordenes',                     [OrdenCompraController::class, 'store'])        ->name('ordenes.store')        ->middleware('can:crear compras');
+    Route::get('/ordenes/{orden}',              [OrdenCompraController::class, 'show'])         ->name('ordenes.show')         ->middleware('can:ver compras');
+    Route::get('/ordenes/{orden}/editar',       [OrdenCompraController::class, 'edit'])         ->name('ordenes.edit')         ->middleware('can:crear compras');
+    Route::put('/ordenes/{orden}',              [OrdenCompraController::class, 'update'])       ->name('ordenes.update')       ->middleware('can:crear compras');
+    Route::delete('/ordenes/{orden}',           [OrdenCompraController::class, 'destroy'])      ->name('ordenes.destroy')      ->middleware('can:crear compras');
+    Route::patch('/ordenes/{orden}/estado',     [OrdenCompraController::class, 'cambiarEstado'])->name('ordenes.estado')       ->middleware('can:aprobar compras');
+    Route::post('/ordenes/{orden}/recibir',     [OrdenCompraController::class, 'recibir'])      ->name('ordenes.recibir')      ->middleware('can:crear compras');
+    Route::get('/ordenes/{orden}/pdf',          [OrdenCompraController::class, 'pdf'])          ->name('ordenes.pdf')          ->middleware('can:ver compras');
+    Route::delete('/ordenes',                   [OrdenCompraController::class, 'bulkDelete'])   ->name('ordenes.bulk-delete')  ->middleware('can:crear compras');
     });
 
     // ── Recibos de Caja ───────────────────────────────────────
     Route::middleware('modulo:contable')->group(function () {
-    Route::get('/recibos',              [ReciboCajaController::class, 'index'])  ->name('recibos.index');
-    Route::get('/recibos/crear',        [ReciboCajaController::class, 'create']) ->name('recibos.create');
-    Route::post('/recibos',             [ReciboCajaController::class, 'store'])  ->name('recibos.store');
-    Route::get('/recibos/{recibo}',     [ReciboCajaController::class, 'show'])   ->name('recibos.show');
-    Route::delete('/recibos/{recibo}',  [ReciboCajaController::class, 'destroy'])->name('recibos.destroy');
-    Route::get('/recibos/{recibo}/pdf', [ReciboCajaController::class, 'pdf'])    ->name('recibos.pdf');
+    Route::get('/recibos',              [ReciboCajaController::class, 'index'])  ->name('recibos.index')   ->middleware('can:ver facturas');
+    Route::get('/recibos/crear',        [ReciboCajaController::class, 'create']) ->name('recibos.create')  ->middleware('can:crear facturas');
+    Route::post('/recibos',             [ReciboCajaController::class, 'store'])  ->name('recibos.store')   ->middleware('can:crear facturas');
+    Route::get('/recibos/{recibo}',     [ReciboCajaController::class, 'show'])   ->name('recibos.show')    ->middleware('can:ver facturas');
+    Route::delete('/recibos/{recibo}',  [ReciboCajaController::class, 'destroy'])->name('recibos.destroy') ->middleware('can:anular facturas');
+    Route::get('/recibos/{recibo}/pdf', [ReciboCajaController::class, 'pdf'])    ->name('recibos.pdf')     ->middleware('can:ver facturas');
     });
 
     // ── Reportes ──────────────────────────────────────────────
-    Route::get('/reportes',                [ReporteController::class, 'index'])        ->name('reportes.index');
+    Route::get('/reportes',                [ReporteController::class, 'index'])        ->name('reportes.index')              ->middleware('can:ver reportes');
     Route::middleware('modulo:facturacion')->group(function () {
-    Route::get('/reportes/ventas',         [ReporteController::class, 'ventas'])       ->name('reportes.ventas');
-    Route::get('/reportes/cartera',        [ReporteController::class, 'cartera'])      ->name('reportes.cartera');
-    Route::get('/reportes/ventas/pdf',     [ReporteController::class, 'ventasPdf'])    ->name('reportes.ventas.pdf');
-    Route::get('/reportes/cartera/pdf',    [ReporteController::class, 'carteraPdf'])   ->name('reportes.cartera.pdf');
+    Route::get('/reportes/ventas',         [ReporteController::class, 'ventas'])       ->name('reportes.ventas')             ->middleware('can:ver reportes');
+    Route::get('/reportes/cartera',        [ReporteController::class, 'cartera'])      ->name('reportes.cartera')            ->middleware('can:ver reportes');
+    Route::get('/reportes/ventas/pdf',     [ReporteController::class, 'ventasPdf'])    ->name('reportes.ventas.pdf')         ->middleware('can:exportar reportes');
+    Route::get('/reportes/cartera/pdf',    [ReporteController::class, 'carteraPdf'])   ->name('reportes.cartera.pdf')        ->middleware('can:exportar reportes');
     });
     Route::middleware('modulo:inventario')->group(function () {
-    Route::get('/reportes/inventario',     [ReporteController::class, 'inventario'])   ->name('reportes.inventario');
-    Route::get('/reportes/inventario/pdf', [ReporteController::class, 'inventarioPdf'])->name('reportes.inventario.pdf');
+    Route::get('/reportes/inventario',     [ReporteController::class, 'inventario'])   ->name('reportes.inventario')         ->middleware('can:ver reportes');
+    Route::get('/reportes/inventario/pdf', [ReporteController::class, 'inventarioPdf'])->name('reportes.inventario.pdf')     ->middleware('can:exportar reportes');
     });
 
     // ── Empresa ───────────────────────────────────────────────
-    Route::get('/empresa',              [EmpresaController::class, 'index'])     ->name('empresa.index');
-    Route::put('/empresa',              [EmpresaController::class, 'update'])    ->name('empresa.update');
-    Route::delete('/empresa/logo',      [EmpresaController::class, 'deleteLogo'])->name('empresa.logo.delete');
-    Route::post('/empresa/probar-mail', [EmpresaController::class, 'probarMail'])->name('empresa.probarMail');
+    Route::get('/empresa',              [EmpresaController::class, 'index'])     ->name('empresa.index')       ->middleware('can:ver configuracion');
+    Route::put('/empresa',              [EmpresaController::class, 'update'])    ->name('empresa.update')      ->middleware('can:editar configuracion');
+    Route::delete('/empresa/logo',      [EmpresaController::class, 'deleteLogo'])->name('empresa.logo.delete') ->middleware('can:editar configuracion');
+    Route::post('/empresa/probar-mail', [EmpresaController::class, 'probarMail'])->name('empresa.probarMail')  ->middleware('can:editar configuracion');
 
     // ── Usuarios ──────────────────────────────────────────────
-    Route::get('/usuarios',                    [UsuarioController::class, 'index'])       ->name('usuarios.index');
-    Route::get('/usuarios/crear',              [UsuarioController::class, 'create'])      ->name('usuarios.create');
-    Route::post('/usuarios',                   [UsuarioController::class, 'store'])       ->name('usuarios.store');
-    Route::get('/usuarios/{usuario}/editar',   [UsuarioController::class, 'edit'])        ->name('usuarios.edit');
-    Route::put('/usuarios/{usuario}',          [UsuarioController::class, 'update'])      ->name('usuarios.update');
-    Route::delete('/usuarios/{usuario}',       [UsuarioController::class, 'destroy'])     ->name('usuarios.destroy');
-    Route::patch('/usuarios/{usuario}/activo', [UsuarioController::class, 'toggleActivo'])->name('usuarios.activo');
+    Route::get('/usuarios',                    [UsuarioController::class, 'index'])       ->name('usuarios.index')  ->middleware('can:ver usuarios');
+    Route::get('/usuarios/crear',              [UsuarioController::class, 'create'])      ->name('usuarios.create') ->middleware('can:crear usuarios');
+    Route::post('/usuarios',                   [UsuarioController::class, 'store'])       ->name('usuarios.store')  ->middleware('can:crear usuarios');
+    Route::get('/usuarios/{usuario}/editar',   [UsuarioController::class, 'edit'])        ->name('usuarios.edit')   ->middleware('can:editar usuarios');
+    Route::put('/usuarios/{usuario}',          [UsuarioController::class, 'update'])      ->name('usuarios.update') ->middleware('can:editar usuarios');
+    Route::delete('/usuarios/{usuario}',       [UsuarioController::class, 'destroy'])     ->name('usuarios.destroy')->middleware('can:eliminar usuarios');
+    Route::patch('/usuarios/{usuario}/activo', [UsuarioController::class, 'toggleActivo'])->name('usuarios.activo') ->middleware('can:editar usuarios');
 
-    // ── Categorías (solo admin) ───────────────────────────────
+    // ── Categorías (requiere editar inventario) ───────────────
     Route::middleware('modulo:inventario')->group(function () {
-    Route::get('/categorias',                    [CategoriaController::class, 'index'])  ->name('categorias.index')  ->middleware('can:ver usuarios');
-    Route::get('/categorias/crear',              [CategoriaController::class, 'create']) ->name('categorias.create') ->middleware('can:ver usuarios');
-    Route::post('/categorias',                   [CategoriaController::class, 'store'])  ->name('categorias.store')  ->middleware('can:ver usuarios');
-    Route::get('/categorias/{categoria}/editar', [CategoriaController::class, 'edit'])   ->name('categorias.edit')   ->middleware('can:ver usuarios');
-    Route::put('/categorias/{categoria}',        [CategoriaController::class, 'update']) ->name('categorias.update') ->middleware('can:ver usuarios');
-    Route::delete('/categorias/{categoria}',     [CategoriaController::class, 'destroy'])->name('categorias.destroy')->middleware('can:ver usuarios');
+    Route::get('/categorias',                    [CategoriaController::class, 'index'])  ->name('categorias.index')  ->middleware('can:editar inventario');
+    Route::get('/categorias/crear',              [CategoriaController::class, 'create']) ->name('categorias.create') ->middleware('can:editar inventario');
+    Route::post('/categorias',                   [CategoriaController::class, 'store'])  ->name('categorias.store')  ->middleware('can:editar inventario');
+    Route::get('/categorias/{categoria}/editar', [CategoriaController::class, 'edit'])   ->name('categorias.edit')   ->middleware('can:editar inventario');
+    Route::put('/categorias/{categoria}',        [CategoriaController::class, 'update']) ->name('categorias.update') ->middleware('can:editar inventario');
+    Route::delete('/categorias/{categoria}',     [CategoriaController::class, 'destroy'])->name('categorias.destroy')->middleware('can:editar inventario');
     });
 
-    // ── Unidades de Medida (solo admin) ───────────────────────
+    // ── Unidades de Medida (requiere editar inventario) ───────
     Route::middleware('modulo:inventario')->group(function () {
-    Route::get('/unidades',                  [UnidadMedidaController::class, 'index'])  ->name('unidades.index')  ->middleware('can:ver usuarios');
-    Route::get('/unidades/crear',            [UnidadMedidaController::class, 'create']) ->name('unidades.create') ->middleware('can:ver usuarios');
-    Route::post('/unidades',                 [UnidadMedidaController::class, 'store'])  ->name('unidades.store')  ->middleware('can:ver usuarios');
-    Route::get('/unidades/{unidad}/editar',  [UnidadMedidaController::class, 'edit'])   ->name('unidades.edit')   ->middleware('can:ver usuarios');
-    Route::put('/unidades/{unidad}',         [UnidadMedidaController::class, 'update']) ->name('unidades.update') ->middleware('can:ver usuarios');
-    Route::delete('/unidades/{unidad}',      [UnidadMedidaController::class, 'destroy'])->name('unidades.destroy')->middleware('can:ver usuarios');
+    Route::get('/unidades',                  [UnidadMedidaController::class, 'index'])  ->name('unidades.index')  ->middleware('can:editar inventario');
+    Route::get('/unidades/crear',            [UnidadMedidaController::class, 'create']) ->name('unidades.create') ->middleware('can:editar inventario');
+    Route::post('/unidades',                 [UnidadMedidaController::class, 'store'])  ->name('unidades.store')  ->middleware('can:editar inventario');
+    Route::get('/unidades/{unidad}/editar',  [UnidadMedidaController::class, 'edit'])   ->name('unidades.edit')   ->middleware('can:editar inventario');
+    Route::put('/unidades/{unidad}',         [UnidadMedidaController::class, 'update']) ->name('unidades.update') ->middleware('can:editar inventario');
+    Route::delete('/unidades/{unidad}',      [UnidadMedidaController::class, 'destroy'])->name('unidades.destroy')->middleware('can:editar inventario');
     });
 
     // ── Sesiones activas (solo admin) ─────────────────────────
@@ -393,21 +393,21 @@ Route::middleware('auth')->group(function () {
 
     // ── Remisiones ────────────────────────────────────────────
     Route::middleware('modulo:facturacion')->group(function () {
-    Route::get('/remisiones',                        [RemisionController::class, 'index'])        ->name('remisiones.index');
-    Route::get('/remisiones/crear',                  [RemisionController::class, 'create'])       ->name('remisiones.create');
-    Route::post('/remisiones',                       [RemisionController::class, 'store'])        ->name('remisiones.store');
-    Route::get('/remisiones/{remision}',             [RemisionController::class, 'show'])         ->name('remisiones.show');
-    Route::delete('/remisiones/{remision}',          [RemisionController::class, 'destroy'])      ->name('remisiones.destroy');
-    Route::patch('/remisiones/{remision}/estado',    [RemisionController::class, 'cambiarEstado'])->name('remisiones.estado');
-    Route::post('/remisiones/{remision}/convertir',  [RemisionController::class, 'convertir'])    ->name('remisiones.convertir');
-    Route::get('/remisiones/{remision}/pdf',         [RemisionController::class, 'pdf'])          ->name('remisiones.pdf');
+    Route::get('/remisiones',                        [RemisionController::class, 'index'])        ->name('remisiones.index')    ->middleware('can:ver facturas');
+    Route::get('/remisiones/crear',                  [RemisionController::class, 'create'])       ->name('remisiones.create')   ->middleware('can:crear facturas');
+    Route::post('/remisiones',                       [RemisionController::class, 'store'])        ->name('remisiones.store')    ->middleware('can:crear facturas');
+    Route::get('/remisiones/{remision}',             [RemisionController::class, 'show'])         ->name('remisiones.show')     ->middleware('can:ver facturas');
+    Route::delete('/remisiones/{remision}',          [RemisionController::class, 'destroy'])      ->name('remisiones.destroy')  ->middleware('can:anular facturas');
+    Route::patch('/remisiones/{remision}/estado',    [RemisionController::class, 'cambiarEstado'])->name('remisiones.estado')   ->middleware('can:editar facturas');
+    Route::post('/remisiones/{remision}/convertir',  [RemisionController::class, 'convertir'])    ->name('remisiones.convertir')->middleware('can:crear facturas');
+    Route::get('/remisiones/{remision}/pdf',         [RemisionController::class, 'pdf'])          ->name('remisiones.pdf')      ->middleware('can:ver facturas');
     });
 
     // ── Impuestos ─────────────────────────────────────────────
     Route::middleware('modulo:facturacion')->group(function () {
-    Route::get('/impuestos',         [ImpuestosController::class, 'index'])->name('impuestos.index');
-    Route::get('/impuestos/pdf',     [ImpuestosController::class, 'pdf'])  ->name('impuestos.pdf');
-    Route::get('/impuestos/excel',   [ImpuestosController::class, 'excel'])->name('impuestos.excel');
+    Route::get('/impuestos',         [ImpuestosController::class, 'index'])->name('impuestos.index') ->middleware('can:ver configuracion');
+    Route::get('/impuestos/pdf',     [ImpuestosController::class, 'pdf'])  ->name('impuestos.pdf')   ->middleware('can:exportar reportes');
+    Route::get('/impuestos/excel',   [ImpuestosController::class, 'excel'])->name('impuestos.excel') ->middleware('can:exportar reportes');
     });
 
     // ── Búsqueda ──────────────────────────────────────────────
@@ -415,11 +415,11 @@ Route::middleware('auth')->group(function () {
 
     // ── Excel exports ─────────────────────────────────────────
     Route::middleware('modulo:facturacion')->group(function () {
-    Route::get('/reportes/ventas/excel',     [ReporteController::class, 'ventasExcel'])    ->name('reportes.ventas.excel');
-    Route::get('/reportes/cartera/excel',    [ReporteController::class, 'carteraExcel'])   ->name('reportes.cartera.excel');
+    Route::get('/reportes/ventas/excel',     [ReporteController::class, 'ventasExcel'])    ->name('reportes.ventas.excel')    ->middleware('can:exportar reportes');
+    Route::get('/reportes/cartera/excel',    [ReporteController::class, 'carteraExcel'])   ->name('reportes.cartera.excel')   ->middleware('can:exportar reportes');
     });
     Route::middleware('modulo:inventario')->group(function () {
-    Route::get('/reportes/inventario/excel', [ReporteController::class, 'inventarioExcel'])->name('reportes.inventario.excel');
+    Route::get('/reportes/inventario/excel', [ReporteController::class, 'inventarioExcel'])->name('reportes.inventario.excel')->middleware('can:exportar reportes');
     });
 
     // ── APIs internas ─────────────────────────────────────────

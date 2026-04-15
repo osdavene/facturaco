@@ -160,72 +160,94 @@
                                 :active="request()->routeIs('dashboard')">
                         Dashboard
                     </x-nav-item>
+                    @can('ver facturas')
                     <x-nav-item href="{{ route('facturas.index') }}"
                                 icon="fa-file-invoice"
                                 :active="request()->routeIs('facturas.*')">
                         Facturación
                     </x-nav-item>
+                    @endcan
+                    @can('ver cotizaciones')
                     <x-nav-item href="{{ route('cotizaciones.index') }}"
                                 icon="fa-file-alt"
                                 :active="request()->routeIs('cotizaciones.*')">
                         Cotizaciones
                     </x-nav-item>
-
+                    @endcan
+                    @can('ver facturas')
                     <x-nav-item href="{{ route('notas_credito.index') }}"
                                 icon="fas fa-undo-alt"
                                 :active="request()->routeIs('notas_credito.*')">
                         Notas de Crédito
                     </x-nav-item>
-
                     <x-nav-item href="{{ route('remisiones.index') }}"
                                 icon="fa-receipt"
                                 :active="request()->routeIs('remisiones.*')">
                         Remisiones
                     </x-nav-item>
+                    @endcan
                 </x-nav-section>
 
                 {{-- GESTIÓN --}}
+                @if(auth()->user()->can('ver inventario') || auth()->user()->can('ver clientes') || auth()->user()->can('ver proveedores') || auth()->user()->can('ver compras'))
                 <x-nav-section label="Gestión">
+                    @can('ver inventario')
                     <x-nav-item href="{{ route('inventario.index') }}"
                                 icon="fa-boxes"
                                 :active="request()->routeIs('inventario.*')">
                         Inventario
                     </x-nav-item>
+                    @endcan
+                    @can('ver clientes')
                     <x-nav-item href="{{ route('clientes.index') }}"
                                 icon="fa-users"
                                 :active="request()->routeIs('clientes.*')">
                         Clientes
                     </x-nav-item>
+                    @endcan
+                    @can('ver proveedores')
                     <x-nav-item href="{{ route('proveedores.index') }}"
                                 icon="fa-truck"
                                 :active="request()->routeIs('proveedores.*')">
                         Proveedores
                     </x-nav-item>
+                    @endcan
+                    @can('ver compras')
                     <x-nav-item href="{{ route('ordenes.index') }}"
                                 icon="fa-shopping-cart"
                                 :active="request()->routeIs('ordenes.*')">
                         Órdenes de Compra
                     </x-nav-item>
+                    @endcan
                 </x-nav-section>
+                @endif
 
                 {{-- FINANZAS --}}
+                @if(auth()->user()->can('ver facturas') || auth()->user()->can('ver reportes') || auth()->user()->can('ver configuracion'))
                 <x-nav-section label="Finanzas">
+                    @can('ver facturas')
                     <x-nav-item href="{{ route('recibos.index') }}"
                                 icon="fa-hand-holding-usd"
                                 :active="request()->routeIs('recibos.*')">
                         Recibos de Caja
                     </x-nav-item>
+                    @endcan
+                    @can('ver reportes')
                     <x-nav-item href="{{ route('reportes.index') }}"
                                 icon="fa-chart-bar"
                                 :active="request()->routeIs('reportes.*')">
                         Reportes
                     </x-nav-item>
+                    @endcan
+                    @can('ver configuracion')
                     <x-nav-item href="{{ route('impuestos.index') }}"
                                 icon="fa-percent"
                                 :active="request()->routeIs('impuestos.*')">
                         Impuestos / DIAN
                     </x-nav-item>
+                    @endcan
                 </x-nav-section>
+                @endif
 
                 {{-- CONFIGURACIÓN --}}
                 @can('ver usuarios')
@@ -235,11 +257,14 @@
                                 :active="request()->routeIs('usuarios.*')">
                         Usuarios & Roles
                     </x-nav-item>
+                    @can('ver configuracion')
                     <x-nav-item href="{{ route('empresa.index') }}"
                                 icon="fa-building"
                                 :active="request()->routeIs('empresa.*')">
                         Empresa
                     </x-nav-item>
+                    @endcan
+                    @can('editar inventario')
                     <x-nav-item href="{{ route('categorias.index') }}"
                                 icon="fa-tags"
                                 :active="request()->routeIs('categorias.*')">
@@ -250,6 +275,7 @@
                                 :active="request()->routeIs('unidades.*')">
                         Unidades de Medida
                     </x-nav-item>
+                    @endcan
                     <x-nav-item href="{{ route('sesiones.index') }}"
                                 icon="fas fa-users"
                                 :active="request()->routeIs('sesiones.*')">
