@@ -195,6 +195,22 @@
                     @endcan
                 </x-nav-section>
 
+                {{-- NÓMINA --}}
+                @can('ver nomina')
+                <x-nav-section label="Nómina">
+                    <x-nav-item href="{{ route('nomina.index') }}"
+                                icon="fa-file-invoice-dollar"
+                                :active="request()->routeIs('nomina.index') || request()->routeIs('nomina.show') || request()->routeIs('nomina.create')">
+                        Liquidación
+                    </x-nav-item>
+                    <x-nav-item href="{{ route('nomina.empleados.index') }}"
+                                icon="fa-id-badge"
+                                :active="request()->routeIs('nomina.empleados.*')">
+                        Empleados
+                    </x-nav-item>
+                </x-nav-section>
+                @endcan
+
                 {{-- GESTIÓN --}}
                 @if(auth()->user()->can('ver inventario') || auth()->user()->can('ver clientes') || auth()->user()->can('ver proveedores') || auth()->user()->can('ver compras'))
                 <x-nav-section label="Gestión">

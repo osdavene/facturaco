@@ -35,6 +35,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'ver usuarios', 'crear usuarios', 'editar usuarios', 'eliminar usuarios',
             // Configuración
             'ver configuracion', 'editar configuracion',
+            // Nómina
+            'ver nomina', 'gestionar nomina',
         ];
 
         foreach ($permisos as $permiso) {
@@ -63,6 +65,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'ver reportes','exportar reportes',
             'ver usuarios','crear usuarios','editar usuarios',
             'ver configuracion',
+            'ver nomina', 'gestionar nomina',
         ]);
 
         // Vendedor
@@ -87,6 +90,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'ver reportes','exportar reportes',
             'ver clientes','ver proveedores',
             'ver compras',
+            'ver nomina', 'gestionar nomina',
         ]);
 
         // Solo lectura
