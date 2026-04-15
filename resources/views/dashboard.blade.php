@@ -384,7 +384,33 @@ function deltaBadge(float $delta): string {
             </a>
             @endforeach
         </div>
+
+        {{-- Módulos adicionales --}}
+        @if(auth()->user()->can('ver nomina'))
+        <div class="mt-4 pt-4 border-t border-[#1e2d47]">
+            <div class="text-[10px] text-slate-600 uppercase tracking-wider mb-2 font-semibold">Nómina</div>
+            <div class="grid grid-cols-2 gap-2">
+                @foreach([
+                    [route('nomina.index'),            'fa-file-invoice-dollar', 'violet', 'Liquidación'],
+                    [route('nomina.empleados.index'),   'fa-id-badge',            'violet', 'Empleados'],
+                ] as [$url, $icon, $color, $label])
+                <a href="{{ $url }}"
+                   class="flex flex-col items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                          hover:border-violet-500/50 hover:bg-[#1e2d47]
+                          rounded-xl p-3 transition-colors group text-center">
+                    <div class="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center text-violet-500">
+                        <i class="fas {{ $icon }} text-sm"></i>
+                    </div>
+                    <span class="text-[11px] text-slate-500 group-hover:text-slate-300 transition-colors leading-tight">
+                        {{ $label }}
+                    </span>
+                </a>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </div>
+
 
 </div>
 
