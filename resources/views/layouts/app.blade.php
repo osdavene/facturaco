@@ -523,25 +523,34 @@
                         $totalAlertas    = ($alertaDian ? 1 : 0) + ($factVencidas > 0 ? 1 : 0)
                                          + ($stockBajo > 0 ? 1 : 0) + ($cotPorVencer > 0 ? 1 : 0);
                     @endphp
-                    <div class="relative group">
-                        <button class="relative w-9 h-9 bg-[#1a2235] border border-[#1e2d47]
+                    <div class="relative" x-data="{ abierto: false }" @click.outside="abierto = false">
+                        <button @click="abierto = !abierto"
+                                class="relative w-9 h-9 bg-[#1a2235] border border-[#1e2d47]
                                        rounded-lg flex items-center justify-center
                                        text-slate-400 hover:text-white hover:border-slate-500
-                                       transition-colors">
+                                       transition-colors overflow-visible">
                             <i class="fas fa-bell text-sm"></i>
                             @if($totalAlertas > 0)
-                            <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5
-                                         bg-red-500 rounded-full text-[9px] font-bold text-white
-                                         flex items-center justify-center leading-none">
+                            <span class="absolute -top-1.5 -right-1.5 w-5 h-5
+                                         bg-red-500 border-2 border-[#0b0f1a] rounded-full
+                                         text-[9px] font-bold text-white
+                                         flex items-center justify-center leading-none z-10">
                                 {{ $totalAlertas }}
                             </span>
                             @endif
                         </button>
 
                         {{-- Dropdown notificaciones --}}
-                        <div class="absolute right-0 top-full mt-2 w-80 bg-[#141c2e]
-                                    border border-[#1e2d47] rounded-xl shadow-xl z-50
-                                    hidden group-hover:block">
+                        <div x-show="abierto"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute right-0 top-full mt-2 w-80 bg-[#141c2e]
+                                    border border-[#1e2d47] rounded-xl shadow-xl z-50"
+                             style="display:none">
                             <div class="px-4 py-3 border-b border-[#1e2d47] flex items-center justify-between">
                                 <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                     Notificaciones
