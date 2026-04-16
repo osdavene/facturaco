@@ -8,6 +8,7 @@ use App\Models\Empresa;
 use App\Models\Factura;
 use App\Models\FacturaItem;
 use App\Models\Producto;
+use App\Services\ContabilidadService;
 use App\Services\DocumentoService;
 use App\Services\InventarioService;
 use App\Services\PdfService;
@@ -83,7 +84,7 @@ class FacturaController extends Controller
         $userId  = Auth::id();
         $empresa = Empresa::obtener();
 
-        DB::transaction(function () use ($request, $userId, $empresa) {
+        $facturaCreada = DB::transaction(function () use ($request, $userId, $empresa) {
             $cliente     = Cliente::findOrFail($request->cliente_id);
             $prefijo     = $empresa->prefijo_factura ?? 'FE';
             $consecutivo = Factura::siguienteConsecutivo($prefijo);
@@ -156,7 +157,16 @@ class FacturaController extends Controller
                     }
                 }
             }
+
+            return $factura;
         });
+
+        // Asiento contable automático (silencioso — no interrumpe si falla)
+        try {
+            if ($facturaCreada) {
+                (new ContabilidadService())->asientoFactura($facturaCreada);
+            }
+        } catch (\Throwable) {}
 
         return redirect()->route('facturas.index')
             ->with('success', 'Factura creada correctamente.');

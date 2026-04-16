@@ -20,7 +20,9 @@
       "Bash(find:*)",
       "Bash(grep -r \"authorize\\\\|gate\\\\|can\\\\|permission\\\\|role\" /c/Proyectos/facturaco/app/Http/Controllers/Api/V1/*.php)",
       "Bash(xargs grep:*)",
-      "Bash(xargs -I{} basename {})"
+      "Bash(xargs -I{} basename {})",
+      "Bash(grep *)",
+      "Bash(cat \"C:\\\\Proyectos\\\\facturaco/database/migrations/\"*)"
     ]
   }
 }

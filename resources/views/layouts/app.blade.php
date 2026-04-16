@@ -253,6 +253,26 @@
                                 :active="request()->routeIs('recibos.*')">
                         Recibos de Caja
                     </x-nav-item>
+                    <x-nav-item href="{{ route('contabilidad.plan-cuentas.index') }}"
+                                icon="fa-list-ol"
+                                :active="request()->routeIs('contabilidad.plan-cuentas.*')">
+                        Plan de Cuentas
+                    </x-nav-item>
+                    <x-nav-item href="{{ route('contabilidad.libro-diario.index') }}"
+                                icon="fa-book"
+                                :active="request()->routeIs('contabilidad.libro-diario.*')">
+                        Libro Diario
+                    </x-nav-item>
+                    <x-nav-item href="{{ route('contabilidad.reportes.balance') }}"
+                                icon="fa-balance-scale"
+                                :active="request()->routeIs('contabilidad.reportes.balance')">
+                        Balance General
+                    </x-nav-item>
+                    <x-nav-item href="{{ route('contabilidad.reportes.pyg') }}"
+                                icon="fa-chart-line"
+                                :active="request()->routeIs('contabilidad.reportes.pyg')">
+                        Estado de Resultados
+                    </x-nav-item>
                 </x-nav-section>
                 @endcan
 
@@ -483,33 +503,58 @@
                     </form>
 
                     {{-- Notificaciones --}}
+                    @php
+                        $alertaDian      = !$emp->resolucion_numero
+                                        || !$emp->resolucion_vigente
+                                        || $emp->dias_para_vencer <= 30;
+
+                        $factVencidas    = \App\Models\Factura::where('estado', 'vencida')->count();
+
+                        $stockBajo       = \App\Models\Producto::where('activo', true)
+                                            ->where('es_servicio', false)
+                                            ->whereColumn('stock_actual', '<=', 'stock_minimo')
+                                            ->count();
+
+                        $cotPorVencer    = \App\Models\Cotizacion::whereIn('estado', ['borrador', 'enviada'])
+                                            ->whereDate('fecha_vencimiento', '>=', now())
+                                            ->whereDate('fecha_vencimiento', '<=', now()->addDays(7))
+                                            ->count();
+
+                        $totalAlertas    = ($alertaDian ? 1 : 0) + ($factVencidas > 0 ? 1 : 0)
+                                         + ($stockBajo > 0 ? 1 : 0) + ($cotPorVencer > 0 ? 1 : 0);
+                    @endphp
                     <div class="relative group">
                         <button class="relative w-9 h-9 bg-[#1a2235] border border-[#1e2d47]
                                        rounded-lg flex items-center justify-center
                                        text-slate-400 hover:text-white hover:border-slate-500
                                        transition-colors">
                             <i class="fas fa-bell text-sm"></i>
-                            @php
-                                $hayAlertas = ($emp->resolucion_vencimiento &&
-                                              (!$emp->resolucion_vigente || $emp->dias_para_vencer <= 30))
-                                           || !$emp->resolucion_numero;
-                            @endphp
-                            @if($hayAlertas)
-                            <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5
-                                         bg-red-500 rounded-full"></span>
+                            @if($totalAlertas > 0)
+                            <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5
+                                         bg-red-500 rounded-full text-[9px] font-bold text-white
+                                         flex items-center justify-center leading-none">
+                                {{ $totalAlertas }}
+                            </span>
                             @endif
                         </button>
 
                         {{-- Dropdown notificaciones --}}
-                        <div class="absolute right-0 top-full mt-2 w-72 bg-[#141c2e]
+                        <div class="absolute right-0 top-full mt-2 w-80 bg-[#141c2e]
                                     border border-[#1e2d47] rounded-xl shadow-xl z-50
                                     hidden group-hover:block">
-                            <div class="px-4 py-3 border-b border-[#1e2d47]">
+                            <div class="px-4 py-3 border-b border-[#1e2d47] flex items-center justify-between">
                                 <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                     Notificaciones
                                 </div>
+                                @if($totalAlertas > 0)
+                                <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-semibold">
+                                    {{ $totalAlertas }} alerta{{ $totalAlertas > 1 ? 's' : '' }}
+                                </span>
+                                @endif
                             </div>
-                            <div class="py-1">
+                            <div class="py-1 max-h-80 overflow-y-auto">
+
+                                {{-- DIAN --}}
                                 @if(!$emp->resolucion_numero)
                                 <a href="{{ route('empresa.index') }}"
                                    class="flex items-start gap-3 px-4 py-3 hover:bg-[#1a2235] transition-colors">
@@ -518,7 +563,7 @@
                                         <i class="fas fa-exclamation text-xs"></i>
                                     </div>
                                     <div>
-                                        <div class="text-xs font-semibold" style="color:#e2e8f0">Sin resolución DIAN</div>
+                                        <div class="text-xs font-semibold text-slate-200">Sin resolución DIAN</div>
                                         <div class="text-xs text-slate-500 mt-0.5">Configura tu resolución en Empresa</div>
                                     </div>
                                 </a>
@@ -550,12 +595,67 @@
                                         </div>
                                     </div>
                                 </a>
-                                @else
+                                @endif
+
+                                {{-- Facturas vencidas --}}
+                                @if($factVencidas > 0)
+                                <a href="{{ route('facturas.index', ['estado' => 'vencida']) }}"
+                                   class="flex items-start gap-3 px-4 py-3 hover:bg-[#1a2235] transition-colors">
+                                    <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center
+                                                justify-center text-red-400 flex-shrink-0 mt-0.5">
+                                        <i class="fas fa-file-invoice-dollar text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-semibold text-red-400">
+                                            {{ $factVencidas }} factura{{ $factVencidas > 1 ? 's' : '' }} vencida{{ $factVencidas > 1 ? 's' : '' }}
+                                        </div>
+                                        <div class="text-xs text-slate-500 mt-0.5">Cartera pendiente de cobro</div>
+                                    </div>
+                                </a>
+                                @endif
+
+                                {{-- Stock bajo --}}
+                                @if($stockBajo > 0)
+                                <a href="{{ route('inventario.index', ['filtro' => 'stock_bajo']) }}"
+                                   class="flex items-start gap-3 px-4 py-3 hover:bg-[#1a2235] transition-colors">
+                                    <div class="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center
+                                                justify-center text-orange-400 flex-shrink-0 mt-0.5">
+                                        <i class="fas fa-boxes-stacked text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-semibold text-orange-400">
+                                            {{ $stockBajo }} producto{{ $stockBajo > 1 ? 's' : '' }} con stock bajo
+                                        </div>
+                                        <div class="text-xs text-slate-500 mt-0.5">Por debajo del mínimo configurado</div>
+                                    </div>
+                                </a>
+                                @endif
+
+                                {{-- Cotizaciones por vencer --}}
+                                @if($cotPorVencer > 0)
+                                <a href="{{ route('cotizaciones.index') }}"
+                                   class="flex items-start gap-3 px-4 py-3 hover:bg-[#1a2235] transition-colors">
+                                    <div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center
+                                                justify-center text-yellow-400 flex-shrink-0 mt-0.5">
+                                        <i class="fas fa-file-contract text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-semibold text-yellow-400">
+                                            {{ $cotPorVencer }} cotización{{ $cotPorVencer > 1 ? 'es' : '' }} por vencer
+                                        </div>
+                                        <div class="text-xs text-slate-500 mt-0.5">Vencen en los próximos 7 días</div>
+                                    </div>
+                                </a>
+                                @endif
+
+                                {{-- Sin alertas --}}
+                                @if($totalAlertas === 0)
                                 <div class="px-4 py-6 text-center text-slate-500 text-xs">
                                     <i class="fas fa-check-circle text-emerald-500 text-lg mb-2 block"></i>
                                     Todo en orden
                                 </div>
                                 @endif
+
                             </div>
                         </div>
                     </div>

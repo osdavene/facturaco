@@ -29,6 +29,9 @@ use App\Http\Controllers\BackofficeController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\NominaController;
 use App\Http\Controllers\NominaEmpleadoController;
+use App\Http\Controllers\PlanCuentasController;
+use App\Http\Controllers\AsientoContableController;
+use App\Http\Controllers\ReporteContableController;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -498,6 +501,30 @@ Route::middleware('auth')->group(function () {
                    'plazo_pago','email','direccion','lista_precio']); // ← lista_precio agregado
         return response()->json($clientes);
     })->middleware('auth');
+
+    // ── CONTABILIDAD ─────────────────────────────────────────────
+    Route::prefix('contabilidad')->name('contabilidad.')->middleware('can:ver recibos')->group(function () {
+
+        // Plan de Cuentas
+        Route::prefix('plan-cuentas')->name('plan-cuentas.')->group(function () {
+            Route::get('/',                    [PlanCuentasController::class, 'index'])  ->name('index');
+            Route::get('/crear',               [PlanCuentasController::class, 'create']) ->name('create')->middleware('can:crear recibos');
+            Route::post('/',                   [PlanCuentasController::class, 'store'])  ->name('store') ->middleware('can:crear recibos');
+            Route::get('/{planCuenta}/editar', [PlanCuentasController::class, 'edit'])   ->name('edit')  ->middleware('can:crear recibos');
+            Route::put('/{planCuenta}',        [PlanCuentasController::class, 'update']) ->name('update')->middleware('can:crear recibos');
+        });
+
+        // Libro Diario
+        Route::prefix('libro-diario')->name('libro-diario.')->group(function () {
+            Route::get('/',            [AsientoContableController::class, 'index']) ->name('index');
+            Route::get('/{asiento}',   [AsientoContableController::class, 'show'])  ->name('show');
+        });
+
+        // Reportes contables
+        Route::get('/balance', [ReporteContableController::class, 'balance'])->name('reportes.balance');
+        Route::get('/pyg',     [ReporteContableController::class, 'pyg'])    ->name('reportes.pyg');
+
+    });
 
     // ── NÓMINA ────────────────────────────────────────────────────
     Route::prefix('nomina')->name('nomina.')->group(function () {

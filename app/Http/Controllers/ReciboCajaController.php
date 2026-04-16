@@ -5,6 +5,7 @@ use App\Models\ReciboCaja;
 use App\Models\Factura;
 use App\Models\Cliente;
 use App\Models\Empresa;
+use App\Services\ContabilidadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -62,7 +63,7 @@ class ReciboCajaController extends Controller
 
         $userId = auth()->id();
 
-        DB::transaction(function() use ($request, $userId) {
+        $reciboCreado = DB::transaction(function() use ($request, $userId) {
             $cliente     = Cliente::findOrFail($request->cliente_id);
             $consecutivo = ReciboCaja::siguienteConsecutivo();
 
@@ -96,7 +97,15 @@ class ReciboCajaController extends Controller
                     ]);
                 }
             }
+
+            return $recibo;
         });
+
+        try {
+            if ($reciboCreado) {
+                (new ContabilidadService())->asientoRecibo($reciboCreado);
+            }
+        } catch (\Throwable) {}
 
         return redirect()->route('recibos.index')
             ->with('success', 'Recibo de caja creado correctamente.');
