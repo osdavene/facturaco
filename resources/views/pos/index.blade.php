@@ -23,10 +23,12 @@
     {{-- ── TOPBAR POS ──────────────────────────────── --}}
     <header class="flex items-center gap-3 px-4 py-2.5 bg-[#111827] border-b border-[#1e2d47] flex-shrink-0">
         <a href="{{ route('dashboard') }}"
-           class="w-8 h-8 rounded-lg bg-[#1a2235] border border-[#1e2d47] flex items-center justify-center
-                  text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-colors flex-shrink-0"
-           title="Volver">
-            <i class="fas fa-arrow-left text-xs"></i>
+           class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1a2235] border border-[#1e2d47]
+                  text-slate-400 hover:text-amber-400 hover:border-amber-500/50 hover:bg-[#1e2d47]
+                  transition-all duration-150 flex-shrink-0 group"
+           title="Volver al Dashboard">
+            <i class="fas fa-arrow-left text-xs group-hover:-translate-x-0.5 transition-transform duration-150"></i>
+            <span class="hidden sm:inline text-xs font-medium">Dashboard</span>
         </a>
         <div class="font-display font-black text-xl text-white">
             Factura<span class="text-amber-500">CO</span>
