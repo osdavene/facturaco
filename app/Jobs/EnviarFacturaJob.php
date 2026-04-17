@@ -28,6 +28,13 @@ class EnviarFacturaJob implements ShouldQueue
 
     public function handle(MailService $mail): void
     {
+        if (! $mail->estaConfigurado($this->empresa)) {
+            $this->fail(new \RuntimeException(
+                "Correo no configurado en la empresa [{$this->empresa->razon_social}]."
+            ));
+            return;
+        }
+
         $this->factura->loadMissing(['items', 'cliente']);
 
         $mail->paraEmpresa($this->empresa)

@@ -31,8 +31,10 @@ class MailService
             );
         }
 
-        // Nombre único por empresa para que Laravel lo registre como nuevo mailer
         $key = 'empresa_smtp_' . $empresa->id;
+
+        // Purgar instancia cacheada para que el worker no reutilice un transport stale
+        app('mail.manager')->purge($key);
 
         Config::set("mail.mailers.{$key}", [
             'transport'  => 'smtp',
@@ -49,8 +51,11 @@ class MailService
 
     public function estaConfigurado(Empresa $empresa): bool
     {
+        $fromAddress = $empresa->mail_from_address ?: $empresa->email;
+
         return ! empty($empresa->mail_host)
             && ! empty($empresa->mail_username)
-            && ! empty($empresa->mail_password);
+            && ! empty($empresa->mail_password)
+            && ! empty($fromAddress);
     }
 }

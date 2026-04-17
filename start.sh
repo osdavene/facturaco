@@ -135,9 +135,13 @@ echo "=== Seeder ColombiaDivisionSeeder completado ==="
 echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
 
-# ── Queue worker en background ─────────────────────────────────────────────
+# ── Queue worker en background con reinicio automático ────────────────────
 echo "=== Iniciando queue worker ==="
-php artisan queue:work --sleep=3 --tries=3 --max-time=3600 &
+(while true; do
+    php artisan queue:work --sleep=3 --tries=3 --max-jobs=500 2>&1
+    echo "=== Queue worker finalizado — reiniciando en 5s ==="
+    sleep 5
+done) &
 
 # ── Nginx en primer plano (mantiene el container vivo) ────────────────────
 echo "=== Nginx iniciando ==="

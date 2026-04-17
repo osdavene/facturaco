@@ -13,6 +13,7 @@ use App\Models\Producto;
 use App\Services\ContabilidadService;
 use App\Services\DocumentoService;
 use App\Services\InventarioService;
+use App\Services\MailService;
 use App\Services\PdfService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -366,7 +367,7 @@ class FacturaController extends Controller
 
     // ── ENVIAR EMAIL ──────────────────────────────────────────
 
-    public function enviar(Request $request, Factura $factura)
+    public function enviar(Request $request, Factura $factura, MailService $mail)
     {
         $request->validate([
             'email'   => 'required|email',
@@ -377,6 +378,10 @@ class FacturaController extends Controller
         ]);
 
         $empresa = Empresa::obtener();
+
+        if (! $mail->estaConfigurado($empresa)) {
+            return back()->with('error', 'El correo SMTP no está configurado. Ve a Empresa → Configuración de Correo y completa los datos.');
+        }
 
         EnviarFacturaJob::dispatch($factura, $empresa, $request->email, $request->mensaje ?? '');
 
