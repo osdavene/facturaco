@@ -127,6 +127,10 @@ echo "=== Seeder ModuloSeeder iniciando ==="
 php artisan db:seed --class=ModuloSeeder --force
 echo "=== Seeder ModuloSeeder completado ==="
 
+echo "=== Seeder ColombiaDivisionSeeder iniciando ==="
+php artisan db:seed --class=ColombiaDivisionSeeder --force
+echo "=== Seeder ColombiaDivisionSeeder completado ==="
+
 # ── PHP-FPM ────────────────────────────────────────────────────────────────
 echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
