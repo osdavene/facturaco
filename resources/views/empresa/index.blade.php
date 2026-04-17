@@ -276,12 +276,12 @@
                 </div>
             </div>
 
-            {{-- SECCIÓN 4: Impuestos por defecto --}}
+            {{-- SECCIÓN 4: Impuestos + Regional --}}
             <div class="card p-6">
                 <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
                                  text-black text-xs font-black">4</span>
-                    Impuestos por Defecto
+                    Impuestos y Configuración Regional
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
@@ -316,6 +316,63 @@
                                class="form-input"
                                style="color:#e2e8f0">
                     </div>
+                </div>
+
+                {{-- Zona horaria --}}
+                <div class="mt-4">
+                    <label class="form-label flex items-center gap-2">
+                        <i class="fas fa-clock text-amber-500 text-xs"></i>
+                        Zona Horaria
+                        <span class="font-normal text-slate-500 normal-case tracking-normal">
+                            — afecta la hora en facturas, recibos y reportes
+                        </span>
+                    </label>
+                    <select name="timezone" class="form-input sm:max-w-xs" style="color:#e2e8f0">
+                        @php
+                            $tzActual = old('timezone', $empresa->timezone ?? 'America/Bogota');
+                            $zonas = [
+                                'América - Colombia / Perú / Ecuador' => [
+                                    'America/Bogota'    => 'Bogotá, Lima, Quito (UTC-5)',
+                                ],
+                                'América - Venezuela / Bolivia' => [
+                                    'America/Caracas'   => 'Caracas (UTC-4)',
+                                    'America/La_Paz'    => 'La Paz (UTC-4)',
+                                ],
+                                'América - Argentina / Chile' => [
+                                    'America/Argentina/Buenos_Aires' => 'Buenos Aires (UTC-3)',
+                                    'America/Santiago'  => 'Santiago (UTC-3/-4)',
+                                ],
+                                'América - México' => [
+                                    'America/Mexico_City' => 'Ciudad de México (UTC-6)',
+                                    'America/Monterrey'   => 'Monterrey (UTC-6)',
+                                    'America/Tijuana'     => 'Tijuana (UTC-7/-8)',
+                                ],
+                                'América - Estados Unidos' => [
+                                    'America/New_York'  => 'Nueva York (UTC-5/-4)',
+                                    'America/Chicago'   => 'Chicago (UTC-6/-5)',
+                                    'America/Denver'    => 'Denver (UTC-7/-6)',
+                                    'America/Los_Angeles' => 'Los Ángeles (UTC-8/-7)',
+                                ],
+                                'Europa' => [
+                                    'Europe/Madrid'     => 'Madrid (UTC+1/+2)',
+                                    'UTC'               => 'UTC (Coordinado Universal)',
+                                ],
+                            ];
+                        @endphp
+                        @foreach($zonas as $grupo => $opciones)
+                            <optgroup label="{{ $grupo }}">
+                                @foreach($opciones as $tz => $label)
+                                    <option value="{{ $tz }}" {{ $tzActual === $tz ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-slate-600 mt-1">
+                        Hora actual del servidor según esta zona:
+                        <span class="text-amber-500 font-mono">{{ now()->setTimezone($empresa->timezone ?? 'America/Bogota')->format('d/m/Y H:i:s') }}</span>
+                    </p>
                 </div>
             </div>
 

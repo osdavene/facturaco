@@ -58,6 +58,7 @@ class EmpresaController extends Controller
             'wompi_public_key'       => 'nullable|string|max:255',
             'wompi_currency'         => 'nullable|string|max:10',
             'wompi_events_key'       => 'nullable|string|max:255',
+            'timezone'               => 'nullable|string|timezone',
         ], [
             'logo.image'             => 'El archivo del logo debe ser una imagen.',
             'logo.mimes'             => 'El logo debe estar en formato JPG, PNG o WEBP.',

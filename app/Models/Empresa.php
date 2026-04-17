@@ -23,7 +23,7 @@ class Empresa extends Model
         'mail_mailer', 'mail_host', 'mail_port', 'mail_username',
         'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
         'wompi_public_key', 'wompi_currency', 'wompi_events_key',
-        'empresa_padre_id',
+        'empresa_padre_id', 'timezone',
     ];
 
     protected $casts = [

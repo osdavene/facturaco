@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Empresa;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -47,6 +48,13 @@ class EnsureEmpresaSeleccionada
                 session()->forget('empresa_activa_id');
                 $empresaActivaId = null;
             }
+        }
+
+        // Aplicar timezone de la empresa activa
+        if ($empresaActivaId) {
+            $tz = Empresa::where('id', $empresaActivaId)->value('timezone') ?? 'America/Bogota';
+            config(['app.timezone' => $tz]);
+            date_default_timezone_set($tz);
         }
 
         if (!$empresaActivaId) {
