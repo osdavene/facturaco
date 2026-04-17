@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProveedorRequest;
 use App\Http\Requests\UpdateProveedorRequest;
 use App\Models\Proveedor;
+use Illuminate\Http\Request;
 
 class ProveedorController extends Controller
 {
