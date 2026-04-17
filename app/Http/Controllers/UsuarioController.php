@@ -69,8 +69,7 @@ class UsuarioController extends Controller
 
         $usuario->assignRole($request->rol);
 
-        // Determinar rol en pivot (admin si tiene rol admin o super-admin en Spatie)
-        $rolPivot = in_array($request->rol, ['admin', 'super-admin']) ? 'admin' : 'operador';
+        $rolPivot = in_array($request->rol, ['admin', 'propietario']) ? 'admin' : 'operador';
 
         foreach ($empresasValidas as $empId) {
             $usuario->empresas()->attach($empId, [

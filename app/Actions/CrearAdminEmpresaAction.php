@@ -19,7 +19,7 @@ class CrearAdminEmpresaAction
 
         $user->assignRole($data['rol']);
 
-        $rolPivot = in_array($data['rol'], ['admin', 'super-admin']) ? 'admin' : 'operador';
+        $rolPivot = in_array($data['rol'], ['admin', 'propietario']) ? 'admin' : 'operador';
 
         $empresa->usuarios()->attach($user->id, ['rol' => $rolPivot, 'activo' => true]);
 

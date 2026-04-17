@@ -34,6 +34,12 @@ class EnsureEmpresaSeleccionada
             }
         }
 
+        // El superadmin de plataforma solo puede acceder a empresa si está impersonando.
+        // En cualquier otro caso lo redirigimos al backoffice.
+        if (auth()->user()->esSuperadmin() && !session('backoffice_impersonando')) {
+            return redirect()->route('backoffice.dashboard');
+        }
+
         $empresaActivaId = session('empresa_activa_id');
 
         // Verificar que la empresa en sesión sigue siendo válida para el usuario

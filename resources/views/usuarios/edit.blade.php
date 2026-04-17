@@ -112,7 +112,7 @@
             @php
             $rolActual   = $usuario->getRoleNames()->first() ?? '';
             $rolesConfig = [
-                'super-admin'  => ['#f59e0b', 'fa-crown',        'Acceso total al sistema'],
+                'propietario'  => ['#f59e0b', 'fa-crown',        'Acceso total a la empresa'],
                 'admin'        => ['#3b82f6', 'fa-user-shield',  'Gestión completa excepto configuración'],
                 'vendedor'     => ['#10b981', 'fa-cash-register','Facturas, clientes y cotizaciones'],
                 'bodeguero'    => ['#8b5cf6', 'fa-warehouse',    'Inventario y órdenes de compra'],

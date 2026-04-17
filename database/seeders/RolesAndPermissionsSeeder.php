@@ -46,7 +46,7 @@ class RolesAndPermissionsSeeder extends Seeder
         }
 
         // ── ROLES (syncPermissions = idempotente, reemplaza siempre) ──────
-        $superAdmin = Role::firstOrCreate(['name' => 'super-admin']);
+        $superAdmin = Role::firstOrCreate(['name' => 'propietario']);
         $admin      = Role::firstOrCreate(['name' => 'admin']);
         $vendedor   = Role::firstOrCreate(['name' => 'vendedor']);
         $bodeguero  = Role::firstOrCreate(['name' => 'bodeguero']);
@@ -103,7 +103,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'ver proveedores','ver inventario','ver reportes',
         ]);
 
-        // ── USUARIO SUPER ADMIN ───────────────────
+        // ── USUARIO SUPERADMIN DE PLATAFORMA ─────
+        // Este usuario accede al backoffice por is_superadmin=true, NO por roles Spatie.
+        // No debe tener ningún rol de empresa para no mezclar los sistemas.
         $usuario = User::firstOrCreate(
             ['email' => 'admin@facturaco.com'],
             [
@@ -113,10 +115,8 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
 
-        // Asegurar que siempre tenga is_superadmin=true (por si ya existía con false)
         $usuario->update(['is_superadmin' => true]);
-
-        $usuario->syncRoles(['super-admin']);
+        $usuario->syncRoles([]);
 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 

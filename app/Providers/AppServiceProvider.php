@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Super-admin bypasses ALL permission checks regardless of cache state
         Gate::before(function ($user, $ability) {
-            if ($user->hasRole('super-admin')) {
+            if ($user->hasRole('propietario')) {
                 return true;
             }
         });

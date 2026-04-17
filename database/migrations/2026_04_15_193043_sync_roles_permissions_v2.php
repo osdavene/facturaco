@@ -23,7 +23,7 @@ return new class extends Migration
 
         // Mapa: rol → permisos a garantizar (additive, no quita los existentes)
         $mapa = [
-            'super-admin' => $nuevos,
+            'propietario' => $nuevos,
             'admin'       => $nuevos,
             'contador'    => ['ver nomina', 'gestionar nomina', 'ver recibos', 'crear recibos'],
         ];

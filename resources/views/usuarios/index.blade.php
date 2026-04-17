@@ -22,7 +22,7 @@
     @foreach($roles as $rol)
     @php
         $colores = [
-            'super-admin' => ['bg-amber-500/10',   'text-amber-500',   'bg-amber-500'],
+            'propietario' => ['bg-amber-500/10',   'text-amber-500',   'bg-amber-500'],
             'admin'       => ['bg-blue-500/10',     'text-blue-400',    'bg-blue-500'],
             'vendedor'    => ['bg-emerald-500/10',  'text-emerald-500', 'bg-emerald-500'],
             'bodeguero'   => ['bg-purple-500/10',   'text-purple-400',  'bg-purple-500'],
