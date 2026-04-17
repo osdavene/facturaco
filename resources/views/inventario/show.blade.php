@@ -222,7 +222,7 @@
     </div>
     @endif
 
-    <x-activity-log :model="$producto" />
+    <x-activity-log :model="$inventario" />
 
 </div>
 
