@@ -1,5 +1,5 @@
 #!/bin/bash
-# SIN set -e para que ningún fallo mate el arranque del servidor
+set -e
 
 cd /var/www/html
 
@@ -85,7 +85,7 @@ SESSION_PATH=/
 SESSION_DOMAIN=null
 SESSION_HTTP_ONLY=true
 SESSION_SAME_SITE=lax
-QUEUE_CONNECTION=sync
+QUEUE_CONNECTION=database
 BROADCAST_CONNECTION=log
 FILESYSTEM_DISK=local
 
@@ -114,79 +114,26 @@ EOF
 
 echo "=== .env generado ==="
 
-# ── Fix columnas directamente con PDO (sin depender de migraciones) ────────
-echo "=== Verificando columnas ==="
-php -r "
-try {
-    // DATABASE_URL = postgresql://user:pass@host:port/dbname
-    // PDO necesita DSN: pgsql:host=...;port=...;dbname=...
-    \$raw = getenv('DATABASE_URL');
-    \$u   = parse_url(\$raw);
-    \$dsn = 'pgsql:host=' . \$u['host'] . ';port=' . (\$u['port'] ?? 5432) . ';dbname=' . ltrim(\$u['path'], '/');
-    \$pdo = new PDO(\$dsn, \$u['user'], \$u['pass'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-
-    // ── empresa_id en tablas transaccionales y catálogos ─────────────────
-    \$empresa_id = \$pdo->query('SELECT id FROM empresa ORDER BY id LIMIT 1')->fetchColumn();
-    if (!\$empresa_id) \$empresa_id = 1;
-
-    \$tablas = ['clientes','proveedores','productos','categorias','unidades_medida',
-               'facturas','cotizaciones','remisiones','ordenes_compra',
-               'recibos_caja','notas_credito','movimientos_inventario'];
-
-    foreach (\$tablas as \$t) {
-        \$existe = \$pdo->query(\"SELECT COUNT(*) FROM information_schema.columns WHERE table_name='\$t' AND column_name='empresa_id'\")->fetchColumn();
-        if (!\$existe) {
-            \$pdo->exec(\"ALTER TABLE \\\"\$t\\\" ADD COLUMN empresa_id BIGINT NOT NULL DEFAULT \$empresa_id REFERENCES empresa(id) ON DELETE CASCADE\");
-            \$pdo->exec(\"ALTER TABLE \\\"\$t\\\" ALTER COLUMN empresa_id DROP DEFAULT\");
-            echo \"  empresa_id agregado a: \$t\n\";
-        } else {
-            echo \"  empresa_id ya existe en: \$t\n\";
-        }
-    }
-
-    // ── empresa_padre_id en tabla empresa (jerarquía matriz/filial) ───────
-    \$existe = \$pdo->query(\"SELECT COUNT(*) FROM information_schema.columns WHERE table_name='empresa' AND column_name='empresa_padre_id'\")->fetchColumn();
-    if (!\$existe) {
-        \$pdo->exec(\"ALTER TABLE \\\"empresa\\\" ADD COLUMN empresa_padre_id BIGINT NULL REFERENCES empresa(id) ON DELETE SET NULL\");
-        \$pdo->exec(\"CREATE INDEX IF NOT EXISTS empresa_empresa_padre_id_index ON \\\"empresa\\\" (empresa_padre_id)\");
-        echo \"  empresa_padre_id agregado a: empresa\n\";
-    } else {
-        echo \"  empresa_padre_id ya existe en: empresa\n\";
-    }
-
-    // ── is_superadmin en tabla users ──────────────────────────────────────
-    \$existe = \$pdo->query(\"SELECT COUNT(*) FROM information_schema.columns WHERE table_name='users' AND column_name='is_superadmin'\")->fetchColumn();
-    if (!\$existe) {
-        \$pdo->exec(\"ALTER TABLE \\\"users\\\" ADD COLUMN is_superadmin BOOLEAN NOT NULL DEFAULT FALSE\");
-        echo \"  is_superadmin agregado a: users\n\";
-    } else {
-        echo \"  is_superadmin ya existe en: users\n\";
-    }
-
-    echo \"OK\n\";
-} catch (Exception \$e) {
-    echo 'ERROR fix columnas: ' . \$e->getMessage() . \"\n\";
-}
-" 2>&1 || echo "=== Script columnas falló ==="
-
 # ── Preparación rápida ──────────────────────────────────────────────────────
 php artisan storage:link 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 
+# ── Migraciones + seed (bloqueantes: el deploy falla si hay error) ─────────
+echo "=== Ejecutando migraciones ==="
+php artisan migrate --force
+echo "=== Migraciones completadas ==="
+
+echo "=== Seeder ModuloSeeder iniciando ==="
+php artisan db:seed --class=ModuloSeeder --force
+echo "=== Seeder ModuloSeeder completado ==="
+
 # ── PHP-FPM ────────────────────────────────────────────────────────────────
 echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
-echo "=== PHP-FPM iniciado (PID: $!) ==="
 
-# ── Migraciones + seed de módulos en background (no bloquean el arranque) ─
-echo "=== Migraciones iniciando en background ==="
-(
-    php artisan migrate --force 2>&1 \
-    && echo "=== Migraciones completadas ===" \
-    && echo "=== Seeder ModuloSeeder iniciando ===" \
-    && php artisan db:seed --class=ModuloSeeder --force 2>&1 \
-    && echo "=== Seeder ModuloSeeder completado ==="
-) || echo "=== ADVERTENCIA: migración/seed falló ===" &
+# ── Queue worker en background ─────────────────────────────────────────────
+echo "=== Iniciando queue worker ==="
+php artisan queue:work --sleep=3 --tries=3 --max-time=3600 &
 
 # ── Nginx en primer plano (mantiene el container vivo) ────────────────────
 echo "=== Nginx iniciando ==="

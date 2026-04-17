@@ -203,8 +203,115 @@ class FacturaController extends Controller
 
     public function update(Request $request, Factura $factura)
     {
+        if ($factura->estado === 'anulada') {
+            return redirect()->route('facturas.show', $factura)
+                ->with('error', 'No se puede editar una factura anulada.');
+        }
+
+        $request->validate([
+            'cliente_id'              => 'required|exists:clientes,id',
+            'fecha_emision'           => 'required|date',
+            'fecha_vencimiento'       => 'required|date|after_or_equal:fecha_emision',
+            'items'                   => 'required|array|min:1',
+            'items.*.descripcion'     => 'required|string',
+            'items.*.cantidad'        => 'required|numeric|min:0.001',
+            'items.*.precio_unitario' => 'required|numeric|min:0',
+        ]);
+
+        $userId  = Auth::id();
+        $empresa = Empresa::obtener();
+
+        DB::transaction(function () use ($request, $factura, $userId, $empresa) {
+            // Revertir movimientos de inventario de los ítems anteriores
+            foreach ($factura->items as $itemAnterior) {
+                if ($itemAnterior->producto_id) {
+                    $producto = Producto::find($itemAnterior->producto_id);
+                    if ($producto) {
+                        $this->inventario->registrarEntrada(
+                            $producto,
+                            $itemAnterior->cantidad,
+                            $factura->numero,
+                            $userId,
+                            'Ajuste por edición de factura',
+                        );
+                    }
+                }
+            }
+
+            $factura->items()->delete();
+
+            $cliente = Cliente::findOrFail($request->cliente_id);
+            $calc    = $this->documentos->calcularItems($request->items);
+            $ret     = $this->documentos->calcularRetenciones(
+                $calc['subtotal'],
+                $calc['iva'],
+                $cliente->retefuente_pct,
+                $cliente->reteiva_pct,
+                $cliente->reteica_pct,
+            );
+
+            $factura->update([
+                'cliente_id'        => $cliente->id,
+                'cliente_nombre'    => $cliente->nombre_completo,
+                'cliente_documento' => $cliente->tipo_documento.': '.$cliente->documento_formateado,
+                'cliente_direccion' => $cliente->direccion,
+                'cliente_email'     => $cliente->email,
+                'fecha_emision'     => $request->fecha_emision,
+                'fecha_vencimiento' => $request->fecha_vencimiento,
+                'subtotal'          => $calc['subtotal'],
+                'descuento'         => $calc['descuento'],
+                'base_iva'          => $calc['subtotal'],
+                'iva'               => $calc['iva'],
+                'retefuente'        => $ret['retefuente'],
+                'reteiva'           => $ret['reteiva'],
+                'reteica'           => $ret['reteica'],
+                'total'             => $ret['total_neto'],
+                'forma_pago'        => $request->forma_pago ?? $factura->forma_pago,
+                'plazo_pago'        => $request->plazo_pago ?? $factura->plazo_pago,
+                'observaciones'     => $request->observaciones,
+            ]);
+
+            foreach ($calc['items'] as $item) {
+                FacturaItem::create([
+                    'factura_id'      => $factura->id,
+                    'producto_id'     => $item['producto_id'] ?? null,
+                    'codigo'          => $item['codigo']      ?? 'SIN-COD',
+                    'descripcion'     => $item['descripcion'],
+                    'unidad'          => $item['unidad']      ?? 'UN',
+                    'cantidad'        => $item['cantidad'],
+                    'precio_unitario' => $item['precio_unitario'],
+                    'descuento_pct'   => $item['descuento_pct'],
+                    'descuento'       => $item['descuento'],
+                    'subtotal'        => $item['subtotal'],
+                    'iva_pct'         => $item['iva_pct'],
+                    'iva'             => $item['iva'],
+                    'total'           => $item['total'],
+                    'orden'           => $item['orden'],
+                ]);
+
+                if (!empty($item['producto_id'])) {
+                    $producto = Producto::find($item['producto_id']);
+                    if ($producto) {
+                        $this->inventario->registrarSalida(
+                            $producto,
+                            $item['cantidad'],
+                            $factura->numero,
+                            $userId,
+                            'Venta',
+                        );
+                    }
+                }
+            }
+        });
+
+        // Regenerar asiento contable
+        try {
+            (new ContabilidadService())->anularAsientosDe(Factura::class, $factura->id);
+            (new ContabilidadService())->asientoFactura($factura->fresh());
+        } catch (\Throwable) {}
+
         return redirect()->route('facturas.show', $factura)
-            ->with('success', 'Factura actualizada.');
+            ->with('success', 'Factura actualizada correctamente.');
     }
 
     // ── DESTROY ───────────────────────────────────────────────

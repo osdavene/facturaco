@@ -1,4 +1,7 @@
 *.log
+*.sqlite
+*.sqlite-journal
+cookies*.txt
 .DS_Store
 .env
 .env.backup
