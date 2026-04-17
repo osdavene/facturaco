@@ -415,9 +415,9 @@ function agregarAlCarrito(card) {
         nombre:     card.dataset.nombre,
         codigo:     card.dataset.codigo,
         precio:     parseFloat(card.dataset.precio),
-        precioIva:  parseFloat(card.dataset.precioCon_iva || card.dataset['precio-con-iva']),
-        ivaPct:     parseFloat(card.dataset.ivaPct || card.dataset['iva-pct']),
-        incluyeIva: card.dataset.incluyeIva === '1' || card.dataset['incluye-iva'] === '1',
+        precioIva:  parseFloat(card.dataset.precioConIva),
+        ivaPct:     parseFloat(card.dataset.ivaPct),
+        incluyeIva: card.dataset.incluyeIva === '1',
         stock:      stock,
     };
 
@@ -491,7 +491,12 @@ function eliminarItem(idx) {
 }
 
 function cambiarCantidad(idx, delta) {
-    carrito[idx].cantidad = Math.max(0.001, carrito[idx].cantidad + delta);
+    const nueva = carrito[idx].cantidad + delta;
+    if (nueva <= 0) {
+        carrito.splice(idx, 1);
+    } else {
+        carrito[idx].cantidad = nueva;
+    }
     renderizarCarrito();
 }
 
