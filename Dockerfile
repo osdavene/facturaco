@@ -13,8 +13,6 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
 
-RUN ls public/build/ && cat public/build/manifest.json
-
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
