@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Producto;
+use App\Http\Requests\StoreProductoRequest;
+use App\Http\Requests\UpdateProductoRequest;
 use App\Models\Categoria;
-use App\Models\UnidadMedida;
 use App\Models\MovimientoInventario;
+use App\Models\Producto;
+use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -41,28 +43,9 @@ class ProductoController extends Controller
         return view('inventario.create', compact('categorias', 'unidades'));
     }
 
-    public function store(Request $request)
+    public function store(StoreProductoRequest $request)
     {
-        $data = $request->validate([
-            'codigo'          => 'required|string|max:50|unique:productos',
-            'codigo_barras'   => 'nullable|string|max:50|unique:productos',
-            'nombre'          => 'required|string|max:255',
-            'descripcion'     => 'nullable|string',
-            'categoria_id'    => 'nullable|exists:categorias,id',
-            'unidad_medida_id'=> 'nullable|exists:unidades_medida,id',
-            'precio_compra'   => 'numeric|min:0',
-            'precio_venta'    => 'required|numeric|min:0',
-            'precio_venta2'   => 'numeric|min:0',
-            'precio_venta3'   => 'numeric|min:0',
-            'iva_pct'         => 'numeric|min:0|max:100',
-            'incluye_iva'     => 'boolean',
-            'stock_actual'    => 'numeric|min:0',
-            'stock_minimo'    => 'numeric|min:0',
-            'stock_maximo'    => 'numeric|min:0',
-            'ubicacion'       => 'nullable|string|max:100',
-            'es_servicio'     => 'boolean',
-            'observaciones'   => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         $data['incluye_iva'] = $request->boolean('incluye_iva');
         $data['es_servicio'] = $request->boolean('es_servicio');
@@ -109,28 +92,9 @@ class ProductoController extends Controller
         return view('inventario.edit', compact('inventario', 'categorias', 'unidades'));
     }
 
-    public function update(Request $request, Producto $inventario)
+    public function update(UpdateProductoRequest $request, Producto $inventario)
     {
-        $data = $request->validate([
-            'codigo'          => 'required|string|max:50|unique:productos,codigo,'.$inventario->id,
-            'codigo_barras'   => 'nullable|string|max:50|unique:productos,codigo_barras,'.$inventario->id,
-            'nombre'          => 'required|string|max:255',
-            'descripcion'     => 'nullable|string',
-            'categoria_id'    => 'nullable|exists:categorias,id',
-            'unidad_medida_id'=> 'nullable|exists:unidades_medida,id',
-            'precio_compra'   => 'numeric|min:0',
-            'precio_venta'    => 'required|numeric|min:0',
-            'precio_venta2'   => 'numeric|min:0',
-            'precio_venta3'   => 'numeric|min:0',
-            'iva_pct'         => 'numeric|min:0|max:100',
-            'incluye_iva'     => 'boolean',
-            'stock_minimo'    => 'numeric|min:0',
-            'stock_maximo'    => 'numeric|min:0',
-            'ubicacion'       => 'nullable|string|max:100',
-            'activo'          => 'boolean',
-            'es_servicio'     => 'boolean',
-            'observaciones'   => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         $data['incluye_iva'] = $request->boolean('incluye_iva');
         $data['es_servicio'] = $request->boolean('es_servicio');

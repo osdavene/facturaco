@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreFacturaRequest;
+use App\Http\Requests\UpdateFacturaRequest;
 use App\Jobs\EnviarFacturaJob;
 use App\Models\Cliente;
 use App\Models\Empresa;
@@ -69,17 +71,8 @@ class FacturaController extends Controller
 
     // ── STORE ─────────────────────────────────────────────────
 
-    public function store(Request $request)
+    public function store(StoreFacturaRequest $request)
     {
-        $request->validate([
-            'cliente_id'              => 'required|exists:clientes,id',
-            'fecha_emision'           => 'required|date',
-            'fecha_vencimiento'       => 'required|date|after_or_equal:fecha_emision',
-            'items'                   => 'required|array|min:1',
-            'items.*.descripcion'     => 'required|string',
-            'items.*.cantidad'        => 'required|numeric|min:0.001',
-            'items.*.precio_unitario' => 'required|numeric|min:0',
-        ]);
 
         $userId  = Auth::id();
         $empresa = Empresa::obtener();
@@ -201,23 +194,8 @@ class FacturaController extends Controller
 
     // ── UPDATE ────────────────────────────────────────────────
 
-    public function update(Request $request, Factura $factura)
+    public function update(UpdateFacturaRequest $request, Factura $factura)
     {
-        if ($factura->estado === 'anulada') {
-            return redirect()->route('facturas.show', $factura)
-                ->with('error', 'No se puede editar una factura anulada.');
-        }
-
-        $request->validate([
-            'cliente_id'              => 'required|exists:clientes,id',
-            'fecha_emision'           => 'required|date',
-            'fecha_vencimiento'       => 'required|date|after_or_equal:fecha_emision',
-            'items'                   => 'required|array|min:1',
-            'items.*.descripcion'     => 'required|string',
-            'items.*.cantidad'        => 'required|numeric|min:0.001',
-            'items.*.precio_unitario' => 'required|numeric|min:0',
-        ]);
-
         $userId  = Auth::id();
         $empresa = Empresa::obtener();
 
