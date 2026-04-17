@@ -118,22 +118,28 @@ echo "=== .env generado ==="
 php artisan storage:link 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 
-# ── Migraciones + seed (bloqueantes: el deploy falla si hay error) ─────────
-echo "=== Ejecutando migraciones ==="
-php artisan migrate --force
-echo "=== Migraciones completadas ==="
-
-echo "=== Seeder ModuloSeeder iniciando ==="
-php artisan db:seed --class=ModuloSeeder --force
-echo "=== Seeder ModuloSeeder completado ==="
-
-echo "=== Seeder ColombiaDivisionSeeder iniciando ==="
-php artisan db:seed --class=ColombiaDivisionSeeder --force
-echo "=== Seeder ColombiaDivisionSeeder completado ==="
-
 # ── PHP-FPM ────────────────────────────────────────────────────────────────
 echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
+
+# ── Nginx en background (Railway puede hacer healthcheck desde aquí) ───────
+echo "=== Nginx iniciando en background ==="
+nginx -g 'daemon off;' &
+NGINX_PID=$!
+
+# ── Migraciones + seed (en background para no bloquear el healthcheck) ─────
+(
+    echo "=== Ejecutando migraciones ==="
+    php artisan migrate --force && echo "=== Migraciones completadas ===" || echo "=== ERROR en migraciones ==="
+
+    echo "=== Seeder ModuloSeeder ==="
+    php artisan db:seed --class=ModuloSeeder --force 2>&1 || true
+
+    echo "=== Seeder ColombiaDivisionSeeder ==="
+    php artisan db:seed --class=ColombiaDivisionSeeder --force 2>&1 || true
+
+    echo "=== Setup completado ==="
+) &
 
 # ── Queue worker en background con reinicio automático ────────────────────
 echo "=== Iniciando queue worker ==="
@@ -143,6 +149,5 @@ echo "=== Iniciando queue worker ==="
     sleep 5
 done) &
 
-# ── Nginx en primer plano (mantiene el container vivo) ────────────────────
-echo "=== Nginx iniciando ==="
-exec nginx -g 'daemon off;'
+# ── Mantener el container vivo esperando nginx ────────────────────────────
+wait $NGINX_PID
