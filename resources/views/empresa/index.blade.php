@@ -153,24 +153,10 @@
                                class="form-input"
                                style="color:#e2e8f0">
                     </div>
-                    <div>
-                        <label class="form-label">Departamento</label>
-                        <input type="text" name="departamento"
-                               value="{{ old('departamento', $empresa->departamento) }}"
-                               placeholder="CÓRDOBA"
-                               data-uppercase
-                               class="form-input"
-                               style="color:#e2e8f0">
-                    </div>
-                    <div>
-                        <label class="form-label">Municipio</label>
-                        <input type="text" name="municipio"
-                               value="{{ old('municipio', $empresa->municipio) }}"
-                               placeholder="MONTERÍA"
-                               data-uppercase
-                               class="form-input"
-                               style="color:#e2e8f0">
-                    </div>
+                    <x-ubicacion
+                        :departamento="old('departamento', $empresa->departamento)"
+                        :municipio="old('municipio', $empresa->municipio)"
+                    />
                     <div class="sm:col-span-2 lg:col-span-3">
                         <label class="form-label">Dirección</label>
                         <input type="text" name="direccion"

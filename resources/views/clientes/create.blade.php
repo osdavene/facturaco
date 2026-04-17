@@ -192,11 +192,8 @@
                     @error('email') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 @foreach([
-                    ['telefono',     'Teléfono',     '601 1234567'],
-                    ['celular',      'Celular',      '300 1234567'],
-                    ['departamento', 'Departamento', 'CÓRDOBA'],
-                    ['municipio',    'Municipio',    'MONTERÍA'],
-                    ['direccion',    'Dirección',    'CRA 5 # 10-20'],
+                    ['telefono', 'Teléfono', '601 1234567'],
+                    ['celular',  'Celular',  '300 1234567'],
                 ] as [$name, $label, $ph])
                 <div>
                     <label class="form-label">{{ $label }}</label>
@@ -207,6 +204,18 @@
                            class="form-input">
                 </div>
                 @endforeach
+                <x-ubicacion
+                    :departamento="old('departamento')"
+                    :municipio="old('municipio')"
+                />
+                <div>
+                    <label class="form-label">Dirección</label>
+                    <input type="text" name="direccion"
+                           value="{{ old('direccion') }}"
+                           placeholder="CRA 5 # 10-20"
+                           data-uppercase
+                           class="form-input">
+                </div>
             </div>
         </div>
 

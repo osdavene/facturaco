@@ -64,11 +64,10 @@
                     <input type="email" name="email" value="{{ old('email', $empresa->email) }}"
                            class="form-input">
                 </div>
-                <div>
-                    <label class="form-label">Municipio</label>
-                    <input type="text" name="municipio" value="{{ old('municipio', $empresa->municipio) }}"
-                           class="form-input">
-                </div>
+                <x-ubicacion
+                    :departamento="old('departamento', $empresa->departamento)"
+                    :municipio="old('municipio', $empresa->municipio)"
+                />
             </div>
 
             <div>

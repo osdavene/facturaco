@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Cliente;
+use App\Models\Departamento;
 use App\Models\Factura;
+use App\Models\Municipio;
 use App\Models\Producto;
 use App\Models\Proveedor;
 use Illuminate\Http\Request;
@@ -9,6 +11,23 @@ use Illuminate\Support\Facades\Route;
 
 // Búsquedas AJAX internas utilizadas por formularios del sistema.
 // No son parte de la API pública (routes/api.php).
+
+Route::get('/api/departamentos', function () {
+    return response()->json(
+        Departamento::orderBy('nombre')->get(['id', 'nombre'])
+    );
+})->name('api.departamentos');
+
+Route::get('/api/municipios', function (Request $req) {
+    $query = Municipio::orderBy('nombre');
+    if ($req->departamento_id) {
+        $query->where('departamento_id', $req->departamento_id);
+    } elseif ($req->departamento) {
+        $dep = Departamento::where('nombre', strtoupper($req->departamento))->first();
+        $query->where('departamento_id', $dep?->id ?? 0);
+    }
+    return response()->json($query->pluck('nombre'));
+})->name('api.municipios');
 
 Route::get('/api/clientes/buscar', function (Request $req) {
     $clientes = Cliente::where('activo', true)

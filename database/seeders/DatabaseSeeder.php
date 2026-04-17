@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             ModuloSeeder::class,
+            ColombiaDivisionSeeder::class,
         ]);
 
         // User::factory(10)->create();

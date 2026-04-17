@@ -54,12 +54,10 @@
                            placeholder="contacto@empresa.com"
                            class="form-input">
                 </div>
-                <div>
-                    <label class="form-label">Municipio</label>
-                    <input type="text" name="municipio" value="{{ old('municipio') }}"
-                           placeholder="Bogotá D.C."
-                           class="form-input">
-                </div>
+                <x-ubicacion
+                    :departamento="old('departamento')"
+                    :municipio="old('municipio')"
+                />
             </div>
         </div>
 

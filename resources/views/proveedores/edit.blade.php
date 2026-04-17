@@ -79,9 +79,6 @@
                     ['email',          'Email',          'email', false, false],
                     ['telefono',       'Teléfono',       'text',  false, true],
                     ['celular',        'Celular',        'text',  false, true],
-                    ['departamento',   'Departamento',   'text',  true,  false],
-                    ['municipio',      'Municipio',      'text',  true,  false],
-                    ['direccion',      'Dirección',      'text',  true,  false],
                 ] as [$name, $label, $type, $upper, $numeric])
                 <div>
                     <label class="form-label">{{ $label }}</label>
@@ -92,6 +89,17 @@
                            class="form-input">
                 </div>
                 @endforeach
+                <x-ubicacion
+                    :departamento="old('departamento', $proveedor->departamento)"
+                    :municipio="old('municipio', $proveedor->municipio)"
+                />
+                <div>
+                    <label class="form-label">Dirección</label>
+                    <input type="text" name="direccion"
+                           value="{{ old('direccion', $proveedor->direccion) }}"
+                           data-uppercase
+                           class="form-input">
+                </div>
             </div>
         </div>
 

@@ -84,9 +84,6 @@
                     ['email',           'Email',           'email', 'ventas@proveedor.com', false, false],
                     ['telefono',        'Teléfono',        'text',  '601 1234567',          false, true],
                     ['celular',         'Celular',         'text',  '300 1234567',          false, true],
-                    ['departamento',    'Departamento',    'text',  'CÓRDOBA',              true,  false],
-                    ['municipio',       'Municipio',       'text',  'MONTERÍA',             true,  false],
-                    ['direccion',       'Dirección',       'text',  'CRA 5 # 10-20',        true,  false],
                 ] as [$name, $label, $type, $ph, $upper, $numeric])
                 <div>
                     <label class="form-label">{{ $label }}</label>
@@ -98,6 +95,18 @@
                            class="form-input">
                 </div>
                 @endforeach
+                <x-ubicacion
+                    :departamento="old('departamento')"
+                    :municipio="old('municipio')"
+                />
+                <div>
+                    <label class="form-label">Dirección</label>
+                    <input type="text" name="direccion"
+                           value="{{ old('direccion') }}"
+                           placeholder="CRA 5 # 10-20"
+                           data-uppercase
+                           class="form-input">
+                </div>
             </div>
         </div>
 
