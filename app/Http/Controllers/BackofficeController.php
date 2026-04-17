@@ -2,37 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ActualizarModulosEmpresaAction;
+use App\Actions\CopiarAdminsDeMatrizAction;
+use App\Actions\CrearAdminEmpresaAction;
 use App\Models\Empresa;
 use App\Models\Modulo;
 use App\Models\User;
-use App\Http\Controllers\EmpresaSelectorController;
+use App\Services\BackupSqlService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class BackofficeController extends Controller
 {
-    // ── Super Panel (dashboard unificado) ────────────────────────────────
+    public function __construct(
+        private CrearAdminEmpresaAction      $crearAdmin,
+        private CopiarAdminsDeMatrizAction   $copiarAdmins,
+        private ActualizarModulosEmpresaAction $actualizarModulos,
+        private BackupSqlService             $backupSql,
+    ) {}
+
+    // ── Super Panel ───────────────────────────────────────────────────────
 
     public function dashboard()
     {
-        $totalEmpresas  = Empresa::count();
-        $totalMatrices  = Empresa::whereNull('empresa_padre_id')->count();
-        $totalFiliales  = Empresa::whereNotNull('empresa_padre_id')->count();
-        $totalUsuarios  = User::where('is_superadmin', false)->count();
+        $totalEmpresas = Empresa::count();
+        $totalMatrices = Empresa::whereNull('empresa_padre_id')->count();
+        $totalFiliales = Empresa::whereNotNull('empresa_padre_id')->count();
+        $totalUsuarios = User::where('is_superadmin', false)->count();
 
-        // Todas las empresas con sus filiales y conteo de usuarios
         $empresas = Empresa::whereNull('empresa_padre_id')
             ->with(['filiales.usuarios', 'filiales'])
             ->withCount(['filiales', 'usuarios'])
             ->orderBy('razon_social')
             ->get();
 
-        // Todas las filiales sueltas también (por si se usa en tab empresas)
         $todasEmpresas = Empresa::orderBy('razon_social')->get();
 
-        // Usuarios con sus empresas
         $usuarios = User::where('is_superadmin', false)
             ->with(['empresas', 'roles'])
             ->orderBy('name')
@@ -66,19 +72,18 @@ class BackofficeController extends Controller
     public function empresasStore(Request $request)
     {
         $data = $request->validate([
-            'razon_social'      => 'required|string|max:200',
-            'nit'               => 'required|string|max:20',
-            'email'             => 'nullable|email|max:200',
-            'telefono'          => 'nullable|string|max:20',
-            'municipio'         => 'nullable|string|max:100',
-            'empresa_padre_id'  => 'nullable|exists:empresa,id',
+            'razon_social'     => 'required|string|max:200',
+            'nit'              => 'required|string|max:20',
+            'email'            => 'nullable|email|max:200',
+            'telefono'         => 'nullable|string|max:20',
+            'municipio'        => 'nullable|string|max:100',
+            'empresa_padre_id' => 'nullable|exists:empresa,id',
         ]);
 
         $empresa = Empresa::create($data);
 
-        // Si es filial, copiar admins de la matriz automáticamente
         if ($empresa->empresa_padre_id) {
-            $this->copiarAdminsDeMatriz($empresa);
+            $this->copiarAdmins->execute($empresa);
         }
 
         return redirect()->route('backoffice.empresas')
@@ -97,12 +102,41 @@ class BackofficeController extends Controller
         return view('backoffice.empresas.editar', compact('empresa', 'matrices', 'adminUsuarios'));
     }
 
+    public function empresasUpdate(Request $request, Empresa $empresa)
+    {
+        $data = $request->validate([
+            'razon_social'     => 'required|string|max:200',
+            'nit'              => 'required|string|max:20',
+            'email'            => 'nullable|email|max:200',
+            'telefono'         => 'nullable|string|max:20',
+            'municipio'        => 'nullable|string|max:100',
+            'empresa_padre_id' => 'nullable|exists:empresa,id',
+        ]);
+
+        if (isset($data['empresa_padre_id']) && $data['empresa_padre_id'] == $empresa->id) {
+            return back()->withErrors(['empresa_padre_id' => 'Una empresa no puede ser filial de sí misma.']);
+        }
+
+        $empresa->update($data);
+
+        return redirect()->route('backoffice.empresas')->with('success', 'Empresa actualizada.');
+    }
+
+    public function empresasDestroy(Empresa $empresa)
+    {
+        Empresa::where('empresa_padre_id', $empresa->id)->update(['empresa_padre_id' => null]);
+
+        $nombre = $empresa->razon_social;
+        $empresa->delete();
+
+        return redirect()->route('backoffice.empresas')->with('success', '"' . $nombre . '" eliminada.');
+    }
+
+    // ── Módulos ───────────────────────────────────────────────────────────
+
     public function modulos(Empresa $empresa)
     {
-        $modulos = Modulo::where('activo', true)
-            ->orderBy('orden')
-            ->orderBy('nombre')
-            ->get();
+        $modulos = Modulo::where('activo', true)->orderBy('orden')->orderBy('nombre')->get();
 
         $modulosActivos = $empresa->modulos()
             ->wherePivot('activo', true)
@@ -119,60 +153,14 @@ class BackofficeController extends Controller
             'modulos.*' => 'integer|exists:modulos,id',
         ]);
 
-        $modulosIds = collect($data['modulos'] ?? [])->map(fn ($id) => (int) $id)->unique()->values();
-
-        $modulosDisponibles = Modulo::where('activo', true)
-            ->whereIn('id', $modulosIds)
-            ->pluck('id');
-
-        $syncData = [];
-        foreach ($modulosDisponibles as $moduloId) {
-            $syncData[$moduloId] = ['activo' => true];
-        }
-
-        $empresa->modulos()->sync($syncData);
+        $this->actualizarModulos->execute($empresa, $data['modulos'] ?? []);
 
         return redirect()
             ->route('backoffice.empresas.modulos', $empresa)
             ->with('success', 'Módulos actualizados correctamente para ' . $empresa->razon_social . '.');
     }
 
-    public function empresasUpdate(Request $request, Empresa $empresa)
-    {
-        $data = $request->validate([
-            'razon_social'      => 'required|string|max:200',
-            'nit'               => 'required|string|max:20',
-            'email'             => 'nullable|email|max:200',
-            'telefono'          => 'nullable|string|max:20',
-            'municipio'         => 'nullable|string|max:100',
-            'empresa_padre_id'  => 'nullable|exists:empresa,id',
-        ]);
-
-        // Evitar que una empresa sea filial de sí misma
-        if (isset($data['empresa_padre_id']) && $data['empresa_padre_id'] == $empresa->id) {
-            return back()->withErrors(['empresa_padre_id' => 'Una empresa no puede ser filial de sí misma.']);
-        }
-
-        $empresa->update($data);
-
-        return redirect()->route('backoffice.empresas')
-            ->with('success', 'Empresa actualizada.');
-    }
-
-    public function empresasDestroy(Empresa $empresa)
-    {
-        // Reubicar filiales como matrices independientes antes de eliminar
-        Empresa::where('empresa_padre_id', $empresa->id)
-            ->update(['empresa_padre_id' => null]);
-
-        $nombre = $empresa->razon_social;
-        $empresa->delete();
-
-        return redirect()->route('backoffice.empresas')
-            ->with('success', '"' . $nombre . '" eliminada.');
-    }
-
-    // ── Usuarios admin de empresa ─────────────────────────────────────────
+    // ── Admin de empresa ──────────────────────────────────────────────────
 
     public function crearAdmin(Empresa $empresa)
     {
@@ -188,36 +176,7 @@ class BackofficeController extends Controller
             'rol'      => 'required|exists:roles,name',
         ]);
 
-        $user = User::create([
-            'name'     => strtoupper($data['name']),
-            'email'    => strtolower($data['email']),
-            'password' => Hash::make($data['password']),
-            'activo'   => true,
-        ]);
-
-        // Asignar rol Spatie (controla permisos en toda la app)
-        $user->assignRole($data['rol']);
-
-        // Rol en el pivot: admin si es admin/super-admin, operador en cualquier otro caso
-        $rolPivot = in_array($data['rol'], ['admin', 'super-admin']) ? 'admin' : 'operador';
-
-        // Vincular a la empresa
-        $empresa->usuarios()->attach($user->id, ['rol' => $rolPivot, 'activo' => true]);
-
-        // Si la empresa es una filial, también vincular a la matriz
-        if ($empresa->empresa_padre_id) {
-            $matriz = $empresa->padre;
-            if ($matriz && !$matriz->usuarios()->where('user_id', $user->id)->exists()) {
-                $matriz->usuarios()->attach($user->id, ['rol' => $rolPivot, 'activo' => true]);
-            }
-        }
-
-        // Si la empresa es matriz, vincular a todas sus filiales
-        foreach ($empresa->filiales as $filial) {
-            if (!$filial->usuarios()->where('user_id', $user->id)->exists()) {
-                $filial->usuarios()->attach($user->id, ['rol' => $rolPivot, 'activo' => true]);
-            }
-        }
+        $user = $this->crearAdmin->execute($data, $empresa);
 
         return redirect()->route('backoffice.empresas')
             ->with('success', 'Usuario admin "' . $user->name . '" creado y vinculado a ' . $empresa->razon_social . '.');
@@ -237,7 +196,7 @@ class BackofficeController extends Controller
 
     public function usuarioEditar(User $usuario)
     {
-        $todasEmpresas = Empresa::orderBy('razon_social')->get();
+        $todasEmpresas   = Empresa::orderBy('razon_social')->get();
         $empresasUsuario = $usuario->empresas()->pluck('empresa_id')->toArray();
 
         return view('backoffice.usuarios.editar', compact('usuario', 'todasEmpresas', 'empresasUsuario'));
@@ -246,11 +205,11 @@ class BackofficeController extends Controller
     public function usuarioUpdate(Request $request, User $usuario)
     {
         $request->validate([
-            'name'        => 'required|string|max:100',
-            'email'       => 'required|email|unique:users,email,' . $usuario->id,
-            'empresa_ids' => 'nullable|array',
+            'name'          => 'required|string|max:100',
+            'email'         => 'required|email|unique:users,email,' . $usuario->id,
+            'empresa_ids'   => 'nullable|array',
             'empresa_ids.*' => 'exists:empresa,id',
-            'roles'       => 'nullable|array',
+            'roles'         => 'nullable|array',
         ]);
 
         $usuario->update([
@@ -263,7 +222,6 @@ class BackofficeController extends Controller
             $usuario->update(['password' => Hash::make($request->password)]);
         }
 
-        // Actualizar empresas asignadas
         $nuevasEmpresas = [];
         foreach ($request->empresa_ids ?? [] as $empId) {
             $rol = in_array($empId, $request->admins ?? []) ? 'admin' : 'operador';
@@ -281,11 +239,10 @@ class BackofficeController extends Controller
         $usuario->empresas()->detach();
         $usuario->delete();
 
-        return redirect()->route('backoffice.usuarios')
-            ->with('success', '"' . $nombre . '" eliminado.');
+        return redirect()->route('backoffice.usuarios')->with('success', '"' . $nombre . '" eliminado.');
     }
 
-    // ── Impersonar empresa (entrar como ese cliente) ──────────────────────
+    // ── Impersonación ─────────────────────────────────────────────────────
 
     public function impersonar(Empresa $empresa)
     {
@@ -302,11 +259,10 @@ class BackofficeController extends Controller
         return redirect()->route('backoffice.dashboard');
     }
 
-    // ── Backup general de la plataforma (solo superadmin) ────────────────
+    // ── Backup ────────────────────────────────────────────────────────────
 
     public function backupIndex()
     {
-        // Conteo total por tabla (sin filtro de empresa)
         $tablas = [
             'empresa'                => 'Empresas',
             'users'                  => 'Usuarios',
@@ -344,79 +300,12 @@ class BackofficeController extends Controller
 
     public function backupDescargar()
     {
-        $tablas = [
-            'empresa', 'empresa_user', 'users',
-            'clientes', 'proveedores', 'productos', 'categorias', 'unidades_medida',
-            'facturas', 'factura_items',
-            'cotizaciones', 'cotizacion_items',
-            'ordenes_compra', 'orden_compra_items',
-            'recibos_caja', 'remisiones', 'remision_items',
-            'movimientos_inventario', 'login_logs',
-        ];
-
-        $sql  = "-- ================================================\n";
-        $sql .= "-- BACKUP COMPLETO — FacturaCO (BackOffice)\n";
-        $sql .= "-- Fecha:        " . now()->format('d/m/Y H:i:s') . "\n";
-        $sql .= "-- Generado por: " . auth()->user()->name . "\n";
-        $sql .= "-- Base de datos: PostgreSQL\n";
-        $sql .= "-- ADVERTENCIA: restaurar este archivo reemplaza todos los datos.\n";
-        $sql .= "-- ================================================\n\n";
-        $sql .= "SET client_encoding = 'UTF8';\n";
-        $sql .= "SET standard_conforming_strings = on;\n\n";
-
-        foreach ($tablas as $tabla) {
-            try {
-                $filas = DB::table($tabla)->get();
-
-                $sql .= "-- ────────────────────────────────────────\n";
-                $sql .= "-- Tabla: {$tabla} ({$filas->count()} registros)\n";
-                $sql .= "-- ────────────────────────────────────────\n";
-
-                if ($filas->isEmpty()) {
-                    $sql .= "-- (sin datos)\n\n";
-                    continue;
-                }
-
-                foreach ($filas as $fila) {
-                    $cols    = array_keys((array) $fila);
-                    $colsSql = implode(', ', array_map(fn($c) => '"' . $c . '"', $cols));
-                    $vals    = array_map(function ($v) {
-                        if (is_null($v))                    return 'NULL';
-                        if (is_bool($v))                    return $v ? 'TRUE' : 'FALSE';
-                        if (is_int($v) || is_float($v))     return $v;
-                        $v = str_replace("'", "''", (string) $v);
-                        return "'" . $v . "'";
-                    }, (array) $fila);
-                    $valsSql = implode(', ', $vals);
-                    $sql .= "INSERT INTO \"{$tabla}\" ({$colsSql}) VALUES ({$valsSql});\n";
-                }
-
-                $sql .= "\n";
-            } catch (\Exception $e) {
-                $sql .= "-- ERROR en {$tabla}: " . $e->getMessage() . "\n\n";
-            }
-        }
-
+        $sql    = $this->backupSql->generar(auth()->user()->name);
         $nombre = 'backoffice_backup_completo_' . now()->format('Y-m-d_His') . '.sql';
 
         return response($sql, 200, [
             'Content-Type'        => 'text/plain; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $nombre . '"',
         ]);
-    }
-
-    // ── Helpers privados ──────────────────────────────────────────────────
-
-    private function copiarAdminsDeMatriz(Empresa $filial): void
-    {
-        $matriz = Empresa::find($filial->empresa_padre_id);
-        if (!$matriz) return;
-
-        $admins = $matriz->usuarios()->wherePivot('rol', 'admin')->get();
-        foreach ($admins as $admin) {
-            if (!$filial->usuarios()->where('user_id', $admin->id)->exists()) {
-                $filial->usuarios()->attach($admin->id, ['rol' => 'admin', 'activo' => true]);
-            }
-        }
     }
 }
