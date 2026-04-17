@@ -304,11 +304,12 @@
             </button>
             <input id="modal-cantidad-input"
                    type="number"
-                   min="0.001"
+                   min="1"
                    step="1"
                    value="1"
                    class="flex-1 bg-[#1a2235] border border-amber-500/60 rounded-xl px-3 py-2
-                          text-center text-xl font-black text-amber-400 focus:outline-none">
+                          text-center text-xl font-black text-amber-400 focus:outline-none
+                          [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
             <button onclick="ajustarCantidadModal(1)"
                     class="w-10 h-10 bg-[#1a2235] border border-[#1e2d47] rounded-xl text-slate-300
                            hover:border-amber-500/50 hover:text-amber-400 transition-colors text-xl font-bold flex items-center justify-center">
@@ -445,7 +446,7 @@ function agregarAlCarrito(card) {
 
 function ajustarCantidadModal(delta) {
     const inp = document.getElementById('modal-cantidad-input');
-    inp.value = Math.max(0.001, parseFloat(inp.value) + delta);
+    inp.value = Math.max(1, parseFloat(inp.value) + delta);
 }
 
 function cerrarModalCantidad() {
