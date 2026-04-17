@@ -47,6 +47,7 @@ return new class extends Migration
             $table->boolean('activo')->default(true);
             $table->text('observaciones')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('empresa_id')->references('id')->on('empresa')->onDelete('cascade');
             $table->index(['empresa_id', 'activo']);

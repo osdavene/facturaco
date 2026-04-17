@@ -13,9 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
-        $middleware->validateCsrfTokens(except: [
-            'webhooks/wompi',
-        ]);
+        $middleware->validateCsrfTokens(except: array_merge(
+            ['webhooks/wompi'],
+            env('APP_ENV') === 'testing' ? ['*'] : [],
+        ));
         $middleware->alias([
             'empresa'           => \App\Http\Middleware\EnsureEmpresaSeleccionada::class,
             'backoffice'        => \App\Http\Middleware\EsBackoffice::class,

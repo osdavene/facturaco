@@ -297,6 +297,22 @@ class FacturaController extends Controller
 
     public function destroy(Factura $factura)
     {
+        $userId = Auth::id();
+
+        $factura->load('items.producto');
+
+        foreach ($factura->items as $item) {
+            if ($item->producto_id && $item->producto && ! $item->producto->es_servicio) {
+                $this->inventario->registrarEntrada(
+                    $item->producto,
+                    $item->cantidad,
+                    $factura->numero,
+                    $userId,
+                    'Anulación',
+                );
+            }
+        }
+
         $factura->update(['estado' => 'anulada']);
 
         return redirect()->route('facturas.index')

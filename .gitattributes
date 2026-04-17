@@ -9,3 +9,17 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Nunca exportar archivos sensibles o generados
+.env export-ignore
+.env.* export-ignore
+*.sqlite export-ignore
+*.sqlite-journal export-ignore
+/storage export-ignore
+/bootstrap/cache export-ignore
+/node_modules export-ignore
+/vendor export-ignore
+/public/build export-ignore
+/public/storage export-ignore
+/tests export-ignore
+/database/database.sqlite export-ignore
