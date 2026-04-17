@@ -193,18 +193,40 @@ class OrdenCompraController extends Controller
 
                 $item->update(['cantidad_recibida' => $cantRecibida]);
 
+                // Resolver el producto: si no está vinculado, crearlo automáticamente
+                $producto = null;
                 if ($item->producto_id) {
                     $producto = Producto::find($item->producto_id);
-                    if ($producto) {
-                        $this->inventario->registrarEntrada(
-                            $producto,
-                            $cantRecibida,
-                            $orden->numero,
-                            $userId,
-                            'Recepción OC',
-                            $item->precio_unitario,
-                        );
-                    }
+                } else {
+                    $empresaId = $orden->empresa_id;
+                    $codigo    = $item->codigo !== 'SIN-COD' ? $item->codigo
+                        : 'OC-' . strtoupper(preg_replace('/\s+/', '-', trim($item->descripcion)));
+
+                    $producto = Producto::create([
+                        'empresa_id'     => $empresaId,
+                        'codigo'         => $codigo,
+                        'nombre'         => $item->descripcion,
+                        'precio_compra'  => $item->precio_unitario,
+                        'precio_venta'   => $item->precio_unitario,
+                        'stock_actual'   => 0,
+                        'stock_minimo'   => 0,
+                        'es_servicio'    => false,
+                        'activo'         => true,
+                        'created_by'     => $userId,
+                    ]);
+
+                    $item->update(['producto_id' => $producto->id]);
+                }
+
+                if ($producto) {
+                    $this->inventario->registrarEntrada(
+                        $producto,
+                        $cantRecibida,
+                        $orden->numero,
+                        $userId,
+                        'Recepción OC',
+                        $item->precio_unitario,
+                    );
                 }
             }
 
