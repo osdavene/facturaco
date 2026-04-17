@@ -346,6 +346,10 @@ let productoModalActual = null;
 let categoriaActiva = null;
 let terminoBusqueda = '';
 
+// Cacheado antes del primer innerHTML: después de esa llamada el elemento
+// queda desconectado del DOM y getElementById devuelve null.
+const CARRITO_VACIO_EL = document.getElementById('carrito-vacio');
+
 // ── Formatear moneda ─────────────────────────────────
 function fmt(n) {
     return '$' + Number(n).toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
@@ -506,8 +510,8 @@ function limpiarCarrito() {
 }
 
 function renderizarCarrito() {
-    const cont  = document.getElementById('carrito-items');
-    const vacio = document.getElementById('carrito-vacio');
+    const cont      = document.getElementById('carrito-items');
+    const vacio     = CARRITO_VACIO_EL;
     const btnCobrar = document.getElementById('btn-cobrar');
 
     if (carrito.length === 0) {
