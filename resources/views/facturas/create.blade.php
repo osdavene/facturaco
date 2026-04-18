@@ -387,14 +387,16 @@ document.getElementById('buscar-producto').addEventListener('input', function() 
 function agregarProducto(p) {
     document.getElementById('buscar-producto').value = '';
     document.getElementById('resultados-producto').classList.add('hidden');
+    const precio = parseFloat(p.precio_aplicado ?? p.precio_venta) || 0;
     agregarItem({
         producto_id:     p.id,
         codigo:          p.codigo,
         descripcion:     p.nombre,
         cantidad:        1,
-        precio_unitario: p.precio_aplicado || p.precio_venta, // ← usar precio según lista
-        iva_pct:         p.iva_pct,
+        precio_unitario: precio,
+        iva_pct:         p.iva_pct ?? 19,
         descuento_pct:   0,
+        sin_precio:      precio === 0,
     });
 }
 
@@ -407,9 +409,10 @@ function agregarItem(data = {}) {
         codigo:          data.codigo          || '',
         descripcion:     data.descripcion     || '',
         cantidad:        data.cantidad        || 1,
-        precio_unitario: data.precio_unitario || 0,
+        precio_unitario: parseFloat(data.precio_unitario) || 0,
         descuento_pct:   data.descuento_pct   || 0,
-        iva_pct:         data.iva_pct         ?? 19,
+        iva_pct:         parseFloat(data.iva_pct ?? 19),
+        sin_precio:      data.sin_precio      || false,
     });
     renderItems();
     calcularTotales();
@@ -427,6 +430,16 @@ function updateItem(id, campo, valor) {
     item[campo] = ['cantidad','precio_unitario','descuento_pct','iva_pct'].includes(campo)
         ? parseFloat(valor) || 0
         : valor;
+    if (campo === 'precio_unitario') {
+        if (item.precio_unitario > 0) item.sin_precio = false;
+        const input = document.querySelector(`tr[data-id="${id}"] input[name*="precio_unitario"]`);
+        if (input) {
+            input.classList.toggle('border-amber-500', item.sin_precio && item.precio_unitario === 0);
+            input.classList.toggle('text-amber-400',   item.sin_precio && item.precio_unitario === 0);
+            input.classList.toggle('border-[#1e2d47]', !(item.sin_precio && item.precio_unitario === 0));
+            input.classList.toggle('text-slate-200',   !(item.sin_precio && item.precio_unitario === 0));
+        }
+    }
     actualizarFilaTotales(id);
     calcularTotales();
 }
@@ -491,8 +504,10 @@ function renderItems() {
                        name="items[${idx}][precio_unitario]"
                        value="${item.precio_unitario}"
                        onchange="updateItem(${item.id},'precio_unitario',this.value)"
-                       class="w-full bg-transparent border-b border-[#1e2d47] text-sm text-slate-200
-                              text-right py-1 focus:outline-none focus:border-amber-500">
+                       class="w-full bg-transparent border-b text-sm text-right py-1 focus:outline-none transition-colors
+                              ${item.sin_precio && item.precio_unitario===0
+                                ? 'border-amber-500 text-amber-400 focus:border-amber-300'
+                                : 'border-[#1e2d47] text-slate-200 focus:border-amber-500'}">
             </td>
             <td class="py-2 px-2 w-16 hidden sm:table-cell">
                 <input type="text"

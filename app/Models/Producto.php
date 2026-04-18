@@ -44,9 +44,17 @@ class Producto extends Model
     ];
 
     protected $casts = [
-        'incluye_iva' => 'boolean',
-        'activo'      => 'boolean',
-        'es_servicio' => 'boolean',
+        'precio_compra'  => 'float',
+        'precio_venta'   => 'float',
+        'precio_venta2'  => 'float',
+        'precio_venta3'  => 'float',
+        'iva_pct'        => 'float',
+        'stock_actual'   => 'float',
+        'stock_minimo'   => 'float',
+        'stock_maximo'   => 'float',
+        'incluye_iva'    => 'boolean',
+        'activo'         => 'boolean',
+        'es_servicio'    => 'boolean',
     ];
 
     public function categoria()
