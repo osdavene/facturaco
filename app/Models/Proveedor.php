@@ -15,18 +15,35 @@ class Proveedor extends Model
 {
     use PertenecerGrupo, HasFactory, SoftDeletes, LogsActivity;
 
+    protected $table = 'proveedores';
+
     protected $fillable = [
         'empresa_id',
-        'nombre',
-        'documento',
+        'tipo_documento',
+        'numero_documento',
         'digito_verificacion',
+        'razon_social',
+        'nombre_contacto',
+        'cargo_contacto',
         'email',
         'telefono',
+        'celular',
+        'departamento',
+        'municipio',
         'direccion',
-        'contacto',
-        'plazo_pago',
+        'regimen',
+        'gran_contribuyente',
+        'autoretenedor',
         'retefuente_pct',
+        'reteiva_pct',
+        'reteica_pct',
+        'plazo_pago',
+        'cuenta_bancaria',
+        'banco',
+        'tipo_cuenta',
+        'cupo_credito',
         'activo',
+        'observaciones',
         'created_by',
         'updated_by',
     ];
