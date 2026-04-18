@@ -62,6 +62,16 @@ class Proveedor extends Model
             ->logOnlyDirty();
     }
 
+    public function scopeBuscar($query, $texto)
+    {
+        return $query->where(function ($q) use ($texto) {
+            $q->where('razon_social',      'like', "%{$texto}%")
+              ->orWhere('numero_documento', 'like', "%{$texto}%")
+              ->orWhere('nombre_contacto',  'like', "%{$texto}%")
+              ->orWhere('email',            'like', "%{$texto}%");
+        });
+    }
+
     /**
      * Productos del proveedor (many-to-many)
      */

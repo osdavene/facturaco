@@ -67,6 +67,15 @@ class Producto extends Model
     /**
      * Proveedores del producto (many-to-many)
      */
+    public function scopeBuscar($query, $texto)
+    {
+        return $query->where(function ($q) use ($texto) {
+            $q->where('nombre',        'like', "%{$texto}%")
+              ->orWhere('codigo',       'like', "%{$texto}%")
+              ->orWhere('codigo_barras','like', "%{$texto}%");
+        });
+    }
+
     public function proveedores(): BelongsToMany
     {
         return $this->belongsToMany(Proveedor::class, 'producto_proveedor')

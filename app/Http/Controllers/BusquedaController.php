@@ -25,8 +25,10 @@ class BusquedaController extends Controller
         $resultados = [];
 
         // ── Facturas ──────────────────────────────────
-        Factura::where('numero', 'like', "%$q%")
-            ->orWhere('cliente_nombre', 'like', "%$q%")
+        Factura::where(function($query) use ($q) {
+                $query->where('numero', 'like', "%$q%")
+                      ->orWhere('cliente_nombre', 'like', "%$q%");
+            })
             ->limit(4)->get()
             ->each(function($f) use (&$resultados) {
                 $resultados[] = [
@@ -100,8 +102,10 @@ class BusquedaController extends Controller
             });
 
         // ── Cotizaciones ──────────────────────────────
-        Cotizacion::where('numero', 'like', "%$q%")
-            ->orWhere('cliente_nombre', 'like', "%$q%")
+        Cotizacion::where(function($query) use ($q) {
+                $query->where('numero', 'like', "%$q%")
+                      ->orWhere('cliente_nombre', 'like', "%$q%");
+            })
             ->limit(2)->get()
             ->each(function($c) use (&$resultados) {
                 $resultados[] = [
@@ -116,8 +120,10 @@ class BusquedaController extends Controller
             });
 
         // ── Remisiones ────────────────────────────────
-        Remision::where('numero', 'like', "%$q%")
-            ->orWhere('cliente_nombre', 'like', "%$q%")
+        Remision::where(function($query) use ($q) {
+                $query->where('numero', 'like', "%$q%")
+                      ->orWhere('cliente_nombre', 'like', "%$q%");
+            })
             ->limit(2)->get()
             ->each(function($r) use (&$resultados) {
                 $resultados[] = [
@@ -132,8 +138,10 @@ class BusquedaController extends Controller
             });
 
         // ── Recibos de Caja ───────────────────────────
-        ReciboCaja::where('numero', 'like', "%$q%")
-            ->orWhere('cliente_nombre', 'like', "%$q%")
+        ReciboCaja::where(function($query) use ($q) {
+                $query->where('numero', 'like', "%$q%")
+                      ->orWhere('cliente_nombre', 'like', "%$q%");
+            })
             ->limit(2)->get()
             ->each(function($r) use (&$resultados) {
                 $resultados[] = [
@@ -148,8 +156,10 @@ class BusquedaController extends Controller
             });
 
         // ── Órdenes de Compra ─────────────────────────
-        OrdenCompra::where('numero', 'like', "%$q%")
-            ->orWhere('proveedor_nombre', 'like', "%$q%")
+        OrdenCompra::where(function($query) use ($q) {
+                $query->where('numero', 'like', "%$q%")
+                      ->orWhere('proveedor_nombre', 'like', "%$q%");
+            })
             ->limit(2)->get()
             ->each(function($o) use (&$resultados) {
                 $resultados[] = [
@@ -164,9 +174,11 @@ class BusquedaController extends Controller
             });
 
         // ── Notas de Crédito ──────────────────────────
-        NotaCredito::where('numero', 'like', "%$q%")
-            ->orWhere('cliente_nombre', 'like', "%$q%")
-            ->orWhere('factura_numero', 'like', "%$q%")
+        NotaCredito::where(function($query) use ($q) {
+                $query->where('numero', 'like', "%$q%")
+                      ->orWhere('cliente_nombre', 'like', "%$q%")
+                      ->orWhere('factura_numero', 'like', "%$q%");
+            })
             ->limit(2)->get()
             ->each(function($n) use (&$resultados) {
                 $resultados[] = [
