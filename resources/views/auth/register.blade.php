@@ -13,8 +13,12 @@
     <div class="w-full max-w-md">
 
         <div class="text-center mb-8">
-            <div class="mb-4">
-                <img src="/img/logo-dark.png" alt="FacturaCO" class="h-14 w-auto object-contain">
+            <div class="inline-flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center
+                            font-display font-black text-black text-xl">FC</div>
+                <div class="font-display font-black text-2xl text-white">
+                    Factura<span class="text-amber-500">CO</span>
+                </div>
             </div>
             <h1 class="font-display font-bold text-2xl mb-1">Crear Cuenta</h1>
             <p class="text-slate-400 text-sm">Completa los datos para registrarte</p>

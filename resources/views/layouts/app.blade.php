@@ -37,33 +37,29 @@
             {{-- Logo + Selector de empresa --}}
             @php $emp = \App\Models\Empresa::obtener(); @endphp
             @php $todasEmpresas = auth()->user()->empresas()->wherePivot('activo', true)->get(); @endphp
-            <div class="px-4 pt-4 pb-3 border-b border-[#1e2d47]">
-
-                {{-- Logo FacturaCO --}}
-                <div class="flex justify-center mb-3">
-                    <img src="/img/logo-dark.png" alt="FacturaCO" class="h-12 w-auto object-contain">
-                </div>
-
+            <div class="px-4 py-4 border-b border-[#1e2d47]">
                 {{-- Si tiene varias empresas: dropdown selector --}}
                 @if($todasEmpresas->count() > 1)
                 <div class="relative group/empsel">
                     <button type="button"
-                            class="w-full flex items-center gap-2.5 rounded-xl px-2 py-1.5
-                                   hover:bg-[#1a2235] transition-colors text-left
-                                   border border-[#1e2d47]">
-                        <div class="w-7 h-7 bg-amber-500/10 border border-amber-500/20 rounded-lg
+                            class="w-full flex items-center gap-3 rounded-xl px-2 py-1.5
+                                   hover:bg-[#1a2235] transition-colors text-left">
+                        <div class="w-9 h-9 bg-amber-500/10 border border-amber-500/20 rounded-xl
                                     flex items-center justify-center flex-shrink-0 overflow-hidden">
                             @if($emp->logo)
-                                <img src="{{ Storage::url($emp->logo) }}" class="w-7 h-7 object-contain" alt="">
+                                <img src="{{ Storage::url($emp->logo) }}" class="w-9 h-9 object-contain" alt="">
                             @else
-                                <span class="font-display font-black text-amber-500 text-xs">
+                                <span class="font-display font-black text-amber-500 text-sm">
                                     {{ strtoupper(substr($emp->razon_social, 0, 2)) }}
                                 </span>
                             @endif
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="text-xs font-semibold text-slate-300 truncate leading-tight">
+                            <div class="text-xs font-bold text-white truncate leading-tight">
                                 {{ $emp->nombre_comercial ?: $emp->razon_social }}
+                            </div>
+                            <div class="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                <span>Factura<span class="text-amber-500">CO</span></span>
                             </div>
                         </div>
                         <i class="fas fa-chevron-down text-slate-600 text-[10px] flex-shrink-0
@@ -119,19 +115,20 @@
                 </div>
                 @else
                 {{-- Solo una empresa: mostrar estático --}}
-                <div class="flex items-center gap-2.5 px-2 border border-[#1e2d47] rounded-xl py-1.5">
-                    <div class="w-7 h-7 bg-amber-500/10 border border-amber-500/20 rounded-lg
-                                flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <div class="flex items-center gap-3 px-2">
+                    <div class="w-9 h-9 bg-amber-500 rounded-xl flex items-center justify-center
+                                font-display font-black text-black text-sm flex-shrink-0 overflow-hidden">
                         @if($emp->logo)
-                            <img src="{{ Storage::url($emp->logo) }}" class="w-7 h-7 object-contain" alt="Logo">
+                            <img src="{{ Storage::url($emp->logo) }}" class="w-9 h-9 object-contain" alt="Logo">
                         @else
-                            <span class="font-display font-black text-amber-500 text-xs">
-                                {{ strtoupper(substr($emp->razon_social, 0, 2)) }}
-                            </span>
+                            FC
                         @endif
                     </div>
                     <div class="min-w-0">
-                        <div class="text-xs font-semibold text-slate-300 truncate leading-tight">
+                        <div class="font-display font-black text-lg text-white leading-tight">
+                            Factura<span class="text-amber-500">CO</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 tracking-wide truncate">
                             {{ $emp->nombre_comercial ?: $emp->razon_social }}
                         </div>
                     </div>
