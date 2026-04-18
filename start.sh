@@ -121,9 +121,14 @@ php artisan view:clear 2>/dev/null || true
 # ── PHP-FPM ────────────────────────────────────────────────────────────────
 echo "=== Iniciando PHP-FPM ==="
 php-fpm -D
+sleep 1
+
+# ── Validar config nginx antes de arrancar ──────────────────────────────────
+echo "=== Validando config nginx ==="
+nginx -t 2>&1
 
 # ── Nginx en background (Railway puede hacer healthcheck desde aquí) ───────
-echo "=== Nginx iniciando en background ==="
+echo "=== Nginx iniciando en puerto ${APP_PORT} ==="
 nginx -g 'daemon off;' &
 NGINX_PID=$!
 
