@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('inventario.store') }}">
+    <form method="POST" action="{{ route('inventario.store') }}" enctype="multipart/form-data">
         @csrf
 
         <x-form-errors class="mb-4" />
@@ -161,10 +161,38 @@
             </div>
         </div>
 
-        {{-- SECCIÓN 3: Stock --}}
-        <div id="seccion-stock" class="card p-6 mb-6">
+        {{-- SECCIÓN 3: Imagen --}}
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">3</span>
+                Imagen del Producto
+            </h2>
+            <div class="flex items-start gap-6">
+                <div id="preview-wrap"
+                     class="w-32 h-32 rounded-2xl border-2 border-dashed border-[#1e2d47]
+                            flex items-center justify-center flex-shrink-0 overflow-hidden bg-[#0d1421]">
+                    <i id="preview-icon" class="fas fa-image text-3xl text-slate-700"></i>
+                    <img id="preview-img" src="" alt="" class="hidden w-full h-full object-cover">
+                </div>
+                <div class="flex-1">
+                    <label class="form-label">Foto del producto</label>
+                    <input type="file" name="imagen" id="imagen-input"
+                           accept="image/jpg,image/jpeg,image/png,image/webp"
+                           class="block w-full text-sm text-slate-400
+                                  file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-amber-500/10 file:text-amber-500
+                                  hover:file:bg-amber-500/20 cursor-pointer">
+                    <p class="text-xs text-slate-600 mt-2">JPG, PNG o WebP · máx. 2 MB</p>
+                    @error('imagen') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </div>
+
+        {{-- SECCIÓN 4: Stock --}}
+        <div id="seccion-stock" class="card p-6 mb-6">
+            <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
+                <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">4</span>
                 Stock e Inventario
             </h2>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -230,6 +258,18 @@ function toggleServicio(cb) {
     seccion.style.opacity      = cb.checked ? '0.4' : '1';
     seccion.style.pointerEvents = cb.checked ? 'none' : 'auto';
 }
+
+document.getElementById('imagen-input').addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById('preview-img').src = e.target.result;
+        document.getElementById('preview-img').classList.remove('hidden');
+        document.getElementById('preview-icon').classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+});
 </script>
 @endpush
 @endsection

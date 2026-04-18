@@ -18,7 +18,8 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('inventario.update', $inventario) }}">
+    <form method="POST" action="{{ route('inventario.update', $inventario) }}"
+          enctype="multipart/form-data">
         @csrf @method('PUT')
 
         <x-form-errors class="mb-4" />
@@ -138,10 +139,53 @@
             </div>
         </div>
 
-        {{-- SECCIÓN 3 --}}
-        <div class="card p-6 mb-6">
+        {{-- SECCIÓN 3: Imagen --}}
+        <div class="card p-6 mb-4">
             <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                 <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">3</span>
+                Imagen del Producto
+            </h2>
+            <div class="flex items-start gap-6">
+                <div id="preview-wrap"
+                     class="w-32 h-32 rounded-2xl border-2 border-[#1e2d47] flex-shrink-0
+                            overflow-hidden bg-[#0d1421] flex items-center justify-center">
+                    @if($inventario->imagen)
+                        <img id="preview-img" src="{{ Storage::url($inventario->imagen) }}"
+                             alt="{{ $inventario->nombre }}" class="w-full h-full object-cover">
+                        <i id="preview-icon" class="fas fa-image text-3xl text-slate-700 hidden"></i>
+                    @else
+                        <i id="preview-icon" class="fas fa-image text-3xl text-slate-700"></i>
+                        <img id="preview-img" src="" alt="" class="hidden w-full h-full object-cover">
+                    @endif
+                </div>
+                <div class="flex-1 space-y-3">
+                    <div>
+                        <label class="form-label">Cambiar imagen</label>
+                        <input type="file" name="imagen" id="imagen-input"
+                               accept="image/jpg,image/jpeg,image/png,image/webp"
+                               class="block w-full text-sm text-slate-400
+                                      file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-amber-500/10 file:text-amber-500
+                                      hover:file:bg-amber-500/20 cursor-pointer">
+                        <p class="text-xs text-slate-600 mt-1">JPG, PNG o WebP · máx. 2 MB</p>
+                        @error('imagen') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    @if($inventario->imagen)
+                    <label class="flex items-center gap-2 cursor-pointer" id="eliminar-wrap">
+                        <input type="checkbox" name="eliminar_imagen" value="1"
+                               class="w-4 h-4 accent-red-500" id="chk-eliminar-imagen">
+                        <span class="text-sm text-red-400">Eliminar imagen actual</span>
+                    </label>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- SECCIÓN 4: Stock --}}
+        <div class="card p-6 mb-6">
+            <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
+                <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">4</span>
                 Stock e Inventario
             </h2>
             <div class="bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3 mb-4 text-xs text-amber-400">
@@ -220,6 +264,37 @@ document.querySelectorAll('input[type="text"], textarea').forEach(el => {
         this.setSelectionRange(pos, pos);
     });
 });
+
+const imagenInput = document.getElementById('imagen-input');
+if (imagenInput) {
+    imagenInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('preview-img').classList.remove('hidden');
+            document.getElementById('preview-icon').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+        const chk = document.getElementById('chk-eliminar-imagen');
+        if (chk) chk.checked = false;
+    });
+}
+
+const chkEliminar = document.getElementById('chk-eliminar-imagen');
+if (chkEliminar) {
+    chkEliminar.addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('preview-img').classList.add('hidden');
+            document.getElementById('preview-icon').classList.remove('hidden');
+            if (imagenInput) imagenInput.value = '';
+        } else {
+            document.getElementById('preview-img').classList.remove('hidden');
+            document.getElementById('preview-icon').classList.add('hidden');
+        }
+    });
+}
 </script>
 @endpush
 @endsection

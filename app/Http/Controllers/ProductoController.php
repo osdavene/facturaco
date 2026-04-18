@@ -10,6 +10,7 @@ use App\Models\Producto;
 use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ProductoController extends Controller
 {
@@ -56,6 +57,10 @@ class ProductoController extends Controller
 
         $data['incluye_iva'] = $request->boolean('incluye_iva');
         $data['es_servicio'] = $request->boolean('es_servicio');
+
+        if ($request->hasFile('imagen')) {
+            $data['imagen'] = $request->file('imagen')->store('productos', 'public');
+        }
 
         DB::transaction(function() use ($data, $request) {
             $producto = Producto::create($data);
@@ -106,6 +111,16 @@ class ProductoController extends Controller
         $data['incluye_iva'] = $request->boolean('incluye_iva');
         $data['es_servicio'] = $request->boolean('es_servicio');
         $data['activo']      = $request->boolean('activo');
+
+        if ($request->boolean('eliminar_imagen') && $inventario->imagen) {
+            Storage::disk('public')->delete($inventario->imagen);
+            $data['imagen'] = null;
+        } elseif ($request->hasFile('imagen')) {
+            if ($inventario->imagen) {
+                Storage::disk('public')->delete($inventario->imagen);
+            }
+            $data['imagen'] = $request->file('imagen')->store('productos', 'public');
+        }
 
         $inventario->update($data);
 

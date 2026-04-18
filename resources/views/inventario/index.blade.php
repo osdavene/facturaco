@@ -128,12 +128,18 @@
                     </td>
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center
-                                        font-bold text-xs text-white flex-shrink-0
-                                        {{ $producto->es_servicio
+                            <div class="w-9 h-9 rounded-xl flex-shrink-0 overflow-hidden
+                                        flex items-center justify-center
+                                        {{ $producto->imagen ? '' : ($producto->es_servicio
                                            ? 'bg-gradient-to-br from-purple-500 to-pink-600'
-                                           : 'bg-gradient-to-br from-amber-500 to-orange-600' }}">
-                                <i class="fas {{ $producto->es_servicio ? 'fa-concierge-bell' : 'fa-box' }}"></i>
+                                           : 'bg-gradient-to-br from-amber-500 to-orange-600') }}">
+                                @if($producto->imagen)
+                                    <img src="{{ Storage::url($producto->imagen) }}"
+                                         alt="{{ $producto->nombre }}"
+                                         class="w-full h-full object-cover">
+                                @else
+                                    <i class="fas {{ $producto->es_servicio ? 'fa-concierge-bell' : 'fa-box' }} text-white text-xs"></i>
+                                @endif
                             </div>
                             <div>
                                 <div class="text-sm font-semibold">{{ $producto->nombre }}</div>

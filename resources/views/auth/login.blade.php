@@ -24,15 +24,8 @@
 
         {{-- Logo --}}
         <div class="relative z-10">
-            <div class="flex items-center gap-3 mb-16">
-                <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center
-                            font-display font-black text-black text-xl">FC</div>
-                <div>
-                    <div class="font-display font-black text-2xl text-white">
-                        Factura<span class="text-amber-500">CO</span>
-                    </div>
-                    <div class="text-xs text-slate-500">Sistema Empresarial</div>
-                </div>
+            <div class="mb-16">
+                <img src="/img/logo-dark.png" alt="FacturaCO" class="h-16 w-auto object-contain">
             </div>
 
             <h2 class="font-display font-bold text-4xl text-white leading-tight mb-4">
@@ -79,12 +72,8 @@
         <div class="w-full max-w-md">
 
             {{-- Logo móvil --}}
-            <div class="flex items-center gap-3 mb-10 lg:hidden">
-                <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center
-                            font-display font-black text-black text-lg">FC</div>
-                <div class="font-display font-black text-xl text-white">
-                    Factura<span class="text-amber-500">CO</span>
-                </div>
+            <div class="mb-10 lg:hidden">
+                <img src="/img/logo-dark.png" alt="FacturaCO" class="h-12 w-auto object-contain">
             </div>
 
             <h1 class="font-display font-bold text-3xl mb-2">Iniciar Sesión</h1>

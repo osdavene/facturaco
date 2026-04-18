@@ -32,6 +32,7 @@ class StoreProductoRequest extends FormRequest
             'ubicacion'        => 'nullable|string|max:100',
             'es_servicio'      => 'boolean',
             'observaciones'    => 'nullable|string',
+            'imagen'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
     }
 }

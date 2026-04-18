@@ -36,11 +36,17 @@
 
         <div class="lg:col-span-1 space-y-4">
             <div class="card p-6 text-center">
-                <div class="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl
-                            {{ $inventario->es_servicio
+                <div class="w-28 h-28 rounded-2xl mx-auto mb-4 overflow-hidden flex items-center justify-center
+                            {{ $inventario->imagen ? '' : ($inventario->es_servicio
                                ? 'bg-gradient-to-br from-purple-500 to-pink-600'
-                               : 'bg-gradient-to-br from-amber-500 to-orange-600' }}">
-                    <i class="fas {{ $inventario->es_servicio ? 'fa-concierge-bell' : 'fa-box' }} text-white"></i>
+                               : 'bg-gradient-to-br from-amber-500 to-orange-600') }}">
+                    @if($inventario->imagen)
+                        <img src="{{ Storage::url($inventario->imagen) }}"
+                             alt="{{ $inventario->nombre }}"
+                             class="w-full h-full object-cover">
+                    @else
+                        <i class="fas {{ $inventario->es_servicio ? 'fa-concierge-bell' : 'fa-box' }} text-white text-3xl"></i>
+                    @endif
                 </div>
                 <div class="font-display font-bold text-lg mb-1 uppercase">{{ $inventario->nombre }}</div>
                 <div class="text-slate-500 text-sm mb-3">
