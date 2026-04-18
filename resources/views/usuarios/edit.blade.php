@@ -159,16 +159,13 @@
 
         <div class="flex items-center justify-between">
             @if($usuario->id !== auth()->id())
-            <form method="POST" action="{{ route('usuarios.destroy', $usuario) }}"
-                  onsubmit="return confirm('¿Eliminar al usuario {{ $usuario->name }}?')">
-                @csrf @method('DELETE')
-                <button type="submit"
-                        class="px-5 py-2.5 bg-red-500/10 border border-red-500/30
-                               text-red-400 hover:bg-red-500/20 rounded-xl text-sm
-                               flex items-center gap-2 transition-colors">
-                    <i class="fas fa-trash"></i> Eliminar
-                </button>
-            </form>
+            <button type="button"
+                    onclick="document.getElementById('form-eliminar-usuario-{{ $usuario->id }}').submit()"
+                    class="px-5 py-2.5 bg-red-500/10 border border-red-500/30
+                           text-red-400 hover:bg-red-500/20 rounded-xl text-sm
+                           flex items-center gap-2 transition-colors">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
             @else
             <div></div>
             @endif
@@ -187,6 +184,15 @@
             </div>
         </div>
     </form>
+
+    @if($usuario->id !== auth()->id())
+    <form id="form-eliminar-usuario-{{ $usuario->id }}"
+          method="POST" action="{{ route('usuarios.destroy', $usuario) }}"
+          onsubmit="return confirm('¿Eliminar al usuario {{ $usuario->name }}?')"
+          class="hidden">
+        @csrf @method('DELETE')
+    </form>
+    @endif
 </div>
 
 @push('scripts')

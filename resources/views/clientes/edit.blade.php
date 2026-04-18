@@ -275,16 +275,13 @@
         </div>
 
         <div class="flex items-center justify-between">
-            <form method="POST" action="{{ route('clientes.destroy', $cliente) }}"
-                  onsubmit="return confirm('¿Eliminar a {{ $cliente->nombre_completo }}?')">
-                @csrf @method('DELETE')
-                <button type="submit"
-                        class="px-5 py-2.5 bg-red-500/10 border border-red-500/30
-                               text-red-400 hover:bg-red-500/20 rounded-xl text-sm
-                               flex items-center gap-2 transition-colors">
-                    <i class="fas fa-trash"></i> Eliminar
-                </button>
-            </form>
+            <button type="button"
+                    onclick="document.getElementById('form-eliminar-cliente-{{ $cliente->id }}').submit()"
+                    class="px-5 py-2.5 bg-red-500/10 border border-red-500/30
+                           text-red-400 hover:bg-red-500/20 rounded-xl text-sm
+                           flex items-center gap-2 transition-colors">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
             <div class="flex gap-3">
                 <a href="{{ route('clientes.index') }}"
                    class="px-6 py-2.5 bg-[#1a2235] border border-[#1e2d47] rounded-xl
@@ -298,6 +295,13 @@
                 </button>
             </div>
         </div>
+    </form>
+
+    <form id="form-eliminar-cliente-{{ $cliente->id }}"
+          method="POST" action="{{ route('clientes.destroy', $cliente) }}"
+          onsubmit="return confirm('¿Eliminar a {{ $cliente->nombre_completo }}?')"
+          class="hidden">
+        @csrf @method('DELETE')
     </form>
 </div>
 
