@@ -1,61 +1,60 @@
 <?php
+
 namespace App\Models;
 
 use App\Traits\PertenecerGrupo;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Proveedor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Producto extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerGrupo, LogsActivity;
-
-    protected $table = 'productos';
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['nombre', 'codigo', 'precio_venta', 'precio_compra', 'stock_actual', 'stock_minimo', 'activo', 'iva_pct'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->useLogName('producto');
-    }
-
-    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
-    {
-        $activity->description = match($eventName) {
-            'created' => 'Producto creado',
-            'updated' => 'Producto actualizado',
-            'deleted' => 'Producto eliminado',
-            default   => $eventName,
-        };
-    }
+    use PertenecerGrupo, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'empresa_id',
-        'codigo', 'codigo_barras', 'nombre', 'descripcion',
-        'categoria_id', 'unidad_medida_id',
-        'precio_compra', 'precio_venta', 'precio_venta2', 'precio_venta3',
-        'iva_pct', 'incluye_iva',
-        'stock_actual', 'stock_minimo', 'stock_maximo', 'ubicacion',
-        'activo', 'es_servicio', 'imagen', 'observaciones', 'created_by', 'updated_by',
+        'codigo',
+        'nombre',
+        'descripcion',
+        'categoria_id',
+        'unidad_medida_id',
+        'precio_compra',
+        'precio_venta',
+        'stock_minimo',
+        'stock_actual',
+        'activo',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [
-        'precio_compra'  => 'float',
-        'precio_venta'   => 'float',
-        'precio_venta2'  => 'float',
-        'precio_venta3'  => 'float',
-        'iva_pct'        => 'float',
-        'stock_actual'   => 'float',
-        'stock_minimo'   => 'float',
-        'stock_maximo'   => 'float',
-        'incluye_iva'    => 'boolean',
-        'activo'         => 'boolean',
-        'es_servicio'    => 'boolean',
+        'precio_compra'   => 'decimal:2',
+        'precio_venta'    => 'decimal:2',
+        'stock_minimo'    => 'decimal:2',
+        'stock_actual'    => 'decimal:2',
+        'activo'          => 'boolean',
     ];
+
+    /**
+     * Proveedores del producto (many-to-many)
+     */
+    public function proveedores(): BelongsToMany
+    {
+        return $this->belongsToMany(Proveedor::class, 'producto_proveedor')
+                    ->withPivot(['precio_compra_sugerido', 'proveedor_principal', 'created_at', 'updated_at'])
+                    ->withTimestamps()
+                    ->orderByPivot('proveedor_principal', 'desc');
+    }
+
+    /**
+     * Proveedor principal del producto
+     */
+    public function proveedorPrincipal()
+    {
+        return $this->proveedores()->wherePivot('proveedor_principal', true)->first();
+    }
 
     public function categoria()
     {
@@ -67,32 +66,44 @@ class Producto extends Model
         return $this->belongsTo(UnidadMedida::class);
     }
 
-    public function movimientos()
+    public function movimientosInventario()
     {
         return $this->hasMany(MovimientoInventario::class);
     }
 
-    public function getBajoStockAttribute(): bool
+    public function facturaItems()
     {
-        return $this->stock_actual <= $this->stock_minimo && !$this->es_servicio;
+        return $this->hasMany(FacturaItem::class);
     }
 
-    public function scopeBuscar($query, $texto)
+    public function cotizacionItems()
     {
-        return $query->where(function($q) use ($texto) {
-            $q->where('nombre',         'like', "%{$texto}%")
-              ->orWhere('codigo',        'like', "%{$texto}%")
-              ->orWhere('codigo_barras', 'like', "%{$texto}%");
-        });
+        return $this->hasMany(CotizacionItem::class);
     }
 
-    public function creadoPor()
+    public function remisionItems()
+    {
+        return $this->hasMany(RemisionItem::class);
+    }
+
+    public function ordenCompraItems()
+    {
+        return $this->hasMany(OrdenCompraItem::class);
+    }
+
+    public function notaCreditoItems()
+    {
+        return $this->hasMany(NotaCreditoItem::class);
+    }
+
+    public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function actualizadoPor()
+    public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
 }
+

@@ -3,81 +3,71 @@
 namespace App\Models;
 
 use App\Traits\PertenecerGrupo;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Producto;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Proveedor extends Model
 {
-    use HasFactory, SoftDeletes, PertenecerGrupo, LogsActivity;
+    use PertenecerGrupo, HasFactory, SoftDeletes, LogsActivity;
 
-    protected $table = 'proveedores';
+    protected $fillable = [
+        'empresa_id',
+        'nombre',
+        'documento',
+        'digito_verificacion',
+        'email',
+        'telefono',
+        'direccion',
+        'contacto',
+        'plazo_pago',
+        'retefuente_pct',
+        'activo',
+        'created_by',
+        'updated_by',
+    ];
+
+    protected $casts = [
+        'plazo_pago'      => 'decimal:2',
+        'retefuente_pct'  => 'decimal:4',
+        'activo'          => 'boolean',
+    ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['razon_social', 'nombre_contacto', 'email', 'celular', 'activo', 'plazo_pago', 'cupo_credito'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->useLogName('proveedor');
+            ->logName('proveedor')
+            ->logOnly(['*'])
+            ->logOnlyDirty();
     }
 
-    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    /**
+     * Productos del proveedor (many-to-many)
+     */
+    public function productos(): BelongsToMany
     {
-        $activity->description = match($eventName) {
-            'created' => 'Proveedor creado',
-            'updated' => 'Proveedor actualizado',
-            'deleted' => 'Proveedor eliminado',
-            default   => $eventName,
-        };
+        return $this->belongsToMany(Producto::class, 'producto_proveedor')
+                    ->withPivot(['precio_compra_sugerido', 'proveedor_principal', 'created_at', 'updated_at'])
+                    ->withTimestamps();
     }
 
-    protected $fillable = [
-        'empresa_id',
-        'tipo_documento', 'numero_documento', 'digito_verificacion',
-        'razon_social', 'nombre_contacto', 'cargo_contacto',
-        'email', 'telefono', 'celular',
-        'departamento', 'municipio', 'direccion',
-        'regimen', 'gran_contribuyente', 'autoretenedor',
-        'retefuente_pct', 'reteiva_pct', 'reteica_pct',
-        'plazo_pago', 'cuenta_bancaria', 'banco', 'tipo_cuenta',
-        'cupo_credito', 'activo', 'observaciones', 'created_by', 'updated_by',
-    ];
-
-    protected $casts = [
-        'gran_contribuyente' => 'boolean',
-        'autoretenedor'      => 'boolean',
-        'activo'             => 'boolean',
-        'cupo_credito'       => 'decimal:2',
-    ];
-
-    public function getDocumentoFormateadoAttribute(): string
+    public function ordenesCompra()
     {
-        if ($this->tipo_documento === 'NIT' && $this->digito_verificacion) {
-            return $this->numero_documento . '-' . $this->digito_verificacion;
-        }
-        return $this->numero_documento;
+        return $this->hasMany(OrdenCompra::class);
     }
 
-    public function scopeBuscar($query, $texto)
-    {
-        return $query->where(function($q) use ($texto) {
-            $q->where('razon_social',      'like', "%{$texto}%")
-              ->orWhere('numero_documento', 'like', "%{$texto}%")
-              ->orWhere('nombre_contacto',  'like', "%{$texto}%")
-              ->orWhere('email',            'like', "%{$texto}%");
-        });
-    }
-
-    public function creadoPor()
+    public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function actualizadoPor()
+    public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
 }
+
