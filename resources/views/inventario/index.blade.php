@@ -76,8 +76,9 @@
         <select name="estado"
                 class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
             <option value="">Todos</option>
-            <option value="activo"   {{ request('estado')=='activo'   ? 'selected':'' }}>Activos</option>
-            <option value="inactivo" {{ request('estado')=='inactivo' ? 'selected':'' }}>Inactivos</option>
+            <option value="activo"    {{ request('estado')=='activo'    ? 'selected':'' }}>Activos</option>
+            <option value="inactivo"  {{ request('estado')=='inactivo'  ? 'selected':'' }}>Inactivos</option>
+            <option value="archivado" {{ request('estado')=='archivado' ? 'selected':'' }}>Archivados ({{ $archivados }})</option>
         </select>
         <button type="submit"
                 class="bg-amber-500 hover:bg-amber-600 text-black font-semibold
@@ -183,6 +184,17 @@
 
                     <td class="px-5 py-4 text-right">
                         <div class="flex items-center justify-end gap-2">
+                            @if($soloArchivados)
+                                <form method="POST" action="{{ route('inventario.restore', $producto->id) }}">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" title="Restaurar"
+                                            class="w-8 h-8 bg-[#1a2235] border border-[#1e2d47] rounded-lg
+                                                   flex items-center justify-center text-slate-400
+                                                   hover:text-green-400 hover:border-green-500/50 transition-colors">
+                                        <i class="fas fa-undo text-xs"></i>
+                                    </button>
+                                </form>
+                            @else
                             <a href="{{ route('inventario.show', $producto) }}" title="Ver"
                                class="w-8 h-8 bg-[#1a2235] border border-[#1e2d47] rounded-lg
                                       flex items-center justify-center text-slate-400
@@ -205,6 +217,7 @@
                                     <i class="fas fa-trash text-xs"></i>
                                 </button>
                             </form>
+                            @endif
                         </div>
                     </td>
                 </tr>

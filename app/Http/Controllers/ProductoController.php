@@ -15,7 +15,13 @@ class ProductoController extends Controller
 {
     public function index(Request $request)
     {
-        $productos = Producto::with(['categoria', 'unidadMedida'])
+        $soloArchivados = $request->estado === 'archivado';
+
+        $query = $soloArchivados
+            ? Producto::onlyTrashed()->with(['categoria', 'unidadMedida'])
+            : Producto::with(['categoria', 'unidadMedida']);
+
+        $productos = $query
             ->when($request->buscar, fn($q) => $q->buscar($request->buscar))
             ->when($request->categoria_id, fn($q) => $q->where('categoria_id', $request->categoria_id))
             ->when($request->estado === 'activo',   fn($q) => $q->where('activo', true))
@@ -25,14 +31,15 @@ class ProductoController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $categorias    = Categoria::where('activo', true)->orderBy('nombre')->get();
+        $categorias     = Categoria::where('activo', true)->orderBy('nombre')->get();
         $totalProductos = Producto::count();
         $bajoStock      = Producto::whereColumn('stock_actual', '<=', 'stock_minimo')->where('es_servicio', false)->count();
         $sinStock       = Producto::where('stock_actual', 0)->where('es_servicio', false)->count();
+        $archivados     = Producto::onlyTrashed()->count();
 
         return view('inventario.index', compact(
             'productos', 'categorias',
-            'totalProductos', 'bajoStock', 'sinStock'
+            'totalProductos', 'bajoStock', 'sinStock', 'archivados', 'soloArchivados'
         ));
     }
 
@@ -112,6 +119,16 @@ class ProductoController extends Controller
         $inventario->delete(); // SoftDelete
         return redirect()->route('inventario.index')
             ->with('success', 'Producto archivado. El registro se conserva para trazabilidad.');
+    }
+
+    public function restore(int $id)
+    {
+        $inventario = Producto::onlyTrashed()->findOrFail($id);
+        $inventario->restore();
+        $inventario->update(['activo' => true]);
+
+        return redirect()->route('inventario.edit', $inventario)
+            ->with('success', 'Producto restaurado. Completa los datos faltantes.');
     }
 
     public function bulkDelete(Request $request)

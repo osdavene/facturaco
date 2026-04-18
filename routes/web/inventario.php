@@ -16,6 +16,7 @@ Route::middleware('modulo:inventario')->group(function () {
     Route::get('/inventario/{inventario}/editar',     [ProductoController::class, 'edit'])        ->name('inventario.edit')        ->middleware('can:editar inventario');
     Route::put('/inventario/{inventario}',            [ProductoController::class, 'update'])      ->name('inventario.update')      ->middleware('can:editar inventario');
     Route::delete('/inventario/{inventario}',         [ProductoController::class, 'destroy'])     ->name('inventario.destroy')     ->middleware('can:editar inventario');
+    Route::patch('/inventario/{id}/restaurar',        [ProductoController::class, 'restore'])     ->name('inventario.restore')     ->middleware('can:editar inventario');
     Route::post('/inventario/{inventario}/ajustar',   [ProductoController::class, 'ajustarStock'])->name('inventario.ajustar')     ->middleware('can:editar inventario');
     Route::delete('/inventario',                      [ProductoController::class, 'bulkDelete'])  ->name('inventario.bulk-delete') ->middleware('can:editar inventario');
 
