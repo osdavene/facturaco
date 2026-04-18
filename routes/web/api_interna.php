@@ -32,10 +32,10 @@ Route::get('/api/municipios', function (Request $req) {
 Route::get('/api/clientes/buscar', function (Request $req) {
     $clientes = Cliente::where('activo', true)
         ->where(function ($q) use ($req) {
-            $q->where('nombres',           'like', '%'.$req->q.'%')
-              ->orWhere('apellidos',        'like', '%'.$req->q.'%')
-              ->orWhere('razon_social',     'like', '%'.$req->q.'%')
-              ->orWhere('numero_documento', 'like', '%'.$req->q.'%');
+            $q->where('nombres',           'ilike', '%'.$req->q.'%')
+              ->orWhere('apellidos',        'ilike', '%'.$req->q.'%')
+              ->orWhere('razon_social',     'ilike', '%'.$req->q.'%')
+              ->orWhere('numero_documento', 'ilike', '%'.$req->q.'%');
         })
         ->limit(10)
         ->get(['id','nombres','apellidos','razon_social','numero_documento',
@@ -47,8 +47,8 @@ Route::get('/api/clientes/buscar', function (Request $req) {
 Route::get('/api/proveedores/buscar', function (Request $req) {
     $proveedores = Proveedor::where('activo', true)
         ->where(function ($q) use ($req) {
-            $q->where('razon_social',     'like', '%'.$req->q.'%')
-              ->orWhere('numero_documento','like', '%'.$req->q.'%');
+            $q->where('razon_social',     'ilike', '%'.$req->q.'%')
+              ->orWhere('numero_documento','ilike', '%'.$req->q.'%');
         })
         ->limit(10)
         ->get(['id','razon_social','tipo_documento','numero_documento',
@@ -60,8 +60,8 @@ Route::get('/api/productos/buscar', function (Request $req) {
     $lista     = $req->lista_precio ?? 'general';
     $productos = Producto::where('activo', true)
         ->where(function ($q) use ($req) {
-            $q->where('nombre', 'like', '%'.$req->q.'%')
-              ->orWhere('codigo','like', '%'.$req->q.'%');
+            $q->where('nombre', 'ilike', '%'.$req->q.'%')
+              ->orWhere('codigo','ilike', '%'.$req->q.'%');
         })
         ->limit(10)
         ->get(['id','codigo','nombre','precio_venta','precio_venta2','precio_venta3','iva_pct','unidad_medida_id','es_servicio','stock_actual'])
@@ -79,8 +79,8 @@ Route::get('/api/productos/buscar', function (Request $req) {
 Route::get('/api/facturas/buscar', function (Request $req) {
     $facturas = Factura::whereIn('estado', ['emitida', 'vencida'])
         ->where(function ($q) use ($req) {
-            $q->where('numero',         'like', '%'.$req->q.'%')
-              ->orWhere('cliente_nombre','like', '%'.$req->q.'%');
+            $q->where('numero',         'ilike', '%'.$req->q.'%')
+              ->orWhere('cliente_nombre','ilike', '%'.$req->q.'%');
         })
         ->limit(10)
         ->get(['id','numero','cliente_nombre','total','total_pagado'])

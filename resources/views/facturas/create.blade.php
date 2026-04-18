@@ -281,6 +281,7 @@ function textoLista(lista) {
 document.addEventListener('input', function(e) {
     if (e.target.matches('input[type="text"], textarea')) {
         if (['fecha_emision','fecha_vencimiento'].includes(e.target.name)) return;
+        if (e.target.id && e.target.id.startsWith('buscar-')) return;
         const pos = e.target.selectionStart;
         e.target.value = e.target.value.toUpperCase();
         e.target.setSelectionRange(pos, pos);

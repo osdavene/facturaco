@@ -26,8 +26,8 @@ class BusquedaController extends Controller
 
         // ── Facturas ──────────────────────────────────
         Factura::where(function($query) use ($q) {
-                $query->where('numero', 'like', "%$q%")
-                      ->orWhere('cliente_nombre', 'like', "%$q%");
+                $query->where('numero', 'ilike', "%$q%")
+                      ->orWhere('cliente_nombre', 'ilike', "%$q%");
             })
             ->limit(4)->get()
             ->each(function($f) use (&$resultados) {
@@ -45,10 +45,10 @@ class BusquedaController extends Controller
         // ── Clientes ──────────────────────────────────
         Cliente::where('activo', true)
             ->where(function($query) use ($q) {
-                $query->where('razon_social',      'like', "%$q%")
-                      ->orWhere('nombres',          'like', "%$q%")
-                      ->orWhere('apellidos',        'like', "%$q%")
-                      ->orWhere('numero_documento', 'like', "%$q%");
+                $query->where('razon_social',      'ilike', "%$q%")
+                      ->orWhere('nombres',          'ilike', "%$q%")
+                      ->orWhere('apellidos',        'ilike', "%$q%")
+                      ->orWhere('numero_documento', 'ilike', "%$q%");
             })
             ->limit(3)->get()
             ->each(function($c) use (&$resultados) {
@@ -66,8 +66,8 @@ class BusquedaController extends Controller
         // ── Productos ─────────────────────────────────
         Producto::where('activo', true)
             ->where(function($query) use ($q) {
-                $query->where('nombre', 'like', "%$q%")
-                      ->orWhere('codigo', 'like', "%$q%");
+                $query->where('nombre', 'ilike', "%$q%")
+                      ->orWhere('codigo', 'ilike', "%$q%");
             })
             ->limit(3)->get()
             ->each(function($p) use (&$resultados) {
@@ -85,8 +85,8 @@ class BusquedaController extends Controller
         // ── Proveedores ───────────────────────────────
         Proveedor::where('activo', true)
             ->where(function($query) use ($q) {
-                $query->where('razon_social',      'like', "%$q%")
-                      ->orWhere('numero_documento', 'like', "%$q%");
+                $query->where('razon_social',      'ilike', "%$q%")
+                      ->orWhere('numero_documento', 'ilike', "%$q%");
             })
             ->limit(2)->get()
             ->each(function($p) use (&$resultados) {
@@ -103,8 +103,8 @@ class BusquedaController extends Controller
 
         // ── Cotizaciones ──────────────────────────────
         Cotizacion::where(function($query) use ($q) {
-                $query->where('numero', 'like', "%$q%")
-                      ->orWhere('cliente_nombre', 'like', "%$q%");
+                $query->where('numero', 'ilike', "%$q%")
+                      ->orWhere('cliente_nombre', 'ilike', "%$q%");
             })
             ->limit(2)->get()
             ->each(function($c) use (&$resultados) {
@@ -121,8 +121,8 @@ class BusquedaController extends Controller
 
         // ── Remisiones ────────────────────────────────
         Remision::where(function($query) use ($q) {
-                $query->where('numero', 'like', "%$q%")
-                      ->orWhere('cliente_nombre', 'like', "%$q%");
+                $query->where('numero', 'ilike', "%$q%")
+                      ->orWhere('cliente_nombre', 'ilike', "%$q%");
             })
             ->limit(2)->get()
             ->each(function($r) use (&$resultados) {
@@ -139,8 +139,8 @@ class BusquedaController extends Controller
 
         // ── Recibos de Caja ───────────────────────────
         ReciboCaja::where(function($query) use ($q) {
-                $query->where('numero', 'like', "%$q%")
-                      ->orWhere('cliente_nombre', 'like', "%$q%");
+                $query->where('numero', 'ilike', "%$q%")
+                      ->orWhere('cliente_nombre', 'ilike', "%$q%");
             })
             ->limit(2)->get()
             ->each(function($r) use (&$resultados) {
@@ -157,8 +157,8 @@ class BusquedaController extends Controller
 
         // ── Órdenes de Compra ─────────────────────────
         OrdenCompra::where(function($query) use ($q) {
-                $query->where('numero', 'like', "%$q%")
-                      ->orWhere('proveedor_nombre', 'like', "%$q%");
+                $query->where('numero', 'ilike', "%$q%")
+                      ->orWhere('proveedor_nombre', 'ilike', "%$q%");
             })
             ->limit(2)->get()
             ->each(function($o) use (&$resultados) {
@@ -175,9 +175,9 @@ class BusquedaController extends Controller
 
         // ── Notas de Crédito ──────────────────────────
         NotaCredito::where(function($query) use ($q) {
-                $query->where('numero', 'like', "%$q%")
-                      ->orWhere('cliente_nombre', 'like', "%$q%")
-                      ->orWhere('factura_numero', 'like', "%$q%");
+                $query->where('numero', 'ilike', "%$q%")
+                      ->orWhere('cliente_nombre', 'ilike', "%$q%")
+                      ->orWhere('factura_numero', 'ilike', "%$q%");
             })
             ->limit(2)->get()
             ->each(function($n) use (&$resultados) {
