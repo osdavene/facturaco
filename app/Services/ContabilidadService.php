@@ -156,16 +156,14 @@ class ContabilidadService
             $saldo = $cuenta->saldo(null, $hasta);
             if (abs($saldo) < 0.01) continue;
 
-            $grupo = match($cuenta->tipo) {
-                'activo'     => &$activo,
-                'pasivo'     => &$pasivo,
-                'patrimonio' => &$patrimonio,
+            $entrada = ['codigo' => $cuenta->codigo, 'nombre' => $cuenta->nombre, 'saldo' => $saldo];
+
+            match($cuenta->tipo) {
+                'activo'     => $activo[]     = $entrada,
+                'pasivo'     => $pasivo[]     = $entrada,
+                'patrimonio' => $patrimonio[] = $entrada,
                 default      => null,
             };
-
-            if ($grupo !== null) {
-                $grupo[] = ['codigo' => $cuenta->codigo, 'nombre' => $cuenta->nombre, 'saldo' => $saldo];
-            }
         }
 
         usort($activo,     fn($a, $b) => strcmp($a['codigo'], $b['codigo']));
