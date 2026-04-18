@@ -64,7 +64,7 @@ Route::get('/api/productos/buscar', function (Request $req) {
               ->orWhere('codigo','like', '%'.$req->q.'%');
         })
         ->limit(10)
-        ->get(['id','codigo','nombre','precio_venta','precio_venta2','precio_venta3','iva_pct','unidad_medida_id'])
+        ->get(['id','codigo','nombre','precio_venta','precio_venta2','precio_venta3','iva_pct','unidad_medida_id','es_servicio','stock_actual'])
         ->map(function ($p) use ($lista) {
             $p->precio_aplicado = match ($lista) {
                 'mayorista' => $p->precio_venta2 > 0 ? $p->precio_venta2 : $p->precio_venta,

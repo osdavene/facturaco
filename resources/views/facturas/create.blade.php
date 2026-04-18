@@ -105,7 +105,7 @@
                     </div>
 
                     {{-- Tabla de items --}}
-                    <div class="overflow-x-auto">
+                    <div>
                         <table class="w-full text-sm" id="tabla-items">
                             <thead>
                                 <tr class="border-b border-[#1e2d47]">
@@ -477,17 +477,26 @@ function renderItems() {
 
         return `
         <tr class="border-b border-[#1e2d47]/30" data-id="${item.id}">
-            <td class="py-2 pr-2">
-                <input type="hidden" name="items[${idx}][producto_id]" value="${item.producto_id}">
-                <input type="hidden" name="items[${idx}][codigo]"      value="${item.codigo}">
+            <td class="py-2 pr-2 relative">
+                <input type="hidden" name="items[${idx}][producto_id]" id="pid-${item.id}" value="${item.producto_id}">
+                <input type="hidden" name="items[${idx}][codigo]"      id="cod-${item.id}" value="${item.codigo}">
                 <input type="text"
+                       id="desc-${item.id}"
                        name="items[${idx}][descripcion]"
-                       value="${item.descripcion.toUpperCase()}"
+                       value="${item.descripcion ? item.descripcion.toUpperCase() : ''}"
+                       oninput="buscarEnLinea(${item.id}, this.value)"
                        onchange="updateItem(${item.id},'descripcion',this.value)"
+                       onblur="cerrarDropdownLinea(${item.id})"
                        placeholder="DESCRIPCIÓN..."
+                       autocomplete="off"
                        style="text-transform:uppercase"
                        class="w-full bg-transparent border-b border-[#1e2d47] text-sm text-slate-200
                               py-1 focus:outline-none focus:border-amber-500 transition-colors uppercase">
+                <div id="dropdown-linea-${item.id}"
+                     class="absolute top-full left-0 mt-1 bg-[#1a2235] border border-[#1e2d47]
+                            rounded-xl shadow-2xl z-[60] hidden max-h-52 overflow-y-auto"
+                     style="min-width:320px">
+                </div>
             </td>
             <td class="py-2 px-2 w-20">
                 <input type="text"
@@ -570,6 +579,64 @@ function calcularTotales() {
     document.getElementById('display-total').textContent      = fmt(total);
     const mt = document.getElementById('mobile-total');
     if (mt) mt.textContent = fmt(total);
+}
+
+// ── Búsqueda en línea de descripción ──────────
+let timerLinea = {};
+
+function buscarEnLinea(itemId, q) {
+    q = q.trim();
+    clearTimeout(timerLinea[itemId]);
+    const dropdown = document.getElementById('dropdown-linea-' + itemId);
+    if (!dropdown) return;
+    if (q.length < 2) { dropdown.classList.add('hidden'); return; }
+
+    timerLinea[itemId] = setTimeout(async () => {
+        const res  = await fetch(`/api/productos/buscar?q=${encodeURIComponent(q)}&lista_precio=${listaPrecios}`);
+        const data = await res.json();
+        if (!data.length) { dropdown.classList.add('hidden'); return; }
+        dropdown.innerHTML = data.map(p => `
+            <div class="px-4 py-2.5 hover:bg-[#141c2e] cursor-pointer border-b border-[#1e2d47]/50 last:border-0"
+                 onmousedown="event.preventDefault(); seleccionarEnLinea(${itemId}, ${JSON.stringify(p).replace(/"/g,'&quot;')})">
+                <div class="flex justify-between items-center gap-3">
+                    <div class="min-w-0">
+                        <div class="text-sm font-medium text-slate-200 truncate">${p.nombre}</div>
+                        <div class="text-xs text-slate-500">${p.codigo}${!p.es_servicio ? ' · Stock: '+p.stock_actual : ''}</div>
+                    </div>
+                    <div class="text-sm font-semibold text-amber-500 flex-shrink-0">
+                        ${fmt(p.precio_aplicado || p.precio_venta)}
+                    </div>
+                </div>
+            </div>`).join('');
+        dropdown.classList.remove('hidden');
+    }, 280);
+}
+
+function seleccionarEnLinea(itemId, p) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+
+    const precio = parseFloat(p.precio_aplicado ?? p.precio_venta) || 0;
+    item.producto_id     = p.id;
+    item.codigo          = p.codigo;
+    item.descripcion     = p.nombre;
+    item.precio_unitario = precio;
+    item.iva_pct         = parseFloat(p.iva_pct ?? 19);
+    item.sin_precio      = precio === 0;
+
+    renderItems();
+    calcularTotales();
+
+    // Foco en cantidad después de seleccionar
+    setTimeout(() => {
+        const cantInput = document.querySelector(`tr[data-id="${itemId}"] input[name*="cantidad"]`);
+        if (cantInput) { cantInput.focus(); cantInput.select(); }
+    }, 40);
+}
+
+function cerrarDropdownLinea(itemId) {
+    const dropdown = document.getElementById('dropdown-linea-' + itemId);
+    if (dropdown) dropdown.classList.add('hidden');
 }
 
 // ── Cerrar dropdowns al hacer click fuera ─────
