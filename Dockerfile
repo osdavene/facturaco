@@ -1,5 +1,11 @@
+FROM node:20-alpine AS frontend
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
 FROM php:8.3-fpm
-# REBUILD-v8-nginx-final
 
 RUN apt-get update && apt-get install -y \
     nginx libpq-dev libzip-dev libpng-dev libxml2-dev libonig-dev unzip \
@@ -10,6 +16,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 COPY . .
+COPY --from=frontend /app/public/build ./public/build
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
 
