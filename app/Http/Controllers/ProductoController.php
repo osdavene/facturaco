@@ -103,7 +103,14 @@ class ProductoController extends Controller
         $inventario->load('proveedores');
         $categorias = Categoria::where('activo', true)->orderBy('nombre')->get();
         $unidades   = UnidadMedida::where('activo', true)->orderBy('nombre')->get();
-        return view('inventario.edit', compact('inventario', 'categorias', 'unidades'));
+        $proveedoresJson = $inventario->proveedores->map(fn($p) => [
+            'id'                     => $p->id,
+            'razon_social'           => $p->razon_social,
+            'numero_documento'       => $p->numero_documento,
+            'precio_compra_sugerido' => (float) $p->pivot->precio_compra_sugerido,
+            'proveedor_principal'    => (bool)  $p->pivot->proveedor_principal,
+        ]);
+        return view('inventario.edit', compact('inventario', 'categorias', 'unidades', 'proveedoresJson'));
     }
 
     private function syncProveedores(Producto $producto, array $proveedores): void

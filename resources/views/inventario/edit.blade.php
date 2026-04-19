@@ -323,13 +323,7 @@ if (chkEliminar) {
 }
 
 // ── Proveedores del producto ──────────────────────────────────────────────────
-let proveedoresProducto = @json($inventario->proveedores->map(fn($p) => [
-    'id'                     => $p->id,
-    'razon_social'           => $p->razon_social,
-    'numero_documento'       => $p->numero_documento,
-    'precio_compra_sugerido' => (float) $p->pivot->precio_compra_sugerido,
-    'proveedor_principal'    => (bool)  $p->pivot->proveedor_principal,
-]));
+let proveedoresProducto = @json($proveedoresJson);
 
 let timerPP;
 document.getElementById('buscar-prov-prod').addEventListener('input', function() {
