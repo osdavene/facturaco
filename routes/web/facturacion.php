@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CotizacionController;
+use App\Http\Controllers\DianController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\ImpuestosController;
 use App\Http\Controllers\NotaCreditoController;
@@ -30,7 +31,9 @@ Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/facturas/{factura}/pdf',      [FacturaController::class, 'pdf'])          ->name('facturas.pdf')         ->middleware('can:ver facturas');
     Route::get('/facturas/{factura}/enviar',   [FacturaController::class, 'formEnviar'])   ->name('facturas.formEnviar')  ->middleware('can:ver facturas');
     Route::post('/facturas/{factura}/enviar',  [FacturaController::class, 'enviar'])       ->name('facturas.enviar')      ->middleware('can:ver facturas');
-    Route::delete('/facturas',                 [FacturaController::class, 'bulkDelete'])   ->name('facturas.bulk-delete') ->middleware('can:anular facturas');
+    Route::delete('/facturas',                          [FacturaController::class, 'bulkDelete'])       ->name('facturas.bulk-delete')  ->middleware('can:anular facturas');
+    Route::post('/facturas/{factura}/dian/enviar',      [DianController::class, 'enviar'])              ->name('facturas.dian.enviar')  ->middleware('can:crear facturas');
+    Route::get('/facturas/{factura}/dian/estado',       [DianController::class, 'consultarEstado'])     ->name('facturas.dian.estado')  ->middleware('can:ver facturas');
 
     // Wompi retorno (dentro de módulo facturacion)
     Route::get('/facturas/{factura}/wompi/retorno', [WompiController::class, 'retorno'])->name('wompi.retorno');

@@ -10,6 +10,7 @@ use App\Models\Empresa;
 use App\Models\Factura;
 use App\Models\Producto;
 use App\Services\ContabilidadService;
+use App\Services\DianService;
 use App\Services\FacturaService;
 use App\Services\MailService;
 use App\Services\PdfService;
@@ -21,6 +22,7 @@ class FacturaController extends Controller
     public function __construct(
         private FacturaService $facturas,
         private PdfService     $pdf,
+        private DianService    $dian,
     ) {}
 
     // ── INDEX ─────────────────────────────────────────────────
@@ -84,9 +86,10 @@ class FacturaController extends Controller
     public function show(Factura $factura)
     {
         $factura->load(['items.producto', 'cliente', 'usuario']);
-        $empresa = Empresa::obtener();
+        $empresa          = Empresa::obtener();
+        $dianConfigurado  = $this->dian->estaConfigurado();
 
-        return view('facturas.show', compact('factura', 'empresa'));
+        return view('facturas.show', compact('factura', 'empresa', 'dianConfigurado'));
     }
 
     // ── EDIT ──────────────────────────────────────────────────
