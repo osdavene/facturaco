@@ -225,6 +225,32 @@
             </div>
         </div>
 
+        {{-- SECCIÓN 5: Proveedores --}}
+        <div class="card p-6 mb-6">
+            <h2 class="font-display font-bold text-base mb-4 flex items-center gap-2">
+                <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">5</span>
+                Proveedores
+            </h2>
+            <div class="relative mb-4">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                <input type="text" id="buscar-prov-prod"
+                       placeholder="Buscar proveedor por nombre o NIT..."
+                       autocomplete="off"
+                       class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
+                              pl-9 pr-4 py-2.5 text-sm placeholder-slate-600
+                              focus:outline-none focus:border-amber-500"
+                       style="color:#e2e8f0">
+                <div id="res-prov-prod"
+                     class="absolute top-full left-0 right-0 mt-1 bg-[#1a2235]
+                            border border-[#1e2d47] rounded-xl shadow-xl z-50
+                            hidden max-h-48 overflow-y-auto"></div>
+            </div>
+            <div id="lista-proveedores" class="space-y-2"></div>
+            <p id="sin-proveedores" class="text-sm text-slate-600 text-center py-4">
+                <i class="fas fa-truck mr-1"></i> Ningún proveedor asociado
+            </p>
+        </div>
+
         <div class="flex items-center justify-end gap-3">
             <a href="{{ route('inventario.index') }}"
                class="px-6 py-2.5 bg-[#1a2235] border border-[#1e2d47] rounded-xl
@@ -270,6 +296,109 @@ document.getElementById('imagen-input').addEventListener('change', function() {
     };
     reader.readAsDataURL(file);
 });
+
+// ── Proveedores del producto ──────────────────────────────────────────────────
+let proveedoresProducto = [];
+
+let timerPP;
+document.getElementById('buscar-prov-prod').addEventListener('input', function() {
+    clearTimeout(timerPP);
+    const q = this.value.trim();
+    if (q.length < 2) { document.getElementById('res-prov-prod').classList.add('hidden'); return; }
+    timerPP = setTimeout(async () => {
+        const res  = await fetch(`/api/proveedores/buscar?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        const div  = document.getElementById('res-prov-prod');
+        if (!data.length) { div.classList.add('hidden'); return; }
+        div.innerHTML = data
+            .filter(p => !proveedoresProducto.find(pp => pp.id === p.id))
+            .map(p => `
+            <div class="px-4 py-2.5 hover:bg-[#141c2e] cursor-pointer border-b border-[#1e2d47]/50 last:border-0"
+                 onmousedown="event.preventDefault()"
+                 onclick="agregarProveedorProducto(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+                <div class="text-sm font-medium" style="color:#e2e8f0">${p.razon_social}</div>
+                <div class="text-xs text-slate-500">${p.tipo_documento}: ${p.numero_documento}</div>
+            </div>`).join('');
+        div.classList.remove('hidden');
+    }, 300);
+});
+
+document.addEventListener('click', e => {
+    if (!e.target.closest('#buscar-prov-prod') && !e.target.closest('#res-prov-prod'))
+        document.getElementById('res-prov-prod').classList.add('hidden');
+});
+
+function agregarProveedorProducto(p) {
+    document.getElementById('buscar-prov-prod').value = '';
+    document.getElementById('res-prov-prod').classList.add('hidden');
+    if (proveedoresProducto.find(pp => pp.id === p.id)) return;
+    const esPrimero = proveedoresProducto.length === 0;
+    proveedoresProducto.push({
+        id: p.id,
+        razon_social: p.razon_social,
+        numero_documento: p.numero_documento,
+        precio_compra_sugerido: 0,
+        proveedor_principal: esPrimero,
+    });
+    renderProveedoresProducto();
+}
+
+function quitarProveedorProducto(id) {
+    proveedoresProducto = proveedoresProducto.filter(p => p.id !== id);
+    if (proveedoresProducto.length > 0 && !proveedoresProducto.find(p => p.proveedor_principal))
+        proveedoresProducto[0].proveedor_principal = true;
+    renderProveedoresProducto();
+}
+
+function setPrincipal(id) {
+    proveedoresProducto.forEach(p => p.proveedor_principal = p.id === id);
+    renderProveedoresProducto();
+}
+
+function setPrecio(id, val) {
+    const p = proveedoresProducto.find(p => p.id === id);
+    if (p) p.precio_compra_sugerido = parseFloat(val) || 0;
+}
+
+function renderProveedoresProducto() {
+    const lista = document.getElementById('lista-proveedores');
+    const sinP  = document.getElementById('sin-proveedores');
+    sinP.classList.toggle('hidden', proveedoresProducto.length > 0);
+    lista.innerHTML = proveedoresProducto.map((p, idx) => `
+        <div class="flex items-center gap-3 bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-3">
+            <input type="hidden" name="proveedores[${idx}][id]" value="${p.id}">
+            <input type="hidden" name="proveedores[${idx}][proveedor_principal]" value="${p.proveedor_principal ? 1 : 0}">
+            <button type="button" onclick="setPrincipal(${p.id})"
+                    title="Marcar como proveedor principal"
+                    class="flex-shrink-0 w-6 h-6 rounded-full border-2 transition-colors
+                           ${p.proveedor_principal
+                               ? 'bg-amber-500 border-amber-500'
+                               : 'border-slate-600 hover:border-amber-500'}
+                           flex items-center justify-center">
+                ${p.proveedor_principal ? '<i class="fas fa-star text-black text-[9px]"></i>' : ''}
+            </button>
+            <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium truncate" style="color:#e2e8f0">${p.razon_social}</div>
+                <div class="text-xs text-slate-500">${p.numero_documento}</div>
+            </div>
+            <div class="flex items-center gap-1 flex-shrink-0">
+                <span class="text-xs text-slate-500">$</span>
+                <input type="text" inputmode="decimal"
+                       name="proveedores[${idx}][precio_compra_sugerido]"
+                       value="${p.precio_compra_sugerido || ''}"
+                       onchange="setPrecio(${p.id}, this.value)"
+                       placeholder="0"
+                       style="color:#e2e8f0"
+                       class="w-28 bg-[#141c2e] border border-[#1e2d47] rounded-lg px-2 py-1
+                              text-sm text-right focus:outline-none focus:border-amber-500">
+            </div>
+            <button type="button" onclick="quitarProveedorProducto(${p.id})"
+                    class="text-slate-600 hover:text-red-400 transition-colors flex-shrink-0">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+    `).join('');
+}
 </script>
 @endpush
 @endsection

@@ -65,7 +65,6 @@ class ProductoController extends Controller
         DB::transaction(function() use ($data, $request) {
             $producto = Producto::create($data);
 
-            // Registrar movimiento inicial si tiene stock
             if ($producto->stock_actual > 0) {
                 MovimientoInventario::create([
                     'producto_id'    => $producto->id,
@@ -79,6 +78,8 @@ class ProductoController extends Controller
                     'user_id'        => auth()->id(),
                 ]);
             }
+
+            $this->syncProveedores($producto, $request->input('proveedores', []));
         });
 
         return redirect()->route('inventario.index')
@@ -99,9 +100,26 @@ class ProductoController extends Controller
 
     public function edit(Producto $inventario)
     {
+        $inventario->load('proveedores');
         $categorias = Categoria::where('activo', true)->orderBy('nombre')->get();
         $unidades   = UnidadMedida::where('activo', true)->orderBy('nombre')->get();
         return view('inventario.edit', compact('inventario', 'categorias', 'unidades'));
+    }
+
+    private function syncProveedores(Producto $producto, array $proveedores): void
+    {
+        $syncData = [];
+        foreach ($proveedores as $p) {
+            $id = (int) ($p['id'] ?? 0);
+            if (!$id) continue;
+            $syncData[$id] = [
+                'precio_compra_sugerido' => isset($p['precio_compra_sugerido']) && $p['precio_compra_sugerido'] !== ''
+                    ? (float) $p['precio_compra_sugerido']
+                    : null,
+                'proveedor_principal' => !empty($p['proveedor_principal']),
+            ];
+        }
+        $producto->proveedores()->sync($syncData);
     }
 
     public function update(UpdateProductoRequest $request, Producto $inventario)
@@ -122,7 +140,10 @@ class ProductoController extends Controller
             $data['imagen'] = $request->file('imagen')->store('productos', 'public');
         }
 
-        $inventario->update($data);
+        DB::transaction(function() use ($data, $request, $inventario) {
+            $inventario->update($data);
+            $this->syncProveedores($inventario, $request->input('proveedores', []));
+        });
 
         return redirect()->route('inventario.index')
             ->with('success', 'Producto actualizado correctamente.');
