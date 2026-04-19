@@ -154,38 +154,29 @@
     <div class="card p-6">
         <h3 class="font-display font-bold text-base mb-5 flex items-center gap-2">
             <i class="fas fa-hand-holding-usd text-amber-500 text-sm"></i>
-            Retenciones en la Fuente
+            Retenciones Practicadas
         </h3>
-        <div class="space-y-4">
+        <div class="space-y-3">
+            @foreach([
+                ['ReteFuente',  'Retención en la fuente',        $resumen['total_rete'],    'text-orange-400'],
+                ['ReteIVA',     'Retención sobre el IVA',        $resumen['total_reteiva'], 'text-sky-400'],
+                ['ReteICA',     'Retención industria y comercio', $resumen['total_reteica'], 'text-purple-400'],
+            ] as [$nombre, $desc, $valor, $color])
             <div class="flex items-center justify-between p-3 bg-[#1a2235] rounded-xl">
                 <div>
-                    <div class="text-sm font-semibold" style="color:#e2e8f0">ReteFuente</div>
-                    <div class="text-xs text-slate-500 mt-0.5">Retención en la fuente aplicada</div>
+                    <div class="text-sm font-semibold" style="color:#e2e8f0">{{ $nombre }}</div>
+                    <div class="text-xs text-slate-500 mt-0.5">{{ $desc }}</div>
                 </div>
-                <div class="text-right">
-                    <div class="font-display font-bold text-lg text-orange-400">
-                        ${{ number_format($resumen['total_rete'], 0, ',', '.') }}
-                    </div>
+                <div class="font-display font-bold text-lg {{ $color }}">
+                    ${{ number_format($valor, 0, ',', '.') }}
                 </div>
             </div>
-            <div class="flex items-center justify-between p-3 bg-[#1a2235] rounded-xl">
-                <div>
-                    <div class="text-sm font-semibold" style="color:#e2e8f0">ReteICA</div>
-                    <div class="text-xs text-slate-500 mt-0.5">Retención industria y comercio</div>
-                </div>
-                <div class="text-right">
-                    <div class="font-display font-bold text-lg text-purple-400">
-                        ${{ number_format($resumen['total_reteica'], 0, ',', '.') }}
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-[#1e2d47] pt-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-sm font-semibold text-slate-400">Total Retenciones</span>
-                    <span class="font-display font-bold text-xl text-red-400">
-                        ${{ number_format($resumen['total_rete'] + $resumen['total_reteica'], 0, ',', '.') }}
-                    </span>
-                </div>
+            @endforeach
+            <div class="border-t border-[#1e2d47] pt-3 flex items-center justify-between">
+                <span class="text-sm font-semibold text-slate-400">Total Retenciones</span>
+                <span class="font-display font-bold text-xl text-red-400">
+                    ${{ number_format($resumen['total_rete'] + $resumen['total_reteiva'] + $resumen['total_reteica'], 0, ',', '.') }}
+                </span>
             </div>
         </div>
     </div>
@@ -312,6 +303,80 @@
 </div>
 @endif
 
+{{-- Retenciones por Tercero --}}
+@if($retencionesPorCliente->count())
+<div class="card overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-[#1e2d47] flex items-center justify-between">
+        <div>
+            <h3 class="font-display font-bold text-base">Retenciones por Tercero</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Clientes a quienes se les practicó retención en el período</p>
+        </div>
+        <span class="text-xs bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+            {{ $retencionesPorCliente->count() }} terceros
+        </span>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-[#1e2d47]">
+                    <th class="table-th">Cliente</th>
+                    <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Base</th>
+                    <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">ReteFuente</th>
+                    <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">ReteIVA</th>
+                    <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-3 hidden sm:table-cell">ReteICA</th>
+                    <th class="text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Total Ret.</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($retencionesPorCliente as $r)
+                <tr class="table-row">
+                    <td class="px-5 py-3">
+                        <div class="text-sm font-medium" style="color:#e2e8f0">{{ $r->cliente_nombre }}</div>
+                        <div class="text-xs text-slate-500">{{ $r->cliente_documento }} · {{ $r->facturas }} factura(s)</div>
+                    </td>
+                    <td class="px-3 py-3 text-right text-sm text-slate-400 hidden md:table-cell">
+                        ${{ number_format($r->base, 0, ',', '.') }}
+                    </td>
+                    <td class="px-3 py-3 text-right text-sm font-semibold text-orange-400">
+                        ${{ number_format($r->retefuente, 0, ',', '.') }}
+                    </td>
+                    <td class="px-3 py-3 text-right text-sm text-sky-400 hidden sm:table-cell">
+                        ${{ number_format($r->reteiva, 0, ',', '.') }}
+                    </td>
+                    <td class="px-3 py-3 text-right text-sm text-purple-400 hidden sm:table-cell">
+                        ${{ number_format($r->reteica, 0, ',', '.') }}
+                    </td>
+                    <td class="px-5 py-3 text-right text-sm font-bold text-red-400">
+                        ${{ number_format($r->total_retenciones, 0, ',', '.') }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr class="border-t-2 border-[#1e2d47] bg-[#1a2235]">
+                    <td class="px-5 py-3 text-sm font-bold" style="color:#e2e8f0">TOTALES</td>
+                    <td class="px-3 py-3 text-right text-sm font-semibold text-slate-400 hidden md:table-cell">
+                        ${{ number_format($retencionesPorCliente->sum('base'), 0, ',', '.') }}
+                    </td>
+                    <td class="px-3 py-3 text-right text-sm font-bold text-orange-400">
+                        ${{ number_format($resumen['total_rete'], 0, ',', '.') }}
+                    </td>
+                    <td class="px-3 py-3 text-right text-sm font-bold text-sky-400 hidden sm:table-cell">
+                        ${{ number_format($resumen['total_reteiva'], 0, ',', '.') }}
+                    </td>
+                    <td class="px-3 py-3 text-right text-sm font-bold text-purple-400 hidden sm:table-cell">
+                        ${{ number_format($resumen['total_reteica'], 0, ',', '.') }}
+                    </td>
+                    <td class="px-5 py-3 text-right text-sm font-bold text-red-400">
+                        ${{ number_format($resumen['total_rete'] + $resumen['total_reteiva'] + $resumen['total_reteica'], 0, ',', '.') }}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+@endif
+
 {{-- Top clientes IVA --}}
 @if($topClientesIva->count())
 <div class="card overflow-hidden mb-6">
@@ -334,7 +399,7 @@
                 @foreach($topClientesIva as $i => $cli)
                 <tr class="table-row">
                     <td class="px-5 py-3">
-                        <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold inline-flex
+                        <span class="w-6 h-6 rounded-lg inline-flex items-center justify-center text-xs font-bold
                                      {{ $i===0 ? 'bg-amber-500 text-black' : 'bg-[#1a2235] text-slate-400' }}">
                             {{ $i + 1 }}
                         </span>
