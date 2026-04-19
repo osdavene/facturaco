@@ -8,24 +8,19 @@ use App\Jobs\EnviarFacturaJob;
 use App\Models\Cliente;
 use App\Models\Empresa;
 use App\Models\Factura;
-use App\Models\FacturaItem;
 use App\Models\Producto;
 use App\Services\ContabilidadService;
-use App\Services\DocumentoService;
-use App\Services\InventarioService;
+use App\Services\FacturaService;
 use App\Services\MailService;
 use App\Services\PdfService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
 
 class FacturaController extends Controller
 {
     public function __construct(
-        private DocumentoService  $documentos,
-        private InventarioService $inventario,
-        private PdfService        $pdf,
+        private FacturaService $facturas,
+        private PdfService     $pdf,
     ) {}
 
     // ── INDEX ─────────────────────────────────────────────────
@@ -33,13 +28,13 @@ class FacturaController extends Controller
     public function index(Request $request)
     {
         $facturas = Factura::with('cliente')
-            ->when($request->buscar, function ($q) use ($request) {
-                $q->where('numero',          'like', '%'.$request->buscar.'%')
-                  ->orWhere('cliente_nombre', 'like', '%'.$request->buscar.'%');
-            })
-            ->when($request->estado,      fn ($q) => $q->where('estado', $request->estado))
-            ->when($request->fecha_desde, fn ($q) => $q->whereDate('fecha_emision', '>=', $request->fecha_desde))
-            ->when($request->fecha_hasta, fn ($q) => $q->whereDate('fecha_emision', '<=', $request->fecha_hasta))
+            ->when($request->buscar, fn($q) => $q->where(function ($inner) use ($request) {
+                $inner->where('numero',          'ilike', '%'.$request->buscar.'%')
+                      ->orWhere('cliente_nombre', 'ilike', '%'.$request->buscar.'%');
+            }))
+            ->when($request->estado,      fn($q) => $q->where('estado', $request->estado))
+            ->when($request->fecha_desde, fn($q) => $q->whereDate('fecha_emision', '>=', $request->fecha_desde))
+            ->when($request->fecha_hasta, fn($q) => $q->whereDate('fecha_emision', '<=', $request->fecha_hasta))
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
@@ -74,92 +69,10 @@ class FacturaController extends Controller
 
     public function store(StoreFacturaRequest $request)
     {
+        $factura = $this->facturas->crear($request, Empresa::obtener(), Auth::id());
 
-        $userId  = Auth::id();
-        $empresa = Empresa::obtener();
-
-        $facturaCreada = DB::transaction(function () use ($request, $userId, $empresa) {
-            $cliente     = Cliente::findOrFail($request->cliente_id);
-            $prefijo     = $empresa->prefijo_factura ?? 'FE';
-            $consecutivo = Factura::siguienteConsecutivo($prefijo);
-
-            $calc = $this->documentos->calcularItems($request->items);
-            $ret  = $this->documentos->calcularRetenciones(
-                $calc['subtotal'],
-                $calc['iva'],
-                $cliente->retefuente_pct,
-                $cliente->reteiva_pct,
-                $cliente->reteica_pct,
-            );
-
-            $factura = Factura::create([
-                'numero'            => $consecutivo['numero'],
-                'prefijo'           => $prefijo,
-                'consecutivo'       => $consecutivo['consecutivo'],
-                'tipo'              => 'factura',
-                'cliente_id'        => $cliente->id,
-                'cliente_nombre'    => $cliente->nombre_completo,
-                'cliente_documento' => $cliente->tipo_documento.': '.$cliente->documento_formateado,
-                'cliente_direccion' => $cliente->direccion,
-                'cliente_email'     => $cliente->email,
-                'fecha_emision'     => $request->fecha_emision,
-                'fecha_vencimiento' => $request->fecha_vencimiento,
-                'subtotal'          => $calc['subtotal'],
-                'descuento'         => $calc['descuento'],
-                'base_iva'          => $calc['subtotal'],
-                'iva'               => $calc['iva'],
-                'retefuente'        => $ret['retefuente'],
-                'reteiva'           => $ret['reteiva'],
-                'reteica'           => $ret['reteica'],
-                'total'             => $ret['total_neto'],
-                'total_pagado'      => 0,
-                'estado'            => $request->estado ?? 'borrador',
-                'forma_pago'        => $request->forma_pago ?? 'contado',
-                'plazo_pago'        => $request->plazo_pago ?? 0,
-                'observaciones'     => $request->observaciones,
-                'user_id'           => $userId,
-            ]);
-
-            foreach ($calc['items'] as $item) {
-                FacturaItem::create([
-                    'factura_id'      => $factura->id,
-                    'producto_id'     => $item['producto_id'] ?? null,
-                    'codigo'          => $item['codigo']      ?? 'SIN-COD',
-                    'descripcion'     => $item['descripcion'],
-                    'unidad'          => $item['unidad']      ?? 'UN',
-                    'cantidad'        => $item['cantidad'],
-                    'precio_unitario' => $item['precio_unitario'],
-                    'descuento_pct'   => $item['descuento_pct'],
-                    'descuento'       => $item['descuento'],
-                    'subtotal'        => $item['subtotal'],
-                    'iva_pct'         => $item['iva_pct'],
-                    'iva'             => $item['iva'],
-                    'total'           => $item['total'],
-                    'orden'           => $item['orden'],
-                ]);
-
-                if (!empty($item['producto_id'])) {
-                    $producto = Producto::find($item['producto_id']);
-                    if ($producto) {
-                        $this->inventario->registrarSalida(
-                            $producto,
-                            $item['cantidad'],
-                            $factura->numero,
-                            $userId,
-                            'Venta',
-                        );
-                    }
-                }
-            }
-
-            return $factura;
-        });
-
-        // Asiento contable automático (silencioso — no interrumpe si falla)
         try {
-            if ($facturaCreada) {
-                (new ContabilidadService())->asientoFactura($facturaCreada);
-            }
+            (new ContabilidadService())->asientoFactura($factura);
         } catch (\Throwable) {}
 
         return redirect()->route('facturas.index')
@@ -197,93 +110,8 @@ class FacturaController extends Controller
 
     public function update(UpdateFacturaRequest $request, Factura $factura)
     {
-        $userId  = Auth::id();
-        $empresa = Empresa::obtener();
+        $this->facturas->actualizar($factura, $request, Auth::id());
 
-        DB::transaction(function () use ($request, $factura, $userId, $empresa) {
-            // Revertir movimientos de inventario de los ítems anteriores
-            foreach ($factura->items as $itemAnterior) {
-                if ($itemAnterior->producto_id) {
-                    $producto = Producto::find($itemAnterior->producto_id);
-                    if ($producto) {
-                        $this->inventario->registrarEntrada(
-                            $producto,
-                            $itemAnterior->cantidad,
-                            $factura->numero,
-                            $userId,
-                            'Ajuste por edición de factura',
-                        );
-                    }
-                }
-            }
-
-            $factura->items()->delete();
-
-            $cliente = Cliente::findOrFail($request->cliente_id);
-            $calc    = $this->documentos->calcularItems($request->items);
-            $ret     = $this->documentos->calcularRetenciones(
-                $calc['subtotal'],
-                $calc['iva'],
-                $cliente->retefuente_pct,
-                $cliente->reteiva_pct,
-                $cliente->reteica_pct,
-            );
-
-            $factura->update([
-                'cliente_id'        => $cliente->id,
-                'cliente_nombre'    => $cliente->nombre_completo,
-                'cliente_documento' => $cliente->tipo_documento.': '.$cliente->documento_formateado,
-                'cliente_direccion' => $cliente->direccion,
-                'cliente_email'     => $cliente->email,
-                'fecha_emision'     => $request->fecha_emision,
-                'fecha_vencimiento' => $request->fecha_vencimiento,
-                'subtotal'          => $calc['subtotal'],
-                'descuento'         => $calc['descuento'],
-                'base_iva'          => $calc['subtotal'],
-                'iva'               => $calc['iva'],
-                'retefuente'        => $ret['retefuente'],
-                'reteiva'           => $ret['reteiva'],
-                'reteica'           => $ret['reteica'],
-                'total'             => $ret['total_neto'],
-                'forma_pago'        => $request->forma_pago ?? $factura->forma_pago,
-                'plazo_pago'        => $request->plazo_pago ?? $factura->plazo_pago,
-                'observaciones'     => $request->observaciones,
-            ]);
-
-            foreach ($calc['items'] as $item) {
-                FacturaItem::create([
-                    'factura_id'      => $factura->id,
-                    'producto_id'     => $item['producto_id'] ?? null,
-                    'codigo'          => $item['codigo']      ?? 'SIN-COD',
-                    'descripcion'     => $item['descripcion'],
-                    'unidad'          => $item['unidad']      ?? 'UN',
-                    'cantidad'        => $item['cantidad'],
-                    'precio_unitario' => $item['precio_unitario'],
-                    'descuento_pct'   => $item['descuento_pct'],
-                    'descuento'       => $item['descuento'],
-                    'subtotal'        => $item['subtotal'],
-                    'iva_pct'         => $item['iva_pct'],
-                    'iva'             => $item['iva'],
-                    'total'           => $item['total'],
-                    'orden'           => $item['orden'],
-                ]);
-
-                if (!empty($item['producto_id'])) {
-                    $producto = Producto::find($item['producto_id']);
-                    if ($producto) {
-                        $this->inventario->registrarSalida(
-                            $producto,
-                            $item['cantidad'],
-                            $factura->numero,
-                            $userId,
-                            'Venta',
-                        );
-                    }
-                }
-            }
-        });
-
-        // Regenerar asiento contable
         try {
             (new ContabilidadService())->anularAsientosDe(Factura::class, $factura->id);
             (new ContabilidadService())->asientoFactura($factura->fresh());
@@ -297,23 +125,7 @@ class FacturaController extends Controller
 
     public function destroy(Factura $factura)
     {
-        $userId = Auth::id();
-
-        $factura->load('items.producto');
-
-        foreach ($factura->items as $item) {
-            if ($item->producto_id && $item->producto && ! $item->producto->es_servicio) {
-                $this->inventario->registrarEntrada(
-                    $item->producto,
-                    $item->cantidad,
-                    $factura->numero,
-                    $userId,
-                    'Anulación',
-                );
-            }
-        }
-
-        $factura->update(['estado' => 'anulada']);
+        $this->facturas->anular($factura, Auth::id());
 
         return redirect()->route('facturas.index')
             ->with('success', 'Factura anulada correctamente.');
@@ -328,8 +140,10 @@ class FacturaController extends Controller
         }
 
         $count = Factura::whereIn('id', $ids)->where('estado', '!=', 'anulada')->count();
-        Factura::whereIn('id', $ids)->where('estado', '!=', 'anulada')
-            ->update(['estado' => 'anulada']);
+
+        foreach (Factura::whereIn('id', $ids)->where('estado', '!=', 'anulada')->get() as $factura) {
+            $this->facturas->anular($factura, Auth::id());
+        }
 
         return redirect()->route('facturas.index')
             ->with('success', "{$count} factura(s) anulada(s) correctamente.");
