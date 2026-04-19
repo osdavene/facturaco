@@ -76,6 +76,25 @@ Route::get('/api/productos/buscar', function (Request $req) {
     return response()->json($productos);
 });
 
+Route::get('/api/productos/{id}/proveedores', function ($id) {
+    $producto = Producto::find($id);
+    if (!$producto) return response()->json([]);
+
+    return response()->json(
+        $producto->proveedores()
+            ->select('proveedores.id', 'razon_social', 'tipo_documento', 'numero_documento')
+            ->get()
+            ->map(fn($p) => [
+                'id'                    => $p->id,
+                'razon_social'          => $p->razon_social,
+                'tipo_documento'        => $p->tipo_documento,
+                'numero_documento'      => $p->numero_documento,
+                'proveedor_principal'   => (bool) $p->pivot->proveedor_principal,
+                'precio_compra_sugerido'=> (float) $p->pivot->precio_compra_sugerido,
+            ])
+    );
+});
+
 Route::get('/api/facturas/buscar', function (Request $req) {
     $facturas = Factura::whereIn('estado', ['emitida', 'vencida'])
         ->where(function ($q) use ($req) {

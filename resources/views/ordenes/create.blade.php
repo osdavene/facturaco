@@ -244,6 +244,7 @@
 @push('scripts')
 <script>
 let items = [], itemCounter = 0;
+let proveedorSeleccionado = null;
 const fmt = n => '$' + Number(n||0).toLocaleString('es-CO', {minimumFractionDigits:0,maximumFractionDigits:0});
 
 // Mayúsculas y numérico
@@ -282,15 +283,29 @@ document.getElementById('buscar-proveedor').addEventListener('input', function()
 });
 
 function seleccionarProveedor(p) {
+    proveedorSeleccionado = p;
     document.getElementById('proveedor_id').value       = p.id;
     document.getElementById('prov-nombre').textContent  = p.razon_social.toUpperCase();
     document.getElementById('prov-doc').textContent     = p.tipo_documento + ': ' + p.numero_documento;
     document.getElementById('proveedor-info').classList.remove('hidden');
     document.getElementById('buscar-proveedor').value   = '';
     document.getElementById('resultados-proveedor').classList.add('hidden');
+
+    // Actualizar precios de items que tienen precio sugerido para este proveedor
+    let actualizado = false;
+    items.forEach(item => {
+        if (!item.proveedores || !item.proveedores.length) return;
+        const match = item.proveedores.find(pv => pv.id === p.id);
+        if (match && match.precio_compra_sugerido > 0) {
+            item.precio_unitario = match.precio_compra_sugerido;
+            actualizado = true;
+        }
+    });
+    if (actualizado) { renderItems(); calcularTotales(); }
 }
 
 function limpiarProveedor() {
+    proveedorSeleccionado = null;
     document.getElementById('proveedor_id').value = '';
     document.getElementById('proveedor-info').classList.add('hidden');
 }
@@ -321,11 +336,24 @@ document.getElementById('buscar-producto').addEventListener('input', function() 
     }, 300);
 });
 
-function agregarProducto(p) {
+async function agregarProducto(p) {
     document.getElementById('buscar-producto').value = '';
     document.getElementById('resultados-producto').classList.add('hidden');
+
+    let precio = p.precio_venta;
+    let proveedoresProducto = [];
+    try {
+        const res = await fetch(`/api/productos/${p.id}/proveedores`);
+        proveedoresProducto = await res.json();
+        if (proveedorSeleccionado) {
+            const match = proveedoresProducto.find(pv => pv.id === proveedorSeleccionado.id);
+            if (match && match.precio_compra_sugerido > 0) precio = match.precio_compra_sugerido;
+        }
+    } catch(e) {}
+
     agregarItem({ producto_id: p.id, codigo: p.codigo, descripcion: p.nombre,
-                  cantidad: 1, precio_unitario: p.precio_venta, iva_pct: p.iva_pct });
+                  cantidad: 1, precio_unitario: precio, iva_pct: p.iva_pct,
+                  proveedores: proveedoresProducto });
 }
 
 function agregarItem(data = {}) {
@@ -337,6 +365,7 @@ function agregarItem(data = {}) {
         cantidad:        data.cantidad        || 1,
         precio_unitario: data.precio_unitario || 0,
         iva_pct:         data.iva_pct         ?? 19,
+        proveedores:     data.proveedores     || [],
     });
     renderItems();
     calcularTotales();
@@ -375,6 +404,19 @@ function renderItems() {
         const base = item.cantidad * item.precio_unitario;
         const iva  = base * (item.iva_pct / 100);
         const tot  = base + iva;
+        const provPrincipal = item.proveedores.find(p => p.proveedor_principal);
+        const provActivo    = proveedorSeleccionado
+            ? item.proveedores.find(p => p.id === proveedorSeleccionado.id)
+            : null;
+        const chipProv = provPrincipal && (!proveedorSeleccionado || proveedorSeleccionado.id !== provPrincipal.id)
+            ? `<div class="flex items-center gap-1 mt-0.5">
+                 <i class="fas fa-truck text-[9px] text-amber-500/50"></i>
+                 <span class="text-[10px] text-slate-600">
+                   ${provPrincipal.razon_social}
+                   ${provPrincipal.precio_compra_sugerido > 0 ? '· ' + fmt(provPrincipal.precio_compra_sugerido) : ''}
+                 </span>
+               </div>`
+            : '';
         return `
         <tr class="border-b border-[#1e2d47]/30" data-id="${item.id}">
             <td class="py-2 pr-2">
@@ -387,6 +429,7 @@ function renderItems() {
                        style="text-transform:uppercase;color:#e2e8f0"
                        class="w-full bg-transparent border-b border-[#1e2d47] text-sm
                               py-1 focus:outline-none focus:border-amber-500">
+                ${chipProv}
             </td>
             <td class="py-2 px-2 w-20">
                 <input type="text" inputmode="decimal" name="items[${idx}][cantidad]"
