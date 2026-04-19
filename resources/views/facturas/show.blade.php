@@ -297,15 +297,23 @@
                 <span>{{ $factura->fecha_dian->format('d/m/Y H:i') }}</span>
             </div>
             @endif
-            <form method="GET" action="{{ route('facturas.dian.estado', $factura) }}" class="pt-1">
-                @csrf
-                <button type="submit"
-                        class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
-                               hover:border-emerald-500/50 text-slate-400 hover:text-emerald-400
-                               px-4 py-2 rounded-xl transition-colors text-sm">
-                    <i class="fas fa-sync-alt"></i> Consultar estado
-                </button>
-            </form>
+            <div class="flex flex-wrap gap-2 pt-1">
+                <form method="GET" action="{{ route('facturas.dian.estado', $factura) }}">
+                    @csrf
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                                   hover:border-emerald-500/50 text-slate-400 hover:text-emerald-400
+                                   px-4 py-2 rounded-xl transition-colors text-sm">
+                        <i class="fas fa-sync-alt"></i> Consultar estado
+                    </button>
+                </form>
+                <a href="{{ route('facturas.dian.xml', $factura) }}"
+                   class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                          hover:border-sky-500/50 text-slate-400 hover:text-sky-400
+                          px-4 py-2 rounded-xl transition-colors text-sm">
+                    <i class="fas fa-code"></i> Descargar XML
+                </a>
+            </div>
         </div>
 
         @elseif(! $dianConfigurado)
@@ -318,15 +326,23 @@
 
         @elseif(in_array($factura->estado, ['emitida', 'pagada']))
         <p class="text-sm text-slate-400 mb-3">Esta factura aún no ha sido enviada a la DIAN.</p>
-        <form method="POST" action="{{ route('facturas.dian.enviar', $factura) }}">
-            @csrf
-            <button type="submit"
-                    class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30
-                           hover:bg-emerald-500/20 text-emerald-400 font-semibold
-                           px-5 py-2 rounded-xl transition-colors text-sm">
-                <i class="fas fa-paper-plane"></i> Enviar a DIAN
-            </button>
-        </form>
+        <div class="flex flex-wrap gap-2">
+            <form method="POST" action="{{ route('facturas.dian.enviar', $factura) }}">
+                @csrf
+                <button type="submit"
+                        class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30
+                               hover:bg-emerald-500/20 text-emerald-400 font-semibold
+                               px-5 py-2 rounded-xl transition-colors text-sm">
+                    <i class="fas fa-paper-plane"></i> Enviar a DIAN
+                </button>
+            </form>
+            <a href="{{ route('facturas.dian.xml', $factura) }}"
+               class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                      hover:border-sky-500/50 text-slate-400 hover:text-sky-400
+                      px-4 py-2 rounded-xl transition-colors text-sm">
+                <i class="fas fa-code"></i> Ver XML
+            </a>
+        </div>
 
         @else
         <p class="text-sm text-slate-500">

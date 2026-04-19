@@ -56,4 +56,18 @@ class DianController extends Controller
             return back()->with('error', 'Error al consultar DIAN: '.$e->getMessage());
         }
     }
+
+    public function xml(Factura $factura)
+    {
+        try {
+            $xml = $this->dian->generarXml($factura);
+
+            return response($xml, 200, [
+                'Content-Type'        => 'application/xml; charset=UTF-8',
+                'Content-Disposition' => 'attachment; filename="'.$factura->numero.'.xml"',
+            ]);
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Error generando XML: '.$e->getMessage());
+        }
+    }
 }

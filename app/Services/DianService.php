@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\Empresa;
 use App\Models\Factura;
 use RuntimeException;
 
 class DianService
 {
+    public function __construct(private DianXmlBuilder $builder) {}
+
     public function estaConfigurado(): bool
     {
         return filled(config('dian.certificado_path'))
@@ -15,7 +18,12 @@ class DianService
 
     public function generarXml(Factura $factura): string
     {
-        throw new RuntimeException('DIAN XML UBL 2.1 no implementado aún (Parte 2).');
+        $factura->loadMissing(['items', 'cliente']);
+        $empresa = Empresa::findOrFail($factura->empresa_id);
+
+        $cufe = $this->calcularCufe($factura, $empresa);
+
+        return $this->builder->build($factura, $empresa, $cufe);
     }
 
     public function firmarXml(string $xml): string
@@ -31,5 +39,45 @@ class DianService
     public function consultarEstado(Factura $factura): array
     {
         throw new RuntimeException('Consulta de estado DIAN no implementada aún (Parte 4).');
+    }
+
+    // ── CUFE (SHA-384) ─────────────────────────────────────────────────────────
+    // Spec DIAN: NumFac + FecFac + HoraFac + ValFac +
+    //            CodImp1(01) + ValImp1(IVA) +
+    //            CodImp2(04) + ValImp2(ICA) +
+    //            CodImp3(03) + ValImp3(INC) +
+    //            ValTot + NitOFE + NumAdq + ClTec + TipoAmbie
+
+    public function calcularCufe(Factura $factura, Empresa $empresa): string
+    {
+        $ambiente   = config('dian.ambiente', 'habilitacion');
+        $tipoAmbie  = $ambiente === 'produccion' ? '1' : '2';
+        $claveTec   = $empresa->clave_tecnica ?? '';
+
+        $nitOfe     = preg_replace('/\D/', '', $empresa->nit ?? '');
+        $numAdq     = preg_replace('/\D/', '', $factura->cliente?->numero_documento
+                        ?? $factura->cliente_documento ?? '');
+
+        $cadena = implode('', [
+            $factura->numero,
+            $factura->fecha_emision->format('Y-m-d'),
+            now('America/Bogota')->format('H:i:s') . '-05:00',
+            $this->fmt($factura->subtotal),
+            '01', $this->fmt($factura->iva),
+            '04', $this->fmt($factura->reteica),
+            '03', '0.00',
+            $this->fmt($factura->total),
+            $nitOfe,
+            $numAdq,
+            $claveTec,
+            $tipoAmbie,
+        ]);
+
+        return hash('sha384', $cadena);
+    }
+
+    private function fmt(float $v): string
+    {
+        return number_format($v, 2, '.', '');
     }
 }
