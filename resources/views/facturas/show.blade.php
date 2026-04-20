@@ -307,11 +307,17 @@
                         <i class="fas fa-sync-alt"></i> Consultar estado
                     </button>
                 </form>
-                <a href="{{ route('facturas.dian.xml', $factura) }}"
+                <a href="{{ route('facturas.dian.xml-firmado', $factura) }}"
                    class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
                           hover:border-sky-500/50 text-slate-400 hover:text-sky-400
                           px-4 py-2 rounded-xl transition-colors text-sm">
-                    <i class="fas fa-code"></i> Descargar XML
+                    <i class="fas fa-file-signature"></i> XML Firmado
+                </a>
+                <a href="{{ route('facturas.dian.xml', $factura) }}"
+                   class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                          hover:border-slate-500/50 text-slate-500 hover:text-slate-400
+                          px-3 py-2 rounded-xl transition-colors text-xs">
+                    <i class="fas fa-code"></i> XML sin firma
                 </a>
             </div>
         </div>
@@ -336,11 +342,19 @@
                     <i class="fas fa-paper-plane"></i> Enviar a DIAN
                 </button>
             </form>
-            <a href="{{ route('facturas.dian.xml', $factura) }}"
+            @if($dianConfigurado)
+            <a href="{{ route('facturas.dian.xml-firmado', $factura) }}"
                class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
                       hover:border-sky-500/50 text-slate-400 hover:text-sky-400
                       px-4 py-2 rounded-xl transition-colors text-sm">
-                <i class="fas fa-code"></i> Ver XML
+                <i class="fas fa-file-signature"></i> XML Firmado
+            </a>
+            @endif
+            <a href="{{ route('facturas.dian.xml', $factura) }}"
+               class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                      hover:border-slate-500/50 text-slate-500 hover:text-slate-400
+                      px-3 py-2 rounded-xl transition-colors text-xs">
+                <i class="fas fa-code"></i> XML sin firma
             </a>
         </div>
 

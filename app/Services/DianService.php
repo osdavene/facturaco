@@ -8,7 +8,10 @@ use RuntimeException;
 
 class DianService
 {
-    public function __construct(private DianXmlBuilder $builder) {}
+    public function __construct(
+        private DianXmlBuilder $builder,
+        private DianXmlSigner  $signer,
+    ) {}
 
     public function estaConfigurado(): bool
     {
@@ -20,15 +23,18 @@ class DianService
     {
         $factura->loadMissing(['items', 'cliente']);
         $empresa = Empresa::findOrFail($factura->empresa_id);
-
-        $cufe = $this->calcularCufe($factura, $empresa);
+        $cufe    = $this->calcularCufe($factura, $empresa);
 
         return $this->builder->build($factura, $empresa, $cufe);
     }
 
     public function firmarXml(string $xml): string
     {
-        throw new RuntimeException('Firma digital XAdES no implementada aún (Parte 3).');
+        if (! $this->estaConfigurado()) {
+            throw new RuntimeException('Certificado DIAN no configurado. Define DIAN_CERTIFICADO_PATH y DIAN_CERTIFICADO_PASSWORD.');
+        }
+
+        return $this->signer->sign($xml);
     }
 
     public function enviar(Factura $factura): array
@@ -45,18 +51,17 @@ class DianService
     // Spec DIAN: NumFac + FecFac + HoraFac + ValFac +
     //            CodImp1(01) + ValImp1(IVA) +
     //            CodImp2(04) + ValImp2(ICA) +
-    //            CodImp3(03) + ValImp3(INC) +
+    //            CodImp3(03) + ValImp3(INC=0) +
     //            ValTot + NitOFE + NumAdq + ClTec + TipoAmbie
 
     public function calcularCufe(Factura $factura, Empresa $empresa): string
     {
-        $ambiente   = config('dian.ambiente', 'habilitacion');
-        $tipoAmbie  = $ambiente === 'produccion' ? '1' : '2';
-        $claveTec   = $empresa->clave_tecnica ?? '';
+        $ambiente  = config('dian.ambiente', 'habilitacion');
+        $claveTec  = $empresa->clave_tecnica ?? '';
 
-        $nitOfe     = preg_replace('/\D/', '', $empresa->nit ?? '');
-        $numAdq     = preg_replace('/\D/', '', $factura->cliente?->numero_documento
-                        ?? $factura->cliente_documento ?? '');
+        $nitOfe  = preg_replace('/\D/', '', $empresa->nit ?? '');
+        $numAdq  = preg_replace('/\D/', '', $factura->cliente?->numero_documento
+                       ?? $factura->cliente_documento ?? '');
 
         $cadena = implode('', [
             $factura->numero,
@@ -70,7 +75,7 @@ class DianService
             $nitOfe,
             $numAdq,
             $claveTec,
-            $tipoAmbie,
+            $ambiente === 'produccion' ? '1' : '2',
         ]);
 
         return hash('sha384', $cadena);
