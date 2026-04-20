@@ -292,38 +292,51 @@
 </div>
 
 {{-- ── MODAL CANTIDAD ──────────────────────────────── --}}
-<div id="modal-cantidad" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-    <div class="bg-[#111827] border border-[#1e2d47] rounded-2xl p-6 w-80 shadow-2xl">
-        <div class="text-sm font-semibold text-white mb-1" id="modal-producto-nombre"></div>
-        <div class="text-xs text-slate-500 mb-4" id="modal-producto-precio"></div>
-        <div class="flex gap-3 items-center mb-4">
-            <button onclick="ajustarCantidadModal(-1)"
-                    class="w-10 h-10 bg-[#1a2235] border border-[#1e2d47] rounded-xl text-slate-300
-                           hover:border-amber-500/50 hover:text-amber-400 transition-colors text-xl font-bold flex items-center justify-center">
-                −
-            </button>
-            <input id="modal-cantidad-input"
-                   type="number"
-                   min="1"
-                   step="1"
-                   value="1"
-                   class="flex-1 bg-[#1a2235] border border-amber-500/60 rounded-xl px-3 py-2
-                          text-center text-xl font-black text-amber-400 focus:outline-none
-                          [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-            <button onclick="ajustarCantidadModal(1)"
-                    class="w-10 h-10 bg-[#1a2235] border border-[#1e2d47] rounded-xl text-slate-300
-                           hover:border-amber-500/50 hover:text-amber-400 transition-colors text-xl font-bold flex items-center justify-center">
-                +
-            </button>
+<div id="modal-cantidad" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4"
+     style="backdrop-filter:blur(2px)">
+    <div class="bg-[#111827] border border-[#1e2d47] rounded-2xl shadow-2xl w-full max-w-xs">
+
+        {{-- Cabecera --}}
+        <div class="px-6 pt-5 pb-3 border-b border-[#1e2d47]">
+            <div class="font-bold text-white text-base leading-tight" id="modal-producto-nombre"></div>
+            <div class="text-amber-400 text-sm font-semibold mt-0.5" id="modal-producto-precio"></div>
         </div>
-        <div class="flex gap-2">
+
+        {{-- Control cantidad --}}
+        <div class="px-6 py-5">
+            <div class="flex items-stretch gap-3">
+                <button onclick="ajustarCantidadModal(-1)"
+                        class="w-12 h-12 shrink-0 bg-[#1a2235] border border-[#1e2d47] rounded-xl
+                               text-slate-300 hover:border-amber-500/60 hover:text-amber-400 hover:bg-[#1e2d47]
+                               transition-all text-2xl font-bold flex items-center justify-center select-none">
+                    −
+                </button>
+                <input id="modal-cantidad-input"
+                       type="number" min="1" step="1" value="1"
+                       class="h-12 flex-1 min-w-0 bg-[#0f1623] border-2 border-amber-500/50 rounded-xl
+                              text-center text-2xl font-black text-amber-400
+                              focus:outline-none focus:border-amber-500
+                              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none
+                              [&::-webkit-inner-spin-button]:appearance-none">
+                <button onclick="ajustarCantidadModal(1)"
+                        class="w-12 h-12 shrink-0 bg-[#1a2235] border border-[#1e2d47] rounded-xl
+                               text-slate-300 hover:border-amber-500/60 hover:text-amber-400 hover:bg-[#1e2d47]
+                               transition-all text-2xl font-bold flex items-center justify-center select-none">
+                    +
+                </button>
+            </div>
+        </div>
+
+        {{-- Botones --}}
+        <div class="flex gap-3 px-6 pb-5">
             <button onclick="cerrarModalCantidad()"
-                    class="flex-1 py-2.5 bg-[#1a2235] border border-[#1e2d47] rounded-xl text-sm text-slate-400
-                           hover:border-slate-500 transition-colors">
+                    class="flex-1 h-11 bg-[#1a2235] border border-[#1e2d47] rounded-xl text-sm
+                           text-slate-400 hover:text-white hover:border-slate-500 transition-all">
                 Cancelar
             </button>
             <button onclick="confirmarCantidad()"
-                    class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 rounded-xl text-sm font-bold text-black transition-colors">
+                    class="flex-1 h-11 bg-amber-500 hover:bg-amber-400 active:bg-amber-600
+                           rounded-xl text-sm font-bold text-black transition-all shadow-lg shadow-amber-500/20">
                 Agregar
             </button>
         </div>
