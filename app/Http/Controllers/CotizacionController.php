@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cotizacion;
 use App\Models\CotizacionItem;
+use App\Http\Requests\StoreCotizacionRequest;
 use App\Models\Empresa;
 use App\Models\Factura;
 use App\Models\FacturaItem;
@@ -50,17 +51,8 @@ class CotizacionController extends Controller
         return view('cotizaciones.create', compact('consecutivo', 'empresa'));
     }
 
-    public function store(Request $request)
+    public function store(StoreCotizacionRequest $request)
     {
-        $request->validate([
-            'cliente_nombre'          => 'required|string|max:255',
-            'fecha_emision'           => 'required|date',
-            'fecha_vencimiento'       => 'required|date|after_or_equal:fecha_emision',
-            'items'                   => 'required|array|min:1',
-            'items.*.descripcion'     => 'required|string',
-            'items.*.cantidad'        => 'required|numeric|min:0.001',
-            'items.*.precio_unitario' => 'required|numeric|min:0',
-        ]);
 
         $userId = auth()->id();
 
@@ -155,7 +147,8 @@ class CotizacionController extends Controller
                 'cliente_documento' => $cotizacion->cliente_documento ?? '',
                 'cliente_email'     => $cotizacion->cliente_email,
                 'cliente_direccion' => $cotizacion->cliente_direccion,
-                'fecha_emision'     => now(),
+                'fecha_emision'     => today(),
+                'hora_emision'      => now('America/Bogota')->format('H:i:s'),
                 'fecha_vencimiento' => now()->addDays($cotizacion->plazo_pago ?: 30),
                 'subtotal'          => $cotizacion->subtotal,
                 'descuento'         => $cotizacion->descuento,

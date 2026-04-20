@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReciboCajaRequest;
 use App\Models\ReciboCaja;
 use App\Models\Factura;
 use App\Models\Cliente;
@@ -47,19 +48,8 @@ class ReciboCajaController extends Controller
         return view('recibos.create', compact('consecutivo', 'clientes', 'factura'));
     }
 
-    public function store(Request $request)
+    public function store(StoreReciboCajaRequest $request)
     {
-        $request->validate([
-            'cliente_id'    => 'required|exists:clientes,id',
-            'fecha'         => 'required|date',
-            'valor'         => 'required|numeric|min:1',
-            'forma_pago'    => 'required|in:efectivo,transferencia,cheque,tarjeta,consignacion',
-            'concepto'      => 'required|string|max:255',
-            'factura_id'    => 'nullable|exists:facturas,id',
-            'banco'         => 'nullable|string|max:100',
-            'num_referencia'=> 'nullable|string|max:50',
-            'observaciones' => 'nullable|string',
-        ]);
 
         $userId = auth()->id();
 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreOrdenCompraRequest;
+use App\Http\Requests\UpdateOrdenCompraRequest;
 use App\Models\Empresa;
 use App\Models\OrdenCompra;
 use App\Models\Proveedor;
@@ -46,17 +48,8 @@ class OrdenCompraController extends Controller
         return view('ordenes.create', compact('consecutivo', 'proveedores'));
     }
 
-    public function store(Request $request)
+    public function store(StoreOrdenCompraRequest $request)
     {
-        $request->validate([
-            'proveedor_id'            => 'required|exists:proveedores,id',
-            'fecha_emision'           => 'required|date',
-            'fecha_esperada'          => 'nullable|date|after_or_equal:fecha_emision',
-            'items'                   => 'required|array|min:1',
-            'items.*.descripcion'     => 'required|string',
-            'items.*.cantidad'        => 'required|numeric|min:0.001',
-            'items.*.precio_unitario' => 'required|numeric|min:0',
-        ]);
 
         $this->ordenes->crear($request, auth()->id());
 
@@ -84,17 +77,8 @@ class OrdenCompraController extends Controller
         return view('ordenes.create', compact('orden', 'proveedores'));
     }
 
-    public function update(Request $request, OrdenCompra $orden)
+    public function update(UpdateOrdenCompraRequest $request, OrdenCompra $orden)
     {
-        $request->validate([
-            'proveedor_id'            => 'required|exists:proveedores,id',
-            'fecha_emision'           => 'required|date',
-            'fecha_esperada'          => 'nullable|date|after_or_equal:fecha_emision',
-            'items'                   => 'required|array|min:1',
-            'items.*.descripcion'     => 'required|string',
-            'items.*.cantidad'        => 'required|numeric|min:0.001',
-            'items.*.precio_unitario' => 'required|numeric|min:0',
-        ]);
 
         $this->ordenes->actualizar($orden, $request);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRemisionRequest;
 use App\Models\Empresa;
 use App\Models\Factura;
 use App\Models\FacturaItem;
@@ -47,15 +48,8 @@ class RemisionController extends Controller
         return view('remisiones.create', compact('consecutivo', 'empresa'));
     }
 
-    public function store(Request $request)
+    public function store(StoreRemisionRequest $request)
     {
-        $request->validate([
-            'cliente_nombre'      => 'required|string|max:255',
-            'fecha_emision'       => 'required|date',
-            'items'               => 'required|array|min:1',
-            'items.*.descripcion' => 'required|string',
-            'items.*.cantidad'    => 'required|numeric|min:0.001',
-        ]);
 
         $userId = auth()->id();
 
@@ -159,7 +153,8 @@ class RemisionController extends Controller
                 'cliente_documento' => $remision->cliente_documento ?? '',
                 'cliente_email'     => $remision->cliente_email,
                 'cliente_direccion' => $remision->cliente_direccion,
-                'fecha_emision'     => now(),
+                'fecha_emision'     => today(),
+                'hora_emision'      => now('America/Bogota')->format('H:i:s'),
                 'fecha_vencimiento' => now()->addDays(30),
                 'subtotal'          => $subtotal,
                 'descuento'         => 0,

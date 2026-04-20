@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreNotaCreditoRequest;
 use App\Models\NotaCredito;
 use App\Models\NotaCreditoItem;
 use App\Models\Factura;
@@ -46,20 +47,8 @@ class NotaCreditoController extends Controller
         return view('notas_credito.create', compact('factura', 'empresa'));
     }
 
-    public function store(Request $request)
+    public function store(StoreNotaCreditoRequest $request)
     {
-        $request->validate([
-            'factura_id'              => 'required|exists:facturas,id',
-            'motivo'                  => 'required|string',
-            'tipo'                    => 'required|in:total,parcial',
-            'fecha'                   => 'required|date',
-            'observaciones'           => 'nullable|string|max:500',
-            'items'                   => 'required|array|min:1',
-            'items.*.descripcion'     => 'required|string',
-            'items.*.cantidad'        => 'required|numeric|min:0.001',
-            'items.*.precio_unitario' => 'required|numeric|min:0',
-            'items.*.devolver_stock'  => 'nullable',
-        ]);
 
         $factura = Factura::with('items.producto')->findOrFail($request->factura_id);
         $userId  = Auth::id();
