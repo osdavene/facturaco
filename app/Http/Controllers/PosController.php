@@ -103,6 +103,7 @@ class PosController extends Controller
                 'cliente_direccion' => $cliente->direccion ?? '',
                 'cliente_email'     => $cliente->email    ?? '',
                 'fecha_emision'     => today(),
+                'hora_emision'      => now('America/Bogota')->format('H:i:s'),
                 'fecha_vencimiento' => today(),
                 'subtotal'          => $calc['subtotal'],
                 'descuento'         => $calc['descuento'],

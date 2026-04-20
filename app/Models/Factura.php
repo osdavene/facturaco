@@ -38,7 +38,7 @@ class Factura extends Model
         'numero', 'prefijo', 'consecutivo', 'tipo',
         'cliente_id', 'cliente_nombre', 'cliente_documento',
         'cliente_direccion', 'cliente_email',
-        'fecha_emision', 'fecha_vencimiento',
+        'fecha_emision', 'hora_emision', 'fecha_vencimiento',
         'subtotal', 'descuento', 'base_iva', 'iva',
         'retefuente', 'reteiva', 'reteica',
         'total', 'total_pagado',
@@ -48,6 +48,7 @@ class Factura extends Model
 
     protected $casts = [
         'fecha_emision'     => 'date',
+        'hora_emision'      => 'string',
         'fecha_vencimiento' => 'date',
         'enviada_dian'      => 'boolean',
         'fecha_dian'        => 'datetime',

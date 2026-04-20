@@ -40,6 +40,7 @@ class FacturaService
                 'cliente_direccion' => $cliente->direccion,
                 'cliente_email'     => $cliente->email,
                 'fecha_emision'     => $request->fecha_emision,
+                'hora_emision'      => now('America/Bogota')->format('H:i:s'),
                 'fecha_vencimiento' => $request->fecha_vencimiento,
                 'subtotal'          => $calc['subtotal'],
                 'descuento'         => $calc['descuento'],

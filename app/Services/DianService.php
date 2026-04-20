@@ -88,10 +88,12 @@ class DianService
         $numAdq = preg_replace('/\D/', '', $factura->cliente?->numero_documento
                       ?? $factura->cliente_documento ?? '');
 
+        $horaEmision = ($factura->hora_emision ?? now('America/Bogota')->format('H:i:s')) . '-05:00';
+
         $cadena = implode('', [
             $factura->numero,
             $factura->fecha_emision->format('Y-m-d'),
-            now('America/Bogota')->format('H:i:s') . '-05:00',
+            $horaEmision,
             $this->fmt($factura->subtotal),
             '01', $this->fmt($factura->iva),
             '04', $this->fmt($factura->reteica),

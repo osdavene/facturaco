@@ -58,7 +58,7 @@ class DianXmlBuilder
         $uuid->setAttribute('schemeName', 'CUFE-SHA384');
 
         $this->cbc($invoice, 'IssueDate', $factura->fecha_emision->format('Y-m-d'));
-        $this->cbc($invoice, 'IssueTime', now('America/Bogota')->format('H:i:s') . '-05:00');
+        $this->cbc($invoice, 'IssueTime', ($factura->hora_emision ?? now('America/Bogota')->format('H:i:s')) . '-05:00');
 
         $typeCode = $this->cbc($invoice, 'InvoiceTypeCode', '01');
         $typeCode->setAttribute('listAgencyID', '195');
