@@ -34,8 +34,9 @@ Route::middleware('modulo:facturacion')->group(function () {
     Route::delete('/facturas',                          [FacturaController::class, 'bulkDelete'])       ->name('facturas.bulk-delete')  ->middleware('can:anular facturas');
     Route::post('/facturas/{factura}/dian/enviar',      [DianController::class, 'enviar'])          ->name('facturas.dian.enviar')  ->middleware('can:crear facturas');
     Route::get('/facturas/{factura}/dian/estado',       [DianController::class, 'consultarEstado']) ->name('facturas.dian.estado')  ->middleware('can:ver facturas');
-    Route::get('/facturas/{factura}/dian/xml',          [DianController::class, 'xml'])         ->name('facturas.dian.xml')         ->middleware('can:ver facturas');
-    Route::get('/facturas/{factura}/dian/xml-firmado', [DianController::class, 'xmlFirmado'])  ->name('facturas.dian.xml-firmado') ->middleware('can:ver facturas');
+    Route::get('/facturas/{factura}/dian/xml',          [DianController::class, 'xml'])              ->name('facturas.dian.xml')             ->middleware('can:ver facturas');
+    Route::get('/facturas/{factura}/dian/xml-firmado', [DianController::class, 'xmlFirmado'])       ->name('facturas.dian.xml-firmado')     ->middleware('can:ver facturas');
+    Route::post('/facturas/{factura}/dian/evento',     [DianController::class, 'registrarEvento'])  ->name('facturas.dian.evento')          ->middleware('can:editar facturas');
 
     // Wompi retorno (dentro de módulo facturacion)
     Route::get('/facturas/{factura}/wompi/retorno', [WompiController::class, 'retorno'])->name('wompi.retorno');

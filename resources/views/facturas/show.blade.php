@@ -366,9 +366,129 @@
     </div>
 
     @if($factura->observaciones)
-    <div class="card p-5">
+    <div class="card p-5 mb-4">
         <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Observaciones</h3>
         <p class="text-sm text-slate-300">{{ $factura->observaciones }}</p>
+    </div>
+    @endif
+
+    {{-- Historial de eventos DIAN --}}
+    @if($dianEventos->count())
+    <div class="card overflow-hidden mb-4">
+        <div class="px-5 py-4 border-b border-[#1e2d47] flex items-center justify-between">
+            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <i class="fas fa-history text-emerald-500/60"></i> Historial DIAN
+            </h3>
+            <span class="text-xs text-slate-600">{{ $dianEventos->count() }} evento(s)</span>
+        </div>
+        <div class="divide-y divide-[#1e2d47]/50">
+            @foreach($dianEventos as $evento)
+            <div class="px-5 py-3 flex items-start gap-3">
+                {{-- Ícono estado --}}
+                <div class="mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0
+                            bg-{{ $evento->estado_color }}-500/10">
+                    @if($evento->estado === 'exitoso')
+                        <i class="fas fa-check text-emerald-400 text-xs"></i>
+                    @elseif($evento->estado === 'fallido')
+                        <i class="fas fa-times text-red-400 text-xs"></i>
+                    @elseif($evento->estado === 'procesando')
+                        <i class="fas fa-spinner fa-spin text-amber-400 text-xs"></i>
+                    @else
+                        <i class="fas fa-clock text-slate-500 text-xs"></i>
+                    @endif
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm font-medium">{{ $evento->tipo_label }}</span>
+                        <span class="text-xs text-slate-600">{{ $evento->created_at->format('d/m/Y H:i') }}</span>
+                        @if($evento->codigo_respuesta)
+                        <span class="text-xs font-mono bg-[#141c2e] px-1.5 py-0.5 rounded text-slate-400">
+                            {{ $evento->codigo_respuesta }}
+                        </span>
+                        @endif
+                    </div>
+                    @if($evento->descripcion)
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $evento->descripcion }}</p>
+                    @endif
+                    @if($evento->actor_nombre)
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        <i class="fas fa-user mr-1"></i>{{ $evento->actor_nombre }}
+                        @if($evento->actor_documento) — {{ $evento->actor_documento }} @endif
+                    </p>
+                    @endif
+                    @if($evento->nota)
+                    <p class="text-xs text-slate-500 italic mt-0.5">"{{ $evento->nota }}"</p>
+                    @endif
+                    @if(! empty($evento->errores))
+                    <ul class="mt-1 space-y-0.5">
+                        @foreach($evento->errores as $err)
+                        <li class="text-xs text-red-400/80">• {{ $err }}</li>
+                        @endforeach
+                    </ul>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Registrar evento del comprador (solo si ya fue enviada) --}}
+        @if($factura->enviada_dian)
+        <div class="px-5 py-4 border-t border-[#1e2d47] bg-[#0f1623]/40">
+            <p class="text-xs text-slate-500 mb-3 font-semibold uppercase tracking-wider">Registrar evento del comprador</p>
+            <form method="POST" action="{{ route('facturas.dian.evento', $factura) }}"
+                  class="flex flex-wrap gap-2 items-end">
+                @csrf
+                <select name="tipo"
+                        class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-3 py-2
+                               text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                    <option value="acuse_recibo">Acuse de recibo (032)</option>
+                    <option value="recibo_bien">Recibo de bien/servicio (033)</option>
+                    <option value="aceptacion">Aceptación expresa (034)</option>
+                    <option value="rechazo_comprador">Rechazo (036)</option>
+                </select>
+                <input type="text" name="actor_nombre" placeholder="Nombre del comprador"
+                       class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-3 py-2
+                              text-sm text-slate-200 focus:outline-none focus:border-amber-500 w-48">
+                <input type="text" name="nota" placeholder="Nota (opcional)"
+                       class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-3 py-2
+                              text-sm text-slate-200 focus:outline-none focus:border-amber-500 w-48">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                               hover:border-amber-500/50 text-slate-400 hover:text-amber-400
+                               px-4 py-2 rounded-xl transition-colors text-sm">
+                    <i class="fas fa-plus"></i> Registrar
+                </button>
+            </form>
+        </div>
+        @endif
+    </div>
+    @elseif($factura->enviada_dian)
+    {{-- Si fue enviada pero no hay eventos, mostrar formulario de evento comprador --}}
+    <div class="card p-5 mb-4">
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <i class="fas fa-history text-emerald-500/60"></i> Eventos del comprador
+        </h3>
+        <form method="POST" action="{{ route('facturas.dian.evento', $factura) }}"
+              class="flex flex-wrap gap-2 items-end">
+            @csrf
+            <select name="tipo"
+                    class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-3 py-2
+                           text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                <option value="acuse_recibo">Acuse de recibo (032)</option>
+                <option value="recibo_bien">Recibo de bien/servicio (033)</option>
+                <option value="aceptacion">Aceptación expresa (034)</option>
+                <option value="rechazo_comprador">Rechazo (036)</option>
+            </select>
+            <input type="text" name="actor_nombre" placeholder="Nombre del comprador"
+                   class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-3 py-2
+                          text-sm text-slate-200 focus:outline-none focus:border-amber-500 w-48">
+            <button type="submit"
+                    class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                           hover:border-amber-500/50 text-slate-400 hover:text-amber-400
+                           px-4 py-2 rounded-xl transition-colors text-sm">
+                <i class="fas fa-plus"></i> Registrar evento
+            </button>
+        </form>
     </div>
     @endif
 

@@ -86,10 +86,13 @@ class FacturaController extends Controller
     public function show(Factura $factura)
     {
         $factura->load(['items.producto', 'cliente', 'usuario']);
-        $empresa          = Empresa::obtener();
-        $dianConfigurado  = $this->dian->estaConfigurado();
+        $empresa         = Empresa::obtener();
+        $dianConfigurado = $this->dian->estaConfigurado();
+        $dianEventos     = \App\Models\DianEvento::where('factura_id', $factura->id)
+                               ->latest()
+                               ->get();
 
-        return view('facturas.show', compact('factura', 'empresa', 'dianConfigurado'));
+        return view('facturas.show', compact('factura', 'empresa', 'dianConfigurado', 'dianEventos'));
     }
 
     // ── EDIT ──────────────────────────────────────────────────

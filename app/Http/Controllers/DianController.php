@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\EnviarDianJob;
+use App\Models\DianEvento;
 use App\Models\Factura;
 use App\Services\DianService;
+use Illuminate\Http\Request;
 
 class DianController extends Controller
 {
     public function __construct(private DianService $dian) {}
 
+    // ── Envío asíncrono ───────────────────────────────────────────────────────
+
     public function enviar(Factura $factura)
     {
         if (! $this->dian->estaConfigurado()) {
-            return back()->with('error', 'La integración DIAN no está configurada. Define DIAN_CERTIFICADO_PATH y DIAN_CERTIFICADO_PASSWORD en el servidor.');
+            return back()->with('error', 'La integración DIAN no está configurada. Define DIAN_CERTIFICADO_PATH y DIAN_CERTIFICADO_PASSWORD.');
         }
 
         if ($factura->enviada_dian) {
@@ -23,22 +28,17 @@ class DianController extends Controller
             return back()->with('error', 'Solo se pueden enviar facturas emitidas o pagadas a la DIAN.');
         }
 
-        try {
-            $resultado = $this->dian->enviar($factura);
+        EnviarDianJob::dispatch($factura);
 
-            $factura->update([
-                'cufe'         => $resultado['cufe'],
-                'enviada_dian' => true,
-                'fecha_dian'   => now(),
-            ]);
+        // Evento pendiente para que el usuario vea que está en cola
+        DianEvento::registrar($factura, DianEvento::TIPO_ENVIO, DianEvento::ESTADO_PENDIENTE, [
+            'descripcion' => 'Envío encolado',
+        ]);
 
-            return back()->with('success', 'Factura enviada a la DIAN correctamente. CUFE: ' . $resultado['cufe']);
-        } catch (\RuntimeException $e) {
-            return back()->with('error', $e->getMessage());
-        } catch (\Throwable $e) {
-            return back()->with('error', 'Error al enviar a DIAN: ' . $e->getMessage());
-        }
+        return back()->with('info', 'Factura enviada a la cola de envío DIAN. El estado se actualizará en unos momentos.');
     }
+
+    // ── Consulta de estado ────────────────────────────────────────────────────
 
     public function consultarEstado(Factura $factura)
     {
@@ -48,40 +48,73 @@ class DianController extends Controller
 
         try {
             $estado = $this->dian->consultarEstado($factura);
-            return back()->with('info', 'Estado DIAN: ' . $estado['descripcion']);
+
+            DianEvento::registrar($factura, DianEvento::TIPO_CONSULTA, DianEvento::ESTADO_EXITOSO, [
+                'cufe'        => $factura->cufe,
+                'codigo'      => $estado['codigo'],
+                'descripcion' => $estado['descripcion'],
+                'payload'     => $estado,
+            ]);
+
+            $msg = 'Estado DIAN: ' . $estado['descripcion'];
+            if (! empty($estado['errores'])) {
+                $msg .= ' — ' . implode(' | ', $estado['errores']);
+            }
+
+            return back()->with($estado['valido'] ? 'success' : 'error', $msg);
+
         } catch (\RuntimeException $e) {
+            DianEvento::registrar($factura, DianEvento::TIPO_CONSULTA, DianEvento::ESTADO_FALLIDO, [
+                'descripcion' => $e->getMessage(),
+            ]);
             return back()->with('error', $e->getMessage());
         } catch (\Throwable $e) {
             return back()->with('error', 'Error al consultar DIAN: ' . $e->getMessage());
         }
     }
 
-    /** Descarga el XML sin firma (útil para revisar estructura antes de tener certificado). */
+    // ── Evento del comprador ──────────────────────────────────────────────────
+
+    public function registrarEvento(Request $request, Factura $factura)
+    {
+        $request->validate([
+            'tipo'            => 'required|in:acuse_recibo,recibo_bien,aceptacion,rechazo_comprador',
+            'actor_nombre'    => 'nullable|string|max:255',
+            'actor_documento' => 'nullable|string|max:20',
+            'nota'            => 'nullable|string|max:500',
+        ]);
+
+        DianEvento::registrar($factura, $request->tipo, DianEvento::ESTADO_EXITOSO, [
+            'descripcion'    => 'Evento registrado manualmente',
+            'actor_nombre'   => $request->actor_nombre,
+            'actor_documento'=> $request->actor_documento,
+            'nota'           => $request->nota,
+        ]);
+
+        return back()->with('success', 'Evento registrado correctamente.');
+    }
+
+    // ── Descarga XML ──────────────────────────────────────────────────────────
+
     public function xml(Factura $factura)
     {
         try {
-            $xml      = $this->dian->generarXml($factura);
-            $filename = $factura->numero . '.xml';
-
-            return $this->xmlResponse($xml, $filename);
+            $xml = $this->dian->generarXml($factura);
+            return $this->xmlResponse($xml, $factura->numero . '.xml');
         } catch (\Throwable $e) {
             return back()->with('error', 'Error generando XML: ' . $e->getMessage());
         }
     }
 
-    /** Descarga el XML con firma XAdES-BES (requiere certificado configurado). */
     public function xmlFirmado(Factura $factura)
     {
         if (! $this->dian->estaConfigurado()) {
-            return back()->with('error', 'Certificado DIAN no configurado. Define DIAN_CERTIFICADO_PATH y DIAN_CERTIFICADO_PASSWORD.');
+            return back()->with('error', 'Certificado DIAN no configurado.');
         }
 
         try {
-            $xml      = $this->dian->generarXml($factura);
-            $xml      = $this->dian->firmarXml($xml);
-            $filename = $factura->numero . '-firmado.xml';
-
-            return $this->xmlResponse($xml, $filename);
+            $xml = $this->dian->firmarXml($this->dian->generarXml($factura));
+            return $this->xmlResponse($xml, $factura->numero . '-firmado.xml');
         } catch (\Throwable $e) {
             return back()->with('error', 'Error firmando XML: ' . $e->getMessage());
         }

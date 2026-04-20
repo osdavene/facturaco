@@ -11,6 +11,7 @@ class DianService
     public function __construct(
         private DianXmlBuilder $builder,
         private DianXmlSigner  $signer,
+        private DianSoapClient $soap,
     ) {}
 
     public function estaConfigurado(): bool
@@ -39,12 +40,36 @@ class DianService
 
     public function enviar(Factura $factura): array
     {
-        throw new RuntimeException('Envío a DIAN no implementado aún (Parte 4).');
+        if (! $this->estaConfigurado()) {
+            throw new RuntimeException('Certificado DIAN no configurado.');
+        }
+
+        $factura->loadMissing(['items', 'cliente']);
+        $empresa = Empresa::findOrFail($factura->empresa_id);
+
+        $xml       = $this->generarXml($factura);
+        $xmlFirmado = $this->firmarXml($xml);
+
+        $resultado = $this->soap->sendBillSync($xmlFirmado, $empresa, $factura);
+
+        if (! $resultado['valido']) {
+            $detalle = implode(' | ', $resultado['errores'] ?: [$resultado['descripcion']]);
+            throw new RuntimeException('DIAN rechazó la factura: ' . $detalle);
+        }
+
+        return $resultado;
     }
 
     public function consultarEstado(Factura $factura): array
     {
-        throw new RuntimeException('Consulta de estado DIAN no implementada aún (Parte 4).');
+        $softwareId  = config('dian.software_id');
+        $softwarePin = config('dian.software_pin');
+
+        if (! $softwareId || ! $softwarePin) {
+            throw new RuntimeException('DIAN_SOFTWARE_ID y DIAN_SOFTWARE_PIN son obligatorios para consultar estado.');
+        }
+
+        return $this->soap->getStatusZip($factura->cufe, $softwareId, $softwarePin);
     }
 
     // ── CUFE (SHA-384) ─────────────────────────────────────────────────────────
@@ -56,12 +81,12 @@ class DianService
 
     public function calcularCufe(Factura $factura, Empresa $empresa): string
     {
-        $ambiente  = config('dian.ambiente', 'habilitacion');
-        $claveTec  = $empresa->clave_tecnica ?? '';
+        $ambiente = config('dian.ambiente', 'habilitacion');
+        $claveTec = $empresa->clave_tecnica ?? '';
 
-        $nitOfe  = preg_replace('/\D/', '', $empresa->nit ?? '');
-        $numAdq  = preg_replace('/\D/', '', $factura->cliente?->numero_documento
-                       ?? $factura->cliente_documento ?? '');
+        $nitOfe = preg_replace('/\D/', '', $empresa->nit ?? '');
+        $numAdq = preg_replace('/\D/', '', $factura->cliente?->numero_documento
+                      ?? $factura->cliente_documento ?? '');
 
         $cadena = implode('', [
             $factura->numero,
