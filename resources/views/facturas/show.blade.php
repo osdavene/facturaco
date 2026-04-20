@@ -30,6 +30,77 @@
                 <i class="fas fa-file-pdf"></i> PDF
             </a>
 
+            {{-- XML UBL (siempre disponible) --}}
+            <div class="relative" id="xml-dropdown-wrap">
+                <button onclick="document.getElementById('xml-dropdown').classList.toggle('hidden')"
+                        class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                               hover:border-sky-500/50 text-slate-400 hover:text-sky-400
+                               px-4 py-2.5 rounded-xl transition-colors text-sm">
+                    <i class="fas fa-code"></i> XML
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </button>
+                <div id="xml-dropdown" class="hidden absolute right-0 mt-2 w-52 bg-[#1a2235] border border-[#1e2d47]
+                            rounded-xl shadow-xl z-20 overflow-hidden">
+                    <a href="{{ route('facturas.dian.xml', $factura) }}"
+                       class="flex items-center gap-2 px-4 py-3 text-sm text-slate-300
+                              hover:bg-[#141c2e] hover:text-white transition-colors">
+                        <i class="fas fa-file-code text-slate-500 w-4"></i> Sin firma
+                    </a>
+                    @if($dianConfigurado)
+                    <a href="{{ route('facturas.dian.xml-firmado', $factura) }}"
+                       class="flex items-center gap-2 px-4 py-3 text-sm text-slate-300
+                              hover:bg-[#141c2e] hover:text-sky-400 transition-colors border-t border-[#1e2d47]">
+                        <i class="fas fa-file-signature text-sky-500/60 w-4"></i> Con firma XAdES
+                    </a>
+                    @endif
+                </div>
+            </div>
+            @push('scripts')
+            <script>
+                document.addEventListener('click', function(e) {
+                    const wrap = document.getElementById('xml-dropdown-wrap');
+                    if (wrap && !wrap.contains(e.target)) {
+                        document.getElementById('xml-dropdown')?.classList.add('hidden');
+                    }
+                });
+            </script>
+            @endpush
+
+            {{-- DIAN: enviar o badge estado --}}
+            @if($factura->enviada_dian)
+                {{-- Badge enviada + consultar --}}
+                <form method="GET" action="{{ route('facturas.dian.estado', $factura) }}">
+                    @csrf
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30
+                                   hover:bg-emerald-500/20 text-emerald-400
+                                   px-4 py-2.5 rounded-xl transition-colors text-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        DIAN ✓
+                        <i class="fas fa-sync-alt text-xs opacity-50"></i>
+                    </button>
+                </form>
+            @elseif($dianConfigurado && in_array($factura->estado, ['emitida', 'pagada']))
+                {{-- Enviar a DIAN --}}
+                <form method="POST" action="{{ route('facturas.dian.enviar', $factura) }}">
+                    @csrf
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30
+                                   hover:bg-emerald-500/20 text-emerald-400 font-semibold
+                                   px-4 py-2.5 rounded-xl transition-colors text-sm">
+                        <i class="fas fa-landmark"></i> Enviar DIAN
+                    </button>
+                </form>
+            @elseif(! $dianConfigurado)
+                {{-- DIAN no configurada: badge aviso --}}
+                <span title="Configura DIAN_CERTIFICADO_PATH y DIAN_CERTIFICADO_PASSWORD"
+                      class="inline-flex items-center gap-1.5 bg-[#1a2235] border border-[#1e2d47]
+                             text-slate-600 px-4 py-2.5 rounded-xl text-sm cursor-help">
+                    <i class="fas fa-landmark"></i> DIAN
+                    <i class="fas fa-exclamation-circle text-amber-600/60 text-xs"></i>
+                </span>
+            @endif
+
             {{-- Enviar email --}}
             <a href="{{ route('facturas.formEnviar', $factura) }}"
                class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
@@ -264,106 +335,26 @@
         </div>
     </div>
 
-    {{-- DIAN --}}
-    <div class="card p-5 mb-4">
-        <div class="flex items-center justify-between mb-3">
-            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                <i class="fas fa-landmark text-emerald-500"></i> DIAN — Factura Electrónica
-            </h3>
-            @if($factura->enviada_dian)
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full
-                             bg-emerald-500/10 text-emerald-400">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    Enviada
-                </span>
-            @else
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full
-                             bg-slate-500/10 text-slate-400">
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                    No enviada
-                </span>
-            @endif
-        </div>
-
-        @if($factura->enviada_dian)
-        <div class="space-y-2 text-sm">
-            <div class="flex items-start gap-2">
-                <span class="text-slate-500 shrink-0">CUFE</span>
-                <span class="font-mono text-xs text-emerald-300 break-all">{{ $factura->cufe }}</span>
+    {{-- DIAN: CUFE (solo si fue enviada) --}}
+    @if($factura->enviada_dian)
+    <div class="card p-4 mb-4 border-emerald-500/20">
+        <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <i class="fas fa-landmark text-emerald-400 text-sm"></i>
             </div>
-            @if($factura->fecha_dian)
-            <div class="flex items-center gap-2">
-                <span class="text-slate-500">Enviado el</span>
-                <span>{{ $factura->fecha_dian->format('d/m/Y H:i') }}</span>
-            </div>
-            @endif
-            <div class="flex flex-wrap gap-2 pt-1">
-                <form method="GET" action="{{ route('facturas.dian.estado', $factura) }}">
-                    @csrf
-                    <button type="submit"
-                            class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
-                                   hover:border-emerald-500/50 text-slate-400 hover:text-emerald-400
-                                   px-4 py-2 rounded-xl transition-colors text-sm">
-                        <i class="fas fa-sync-alt"></i> Consultar estado
-                    </button>
-                </form>
-                <a href="{{ route('facturas.dian.xml-firmado', $factura) }}"
-                   class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
-                          hover:border-sky-500/50 text-slate-400 hover:text-sky-400
-                          px-4 py-2 rounded-xl transition-colors text-sm">
-                    <i class="fas fa-file-signature"></i> XML Firmado
-                </a>
-                <a href="{{ route('facturas.dian.xml', $factura) }}"
-                   class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
-                          hover:border-slate-500/50 text-slate-500 hover:text-slate-400
-                          px-3 py-2 rounded-xl transition-colors text-xs">
-                    <i class="fas fa-code"></i> XML sin firma
-                </a>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs font-semibold text-emerald-400">DIAN — Aceptada</span>
+                    @if($factura->fecha_dian)
+                    <span class="text-xs text-slate-600">{{ $factura->fecha_dian->format('d/m/Y H:i') }}</span>
+                    @endif
+                </div>
+                <p class="text-xs text-slate-500 font-semibold mb-0.5">CUFE</p>
+                <p class="font-mono text-xs text-emerald-300 break-all leading-relaxed">{{ $factura->cufe }}</p>
             </div>
         </div>
-
-        @elseif(! $dianConfigurado)
-        <p class="text-sm text-amber-400/80">
-            <i class="fas fa-exclamation-triangle mr-1"></i>
-            La integración DIAN no está configurada.
-            Para habilitarla define <code class="bg-[#141c2e] px-1 rounded text-xs">DIAN_CERTIFICADO_PATH</code>
-            y <code class="bg-[#141c2e] px-1 rounded text-xs">DIAN_CERTIFICADO_PASSWORD</code> en el servidor.
-        </p>
-
-        @elseif(in_array($factura->estado, ['emitida', 'pagada']))
-        <p class="text-sm text-slate-400 mb-3">Esta factura aún no ha sido enviada a la DIAN.</p>
-        <div class="flex flex-wrap gap-2">
-            <form method="POST" action="{{ route('facturas.dian.enviar', $factura) }}">
-                @csrf
-                <button type="submit"
-                        class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30
-                               hover:bg-emerald-500/20 text-emerald-400 font-semibold
-                               px-5 py-2 rounded-xl transition-colors text-sm">
-                    <i class="fas fa-paper-plane"></i> Enviar a DIAN
-                </button>
-            </form>
-            @if($dianConfigurado)
-            <a href="{{ route('facturas.dian.xml-firmado', $factura) }}"
-               class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
-                      hover:border-sky-500/50 text-slate-400 hover:text-sky-400
-                      px-4 py-2 rounded-xl transition-colors text-sm">
-                <i class="fas fa-file-signature"></i> XML Firmado
-            </a>
-            @endif
-            <a href="{{ route('facturas.dian.xml', $factura) }}"
-               class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
-                      hover:border-slate-500/50 text-slate-500 hover:text-slate-400
-                      px-3 py-2 rounded-xl transition-colors text-xs">
-                <i class="fas fa-code"></i> XML sin firma
-            </a>
-        </div>
-
-        @else
-        <p class="text-sm text-slate-500">
-            Solo se pueden enviar facturas en estado <em>emitida</em> o <em>pagada</em>.
-        </p>
-        @endif
     </div>
+    @endif
 
     @if($factura->observaciones)
     <div class="card p-5 mb-4">
