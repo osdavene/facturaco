@@ -79,7 +79,7 @@ class ProductoController extends Controller
                 ]);
             }
 
-            $this->syncProveedores($producto, $request->input('proveedores', []));
+            \App\Actions\ActualizarProveedoresProductoAction::execute($producto, $request->input('proveedores', []));
         });
 
         return redirect()->route('inventario.index')
@@ -113,21 +113,7 @@ class ProductoController extends Controller
         return view('inventario.edit', compact('inventario', 'categorias', 'unidades', 'proveedoresJson'));
     }
 
-    private function syncProveedores(Producto $producto, array $proveedores): void
-    {
-        $syncData = [];
-        foreach ($proveedores as $p) {
-            $id = (int) ($p['id'] ?? 0);
-            if (!$id) continue;
-            $syncData[$id] = [
-                'precio_compra_sugerido' => isset($p['precio_compra_sugerido']) && $p['precio_compra_sugerido'] !== ''
-                    ? (float) $p['precio_compra_sugerido']
-                    : null,
-                'proveedor_principal' => !empty($p['proveedor_principal']),
-            ];
-        }
-        $producto->proveedores()->sync($syncData);
-    }
+
 
     public function update(UpdateProductoRequest $request, Producto $inventario)
     {
@@ -149,7 +135,7 @@ class ProductoController extends Controller
 
         DB::transaction(function() use ($data, $request, $inventario) {
             $inventario->update($data);
-            $this->syncProveedores($inventario, $request->input('proveedores', []));
+            \App\Actions\ActualizarProveedoresProductoAction::execute($inventario, $request->input('proveedores', []));
         });
 
         return redirect()->route('inventario.index')
@@ -187,7 +173,6 @@ class ProductoController extends Controller
             ->with('success', "{$count} producto(s) archivado(s) correctamente.");
     }
 
-    // Ajuste de stock
     public function ajustarStock(Request $request, Producto $inventario)
     {
         $request->validate([
@@ -196,31 +181,10 @@ class ProductoController extends Controller
             'motivo'   => 'required|string|max:255',
         ]);
 
-        DB::transaction(function() use ($request, $inventario) {
-            $stockAnterior = $inventario->stock_actual;
+        $data = $request->validated();
+        $data['referencia'] = $request->referencia ?? '';
 
-            if ($request->tipo === 'entrada') {
-                $stockNuevo = $stockAnterior + $request->cantidad;
-            } elseif ($request->tipo === 'salida') {
-                $stockNuevo = max(0, $stockAnterior - $request->cantidad);
-            } else {
-                $stockNuevo = $request->cantidad; // ajuste directo
-            }
-
-            $inventario->update(['stock_actual' => $stockNuevo]);
-
-            MovimientoInventario::create([
-                'producto_id'    => $inventario->id,
-                'tipo'           => $request->tipo,
-                'cantidad'       => $request->cantidad,
-                'stock_anterior' => $stockAnterior,
-                'stock_nuevo'    => $stockNuevo,
-                'costo_unitario' => $inventario->precio_compra,
-                'motivo'         => $request->motivo,
-                'referencia'     => $request->referencia ?? '',
-                'user_id'        => auth()->id(),
-            ]);
-        });
+        \App\Actions\AjustarStockProductoAction::execute($inventario, $data);
 
         return redirect()->route('inventario.show', $inventario)
             ->with('success', 'Stock ajustado correctamente.');

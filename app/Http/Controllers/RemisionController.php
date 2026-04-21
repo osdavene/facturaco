@@ -50,58 +50,11 @@ class RemisionController extends Controller
 
     public function store(StoreRemisionRequest $request)
     {
+        $data = $request->validated();
+        $data['items'] = $request->items;
+        $data['user_id'] = auth()->id();
 
-        $userId = auth()->id();
-
-        DB::transaction(function () use ($request, $userId) {
-            $consecutivo = Remision::siguienteConsecutivo();
-
-            $subtotal = collect($request->items)->sum(
-                fn ($i) => (float) $i['cantidad'] * (float) ($i['precio_unitario'] ?? 0)
-            );
-
-            $remision = Remision::create([
-                'numero'            => $consecutivo['numero'],
-                'consecutivo'       => $consecutivo['consecutivo'],
-                'cliente_id'        => $request->cliente_id,
-                'cliente_nombre'    => strtoupper($request->cliente_nombre),
-                'cliente_documento' => $request->cliente_documento,
-                'cliente_email'     => $request->cliente_email,
-                'cliente_direccion' => $request->cliente_direccion
-                                        ? strtoupper($request->cliente_direccion) : null,
-                'cliente_telefono'  => $request->cliente_telefono,
-                'fecha_emision'     => $request->fecha_emision,
-                'fecha_entrega'     => $request->fecha_entrega,
-                'lugar_entrega'     => $request->lugar_entrega
-                                        ? strtoupper($request->lugar_entrega) : null,
-                'transportador'     => $request->transportador
-                                        ? strtoupper($request->transportador) : null,
-                'guia'              => $request->guia,
-                'subtotal'          => $subtotal,
-                'total'             => $subtotal,
-                'estado'            => $request->estado ?? 'borrador',
-                'observaciones'     => $request->observaciones
-                                        ? strtoupper($request->observaciones) : null,
-                'user_id'           => $userId,
-            ]);
-
-            foreach ($request->items as $i => $item) {
-                $cant   = (float) $item['cantidad'];
-                $precio = (float) ($item['precio_unitario'] ?? 0);
-
-                RemisionItem::create([
-                    'remision_id'     => $remision->id,
-                    'producto_id'     => $item['producto_id'] ?? null,
-                    'codigo'          => $item['codigo']      ?? null,
-                    'descripcion'     => strtoupper($item['descripcion']),
-                    'unidad'          => $item['unidad']      ?? 'UN',
-                    'cantidad'        => $cant,
-                    'precio_unitario' => $precio,
-                    'total'           => $cant * $precio,
-                    'orden'           => $i,
-                ]);
-            }
-        });
+        \App\Actions\CrearRemisionAction::execute($data);
 
         return redirect()->route('remisiones.index')
             ->with('success', 'Remisión creada correctamente.');
@@ -129,72 +82,11 @@ class RemisionController extends Controller
 
     public function convertir(Remision $remision)
     {
-        if ($remision->estado === 'facturada') {
-            return back()->with('error', 'Esta remisión ya fue facturada.');
+        try {
+            \App\Actions\ConvertirRemisionAFacturaAction::execute($remision);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-        if ($remision->estado === 'anulada') {
-            return back()->with('error', 'No puedes facturar una remisión anulada.');
-        }
-
-        $userId = auth()->id();
-
-        DB::transaction(function () use ($remision, $userId) {
-            $consecutivo = Factura::siguienteConsecutivo();
-
-            $subtotal = $remision->items->sum(fn ($i) => $i->cantidad * $i->precio_unitario);
-            $iva      = $remision->items->sum(fn ($i) => $i->cantidad * $i->precio_unitario * 0.19);
-
-            $factura = Factura::create([
-                'numero'            => $consecutivo['numero'],
-                'consecutivo'       => $consecutivo['consecutivo'],
-                'tipo'              => 'factura',
-                'cliente_id'        => $remision->cliente_id,
-                'cliente_nombre'    => $remision->cliente_nombre,
-                'cliente_documento' => $remision->cliente_documento ?? '',
-                'cliente_email'     => $remision->cliente_email,
-                'cliente_direccion' => $remision->cliente_direccion,
-                'fecha_emision'     => today(),
-                'hora_emision'      => now('America/Bogota')->format('H:i:s'),
-                'fecha_vencimiento' => now()->addDays(30),
-                'subtotal'          => $subtotal,
-                'descuento'         => 0,
-                'iva'               => $iva,
-                'retefuente'        => 0,
-                'reteica'           => 0,
-                'total'             => $subtotal + $iva,
-                'total_pagado'      => 0,
-                'forma_pago'        => 'credito',
-                'plazo_pago'        => 30,
-                'estado'            => 'emitida',
-                'observaciones'     => 'GENERADA DESDE REMISIÓN '.$remision->numero,
-                'user_id'           => $userId,
-            ]);
-
-            foreach ($remision->items as $item) {
-                $base = $item->cantidad * $item->precio_unitario;
-                $iva  = $base * 0.19;
-
-                FacturaItem::create([
-                    'factura_id'      => $factura->id,
-                    'producto_id'     => $item->producto_id,
-                    'codigo'          => $item->codigo,
-                    'descripcion'     => $item->descripcion,
-                    'cantidad'        => $item->cantidad,
-                    'precio_unitario' => $item->precio_unitario,
-                    'descuento_pct'   => 0,
-                    'descuento'       => 0,
-                    'subtotal'        => $base,
-                    'iva_pct'         => 19,
-                    'iva'             => $iva,
-                    'total'           => $base + $iva,
-                ]);
-            }
-
-            $remision->update([
-                'estado'     => 'facturada',
-                'factura_id' => $factura->id,
-            ]);
-        });
 
         return redirect()->route('remisiones.show', $remision)
             ->with('success', '¡Remisión convertida a factura exitosamente!');

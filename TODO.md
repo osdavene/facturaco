@@ -1,15 +1,43 @@
-# TODO: Implementar relación Producto-Proveedor
+# TODO: Refactorización Controladores Grandes
 
-## Pasos del plan aprobado:
+Estado: Pendiente ✅
 
-### 1. [x] Leer contenidos completos de app/Models/Producto.php y app/Models/Proveedor.php para preparar edits precisos
-### 2. [x] Agregar método `proveedores()` en Producto.php (belongsToMany con pivot)
-### 3. [x] Agregar método `productos()` en Proveedor.php (belongsToMany con pivot)
-### 4. [x] Ejecutar `php artisan migrate` para crear tabla pivot (ya ejecutada o nothing to migrate)
-### 5. [x] Verificar relaciones en tinker (métodos disponibles, tabla creada)
-**¡TODO COMPLETADO!** ✅
+## Plan Aprobado
+Refactorizar controladores grandes extrayendo a Actions/Services. Prioridad: ReporteController → ProductoController → Otros.
 
-Relación Producto-Proveedor implementada exitosamente.
+## Pasos Lógicos
 
+### 1. Crear Services/Actions Base ✅
+- ✅ `app/Services/ReporteService.php` (KPIs, queries ventas/inventario/cartera)
+- ✅ `app/Actions/GenerarReportePdfAction.php`
+- ✅ `app/Actions/GenerarReporteExcelAction.php`
 
+### 2. Refactorizar ReporteController ✅
+- ✅ Leer actual
+- ✅ Mover lógica index() a ReporteService::kpisGenerales()
+- ✅ Delegar PDFs/Excel a Actions
+- [ ] Testear reportes
 
+### 3. Crear Actions para ProductoController ✅
+- ✅ `app/Actions/ActualizarProveedoresProductoAction.php`
+- ✅ `app/Actions/AjustarStockProductoAction.php`
+
+### 4. Refactorizar ProductoController ✅
+- ✅ Delegar syncProveedores y ajustarStock a Actions
+- [ ] Testear CRUD productos/stock
+
+### 5. RemisionController & CotizacionController ✅
+- ✅ CrearRemisionAction, ConvertirRemisionAFacturaAction
+- ✅ CrearCotizacionAction, ConvertirCotizacionAFacturaAction
+- ✅ Refactorizar ambos
+
+### 6. BackupController & Backoffice (Pendiente)
+- [ ] GenerarBackupAction
+- [ ] Refactorizar
+
+### 7. Verificación Final (Pendiente)
+- [ ] php artisan test
+- [ ] Manual: CRUDs, reportes, backups
+- [ ] attempt_completion
+
+Progreso: 2/7 completado
