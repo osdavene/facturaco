@@ -50,8 +50,7 @@ class RemisionController extends Controller
 
     public function store(StoreRemisionRequest $request)
     {
-        $data = $request->validated();
-        $data['items'] = $request->items;
+        $data             = $request->validated();
         $data['user_id'] = auth()->id();
 
         \App\Actions\CrearRemisionAction::execute($data);

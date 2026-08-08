@@ -109,13 +109,6 @@ class GenerarBackupAction
 
     public static function descargarCsv(Request $request)
     {
-        $request->validate([
-            'tablas' => 'required|array|min:1',
-            'tablas.*' => 'string',
-            'fecha_desde' => 'nullable|date',
-            'fecha_hasta' => 'nullable|date',
-        ]);
-
         $ids = self::empresaIds();
         $tablasDisponibles = array_keys(self::tablas());
         $tablasSeleccionadas = array_intersect($request->tablas, $tablasDisponibles);

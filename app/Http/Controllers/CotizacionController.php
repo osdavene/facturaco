@@ -53,8 +53,7 @@ class CotizacionController extends Controller
 
     public function store(StoreCotizacionRequest $request)
     {
-        $data = $request->validated();
-        $data['items'] = $request->items;
+        $data             = $request->validated();
         $data['user_id'] = auth()->id();
 
         \App\Actions\CrearCotizacionAction::execute($data);

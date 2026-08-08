@@ -25,6 +25,13 @@ class BackupController extends Controller
 
     public function descargarCsv(Request $request)
     {
+        $request->validate([
+            'tablas'       => 'required|array|min:1',
+            'tablas.*'     => 'string',
+            'fecha_desde'  => 'nullable|date',
+            'fecha_hasta'  => 'nullable|date',
+        ]);
+
         return $this->backupAction->descargarCsv($request);
     }
 }

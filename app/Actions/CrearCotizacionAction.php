@@ -11,8 +11,8 @@ class CrearCotizacionAction
 {
     public static function execute(array $data): Cotizacion
     {
-        $userId = $data['user_id'] ?? auth()->id();
-    $documentos = app(\App\Services\DocumentoService::class);
+        $userId     = $data['user_id'] ?? auth()->id();
+        $documentos = app(DocumentoService::class);
 
         return DB::transaction(function () use ($data, $userId, $documentos) {
             $consecutivo = Cotizacion::siguienteConsecutivo();
