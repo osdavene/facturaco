@@ -21,7 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        config([
+            'cache.default'          => 'array',
+            'permission.cache.store' => 'array',
+        ]);
     }
 
     /**
@@ -29,9 +32,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Super-admin bypasses ALL permission checks regardless of cache state
+        try {
+            app(\Spatie\Permission\PermissionRegistrar::class)->setCacheStore('array');
+        } catch (\Throwable) {}
+
+        // Super-admin y propietario tienen acceso total a todos los permisos
         Gate::before(function ($user, $ability) {
-            if ($user->hasRole('propietario')) {
+            if ($user->esSuperadmin() || $user->hasRole('propietario')) {
                 return true;
             }
         });
