@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+umask 0000
 
 cd /var/www/html
 
@@ -80,9 +81,9 @@ BCRYPT_ROUNDS=12
 DB_CONNECTION=pgsql
 DATABASE_URL="${DATABASE_URL}"
 
-CACHE_DRIVER=file
-CACHE_STORE=file
-SESSION_DRIVER=file
+CACHE_DRIVER=database
+CACHE_STORE=database
+SESSION_DRIVER=database
 SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
 SESSION_PATH=/
