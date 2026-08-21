@@ -57,7 +57,7 @@ class Proveedor extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logName('proveedor')
+            ->useLogName('proveedor')
             ->logOnly(['*'])
             ->logOnlyDirty();
     }
