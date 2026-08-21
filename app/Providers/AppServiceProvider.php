@@ -36,9 +36,9 @@ class AppServiceProvider extends ServiceProvider
             app(\Spatie\Permission\PermissionRegistrar::class)->setCacheStore('array');
         } catch (\Throwable) {}
 
-        // Super-admin y propietario tienen acceso total a todos los permisos
+        // Super-admin, propietario y admin de empresa tienen acceso total a todos los permisos
         Gate::before(function ($user, $ability) {
-            if ($user->esSuperadmin() || $user->hasRole('propietario')) {
+            if ($user->esSuperadmin() || $user->hasRole('propietario') || $user->hasRole('admin') || $user->esAdminEmpresa()) {
                 return true;
             }
         });
