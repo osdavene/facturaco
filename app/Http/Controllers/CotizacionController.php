@@ -85,13 +85,12 @@ class CotizacionController extends Controller
     public function convertir(Cotizacion $cotizacion)
     {
         try {
-            \App\Actions\ConvertirCotizacionAFacturaAction::execute($cotizacion);
+            $factura = \App\Actions\ConvertirCotizacionAFacturaAction::execute($cotizacion);
+            return redirect()->route('facturas.show', $factura)
+                ->with('success', '¡Cotización ' . $cotizacion->numero . ' convertida a Factura ' . $factura->numero . ' exitosamente!');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
-
-        return redirect()->route('cotizaciones.show', $cotizacion)
-            ->with('success', '¡Cotización convertida a factura exitosamente!');
     }
 
     public function pdf(Cotizacion $cotizacion)

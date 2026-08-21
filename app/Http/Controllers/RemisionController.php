@@ -82,13 +82,12 @@ class RemisionController extends Controller
     public function convertir(Remision $remision)
     {
         try {
-            \App\Actions\ConvertirRemisionAFacturaAction::execute($remision);
+            $factura = \App\Actions\ConvertirRemisionAFacturaAction::execute($remision);
+            return redirect()->route('facturas.show', $factura)
+                ->with('success', '¡Remisión ' . $remision->numero . ' convertida a Factura ' . $factura->numero . ' exitosamente!');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
-
-        return redirect()->route('remisiones.show', $remision)
-            ->with('success', '¡Remisión convertida a factura exitosamente!');
     }
 
     public function destroy(Remision $remision)
