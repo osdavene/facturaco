@@ -20,17 +20,20 @@ PHP_INI
 echo "=== PHP ini configurado ==="
 
 # ── Nginx ──────────────────────────────────────────────────────────────────
-# Usamos ${APP_PORT} y escapamos las variables propias de nginx con \$
+mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled /etc/nginx/conf.d
+rm -f /etc/nginx/conf.d/* /etc/nginx/sites-enabled/*
+
 cat > /etc/nginx/sites-available/default << NGINX_CONF
 server {
-    listen ${APP_PORT};
+    listen ${APP_PORT} default_server;
+    listen [::]:${APP_PORT} default_server;
     root /var/www/html/public;
     index index.php index.html;
 
     access_log /dev/stdout;
     error_log /dev/stderr;
 
-    client_max_body_size 10M;
+    client_max_body_size 20M;
 
     location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
@@ -57,6 +60,7 @@ server {
 }
 NGINX_CONF
 
+ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 echo "=== Nginx configurado en puerto ${APP_PORT} ==="
 
 # ── .env ───────────────────────────────────────────────────────────────────
@@ -147,15 +151,15 @@ NGINX_PID=$!
     php artisan db:seed --class=RolesAndPermissionsSeeder --force 2>&1 || true
 
     echo "=== Setup completado ==="
-) &
 
-# ── Queue worker en background con reinicio automático ────────────────────
-echo "=== Iniciando queue worker ==="
-(while true; do
-    php artisan queue:work --sleep=3 --tries=3 --max-jobs=500 2>&1
-    echo "=== Queue worker finalizado — reiniciando en 5s ==="
-    sleep 5
-done) &
+    # Iniciar queue worker después de que la DB esté lista
+    echo "=== Iniciando queue worker ==="
+    while true; do
+        php artisan queue:work --sleep=3 --tries=3 --max-jobs=500 2>&1 || true
+        echo "=== Queue worker finalizado — reiniciando en 5s ==="
+        sleep 5
+    done
+) &
 
 # ── Mantener el container vivo esperando nginx ────────────────────────────
 wait $NGINX_PID
