@@ -384,6 +384,25 @@
         ═══════════════════════════════════════ --}}
         <div class="flex-1 flex flex-col lg:ml-64 min-w-0">
 
+            {{-- Banner cuando el superadmin está impersonando a una empresa --}}
+            @if(session('backoffice_impersonando'))
+            <div class="bg-amber-500/10 border-b border-amber-500/30 px-4 lg:px-7 py-2.5 flex items-center justify-between gap-4 text-xs z-50">
+                <div class="flex items-center gap-2.5 text-amber-300 font-medium truncate">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    <i class="fas fa-eye text-amber-400"></i>
+                    <span class="truncate">Modo cliente activo: <strong>{{ $emp->razon_social }}</strong></span>
+                </div>
+                <form method="POST" action="{{ route('backoffice.salir') }}" class="flex-shrink-0">
+                    @csrf
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-black font-bold px-3 py-1.5 rounded-lg transition-colors text-xs shadow-sm">
+                        <i class="fas fa-arrow-left text-[10px]"></i>
+                        <span>Volver al Backoffice</span>
+                    </button>
+                </form>
+            </div>
+            @endif
+
             {{-- ── TOPBAR ─────────────────────────── --}}
             <header class="sticky top-0 z-50 bg-[#111827]/95 backdrop-blur
                            border-b border-[#1e2d47] px-4 lg:px-7 py-3

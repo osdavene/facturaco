@@ -143,6 +143,9 @@ NGINX_PID=$!
     echo "=== Seeder ColombiaDivisionSeeder ==="
     php artisan db:seed --class=ColombiaDivisionSeeder --force 2>&1 || true
 
+    echo "=== Seeder RolesAndPermissionsSeeder ==="
+    php artisan db:seed --class=RolesAndPermissionsSeeder --force 2>&1 || true
+
     echo "=== Setup completado ==="
 ) &
 

@@ -47,7 +47,7 @@
             <input type="text" name="codigo" value="{{ old('codigo') }}"
                    maxlength="10" required
                    placeholder="Ej: 110501"
-                   class="input w-full font-mono">
+                   class="form-input w-full font-mono">
             <p class="text-xs text-slate-500 mt-1">Código PUC (hasta 10 dígitos)</p>
         </div>
         @endunless
@@ -60,7 +60,7 @@
             <input type="text" name="nombre" value="{{ old('nombre', $cuenta->nombre ?? '') }}"
                    maxlength="250" required
                    placeholder="Ej: Caja General"
-                   class="input w-full">
+                   class="form-input w-full">
         </div>
 
         {{-- Tipo y Naturaleza --}}
@@ -69,7 +69,7 @@
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">
                     Tipo <span class="text-red-400">*</span>
                 </label>
-                <select name="tipo" required class="input w-full">
+                <select name="tipo" required class="form-input w-full">
                     @foreach(['activo'=>'Activo','pasivo'=>'Pasivo','patrimonio'=>'Patrimonio','ingreso'=>'Ingreso','gasto'=>'Gasto','costo'=>'Costo'] as $val => $label)
                     <option value="{{ $val }}" @selected(old('tipo', $cuenta->tipo ?? '') === $val)>{{ $label }}</option>
                     @endforeach
@@ -79,7 +79,7 @@
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">
                     Naturaleza <span class="text-red-400">*</span>
                 </label>
-                <select name="naturaleza" required class="input w-full">
+                <select name="naturaleza" required class="form-input w-full">
                     <option value="debito"  @selected(old('naturaleza', $cuenta->naturaleza ?? '') === 'debito')>Débito</option>
                     <option value="credito" @selected(old('naturaleza', $cuenta->naturaleza ?? '') === 'credito')>Crédito</option>
                 </select>
@@ -92,7 +92,7 @@
             <label class="block text-sm font-medium text-slate-300 mb-1.5">
                 Nivel <span class="text-red-400">*</span>
             </label>
-            <select name="nivel" required class="input w-full">
+            <select name="nivel" required class="form-input w-full">
                 @foreach([1=>'1 – Clase',2=>'2 – Grupo',3=>'3 – Cuenta',4=>'4 – Subcuenta'] as $n => $l)
                 <option value="{{ $n }}" @selected(old('nivel') == $n)>{{ $l }}</option>
                 @endforeach
@@ -103,7 +103,7 @@
         {{-- Cuenta padre --}}
         <div>
             <label class="block text-sm font-medium text-slate-300 mb-1.5">Cuenta Padre</label>
-            <select name="cuenta_padre_id" class="input w-full">
+            <select name="cuenta_padre_id" class="form-input w-full">
                 <option value="">— Sin padre (cuenta raíz) —</option>
                 @foreach($padres as $padre)
                 <option value="{{ $padre->id }}"

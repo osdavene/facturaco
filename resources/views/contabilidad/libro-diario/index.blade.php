@@ -17,24 +17,24 @@
     <div class="flex flex-col sm:flex-row gap-3 flex-wrap">
         <input type="text" name="buscar" value="{{ request('buscar') }}"
                placeholder="Número o descripción..."
-               class="input flex-1 min-w-[200px]">
-        <select name="tipo" class="input sm:w-40">
+               class="form-input flex-1 min-w-[200px]">
+        <select name="tipo" class="form-input sm:w-40">
             <option value="">Todos los tipos</option>
             <option value="factura"  @selected(request('tipo') === 'factura')>Factura</option>
             <option value="recibo"   @selected(request('tipo') === 'recibo')>Recibo de Caja</option>
             <option value="manual"   @selected(request('tipo') === 'manual')>Manual</option>
             <option value="ajuste"   @selected(request('tipo') === 'ajuste')>Ajuste</option>
         </select>
-        <select name="estado" class="input sm:w-36">
+        <select name="estado" class="form-input sm:w-36">
             <option value="">Todos</option>
             <option value="confirmado" @selected(request('estado') === 'confirmado')>Confirmado</option>
             <option value="anulado"    @selected(request('estado') === 'anulado')>Anulado</option>
         </select>
-        <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="input sm:w-40">
-        <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="input sm:w-40">
+        <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="form-input sm:w-40">
+        <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="form-input sm:w-40">
         <button type="submit"
-                class="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600
-                       text-white px-4 py-2.5 rounded-xl text-sm transition-colors">
+                class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600
+                       text-black font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors">
             <i class="fas fa-search"></i> Filtrar
         </button>
         @if(request()->hasAny(['buscar','tipo','estado','fecha_desde','fecha_hasta']))

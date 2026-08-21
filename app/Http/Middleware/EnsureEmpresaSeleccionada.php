@@ -42,8 +42,8 @@ class EnsureEmpresaSeleccionada
 
         $empresaActivaId = session('empresa_activa_id');
 
-        // Verificar que la empresa en sesión sigue siendo válida para el usuario
-        if ($empresaActivaId) {
+        // Verificar que la empresa en sesión sigue siendo válida para el usuario (si no es superadmin impersonando)
+        if ($empresaActivaId && !(auth()->user()->esSuperadmin() && session('backoffice_impersonando'))) {
             $sigue = auth()->user()
                 ->empresas()
                 ->where('empresa_id', $empresaActivaId)
