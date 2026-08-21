@@ -131,6 +131,8 @@ chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # ── Preparación rápida ──────────────────────────────────────────────────────
 php artisan storage:link 2>/dev/null || true
+php artisan config:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 php artisan cache:clear 2>/dev/null || true
 
