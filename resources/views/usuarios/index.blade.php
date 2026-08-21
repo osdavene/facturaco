@@ -196,7 +196,7 @@
             <thead>
                 <tr class="border-b border-[#1e2d47]">
                     <th class="text-left font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Módulo</th>
-                    @foreach(['Super Admin','Admin','Vendedor','Bodeguero','Contador','Solo Lectura'] as $r)
+                    @foreach(['Propietario','Admin','Vendedor','Bodeguero','Contador','Solo Lectura'] as $r)
                     <th class="text-center font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">{{ $r }}</th>
                     @endforeach
                 </tr>
