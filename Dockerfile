@@ -28,8 +28,8 @@ RUN mkdir -p /var/www/html/storage/app/public \
              /var/www/html/storage/logs \
              /var/www/html/bootstrap/cache \
     && chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 777 /var/www/html/storage \
+    && chmod -R 777 /var/www/html/bootstrap/cache
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
