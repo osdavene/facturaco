@@ -91,10 +91,15 @@
             <p class="text-slate-400 text-sm mb-8">Ingresa tus credenciales para continuar</p>
 
             @if($errors->any())
-            <div class="bg-red-500/10 border border-red-500/30 text-red-400
-                        rounded-xl px-5 py-4 mb-6 flex items-start gap-3">
-                <i class="fas fa-exclamation-circle mt-0.5"></i>
-                <div class="text-sm">{{ $errors->first() }}</div>
+            <div class="bg-rose-500/10 border border-rose-500/25 text-rose-300
+                        rounded-xl px-4 py-3.5 mb-6 flex items-center gap-3 text-sm shadow-sm backdrop-blur-sm">
+                <div class="w-8 h-8 rounded-lg bg-rose-500/15 flex items-center justify-center flex-shrink-0 text-rose-400">
+                    <i class="fas fa-shield-alt text-sm"></i>
+                </div>
+                <div>
+                    <span class="font-semibold text-rose-200 block text-xs uppercase tracking-wider">Credenciales Incorrectas</span>
+                    <span class="text-xs text-rose-300/90 mt-0.5 block">{{ $errors->first() }}</span>
+                </div>
             </div>
             @endif
 
