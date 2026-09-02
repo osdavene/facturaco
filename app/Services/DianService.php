@@ -2,58 +2,58 @@
 
 namespace App\Services;
 
+use App\Contracts\DianProviderInterface;
 use App\Models\Empresa;
 use App\Models\Factura;
+use App\Services\Dian\DirectoSoapProvider;
+use App\Services\Dian\FactusProvider;
+use InvalidArgumentException;
 use RuntimeException;
 
 class DianService
 {
+    private array $providers = [];
+
     public function __construct(
-        private DianXmlBuilder $builder,
-        private DianXmlSigner  $signer,
-        private DianSoapClient $soap,
-    ) {}
-
-    public function estaConfigurado(): bool
-    {
-        return filled(config('dian.certificado_path'))
-            && filled(config('dian.certificado_password'));
+        private DirectoSoapProvider $soapProvider,
+        private FactusProvider      $factusProvider,
+    ) {
+        $this->providers['directo'] = $this->soapProvider;
+        $this->providers['factus']  = $this->factusProvider;
     }
 
-    public function generarXml(Factura $factura): string
+    /**
+     * Obtiene el proveedor DIAN activo según la configuración o la empresa.
+     */
+    public function getProvider(?string $nombre = null): DianProviderInterface
     {
-        $factura->loadMissing(['items', 'cliente']);
-        $empresa = Empresa::findOrFail($factura->empresa_id);
-        $cufe    = $this->calcularCufe($factura, $empresa);
+        $driver = $nombre ?: config('dian.proveedor', 'factus');
 
-        return $this->builder->build($factura, $empresa, $cufe);
-    }
-
-    public function firmarXml(string $xml): string
-    {
-        if (! $this->estaConfigurado()) {
-            throw new RuntimeException('Certificado DIAN no configurado. Define DIAN_CERTIFICADO_PATH y DIAN_CERTIFICADO_PASSWORD.');
+        if (! isset($this->providers[$driver])) {
+            throw new InvalidArgumentException("El proveedor DIAN [{$driver}] no está soportado.");
         }
 
-        return $this->signer->sign($xml);
+        return $this->providers[$driver];
+    }
+
+    public function estaConfigurado(?Empresa $empresa = null): bool
+    {
+        return $this->getProvider()->estaConfigurado($empresa);
     }
 
     public function enviar(Factura $factura): array
     {
-        if (! $this->estaConfigurado()) {
-            throw new RuntimeException('Certificado DIAN no configurado.');
+        $provider = $this->getProvider();
+
+        if (! $provider->estaConfigurado()) {
+            $nombreProv = config('dian.proveedor', 'factus');
+            throw new RuntimeException("La integración DIAN con [{$nombreProv}] no está configurada.");
         }
 
-        $factura->loadMissing(['items', 'cliente']);
-        $empresa = Empresa::findOrFail($factura->empresa_id);
+        $resultado = $provider->enviar($factura);
 
-        $xml       = $this->generarXml($factura);
-        $xmlFirmado = $this->firmarXml($xml);
-
-        $resultado = $this->soap->sendBillSync($xmlFirmado, $empresa, $factura);
-
-        if (! $resultado['valido']) {
-            $detalle = implode(' | ', $resultado['errores'] ?: [$resultado['descripcion']]);
+        if (! ($resultado['valido'] ?? false)) {
+            $detalle = implode(' | ', $resultado['errores'] ?: [$resultado['descripcion'] ?? 'Error de validación DIAN']);
             throw new RuntimeException('DIAN rechazó la factura: ' . $detalle);
         }
 
@@ -62,54 +62,16 @@ class DianService
 
     public function consultarEstado(Factura $factura): array
     {
-        $softwareId  = config('dian.software_id');
-        $softwarePin = config('dian.software_pin');
-
-        if (! $softwareId || ! $softwarePin) {
-            throw new RuntimeException('DIAN_SOFTWARE_ID y DIAN_SOFTWARE_PIN son obligatorios para consultar estado.');
-        }
-
-        return $this->soap->getStatusZip($factura->cufe, $softwareId, $softwarePin);
+        return $this->getProvider()->consultarEstado($factura);
     }
 
-    // ── CUFE (SHA-384) ─────────────────────────────────────────────────────────
-    // Spec DIAN: NumFac + FecFac + HoraFac + ValFac +
-    //            CodImp1(01) + ValImp1(IVA) +
-    //            CodImp2(04) + ValImp2(ICA) +
-    //            CodImp3(03) + ValImp3(INC=0) +
-    //            ValTot + NitOFE + NumAdq + ClTec + TipoAmbie
+    public function generarXml(Factura $factura): string
+    {
+        return $this->soapProvider->generarXml($factura);
+    }
 
     public function calcularCufe(Factura $factura, Empresa $empresa): string
     {
-        $ambiente = config('dian.ambiente', 'habilitacion');
-        $claveTec = $empresa->clave_tecnica ?? '';
-
-        $nitOfe = preg_replace('/\D/', '', $empresa->nit ?? '');
-        $numAdq = preg_replace('/\D/', '', $factura->cliente?->numero_documento
-                      ?? $factura->cliente_documento ?? '');
-
-        $horaEmision = ($factura->hora_emision ?? now('America/Bogota')->format('H:i:s')) . '-05:00';
-
-        $cadena = implode('', [
-            $factura->numero,
-            $factura->fecha_emision->format('Y-m-d'),
-            $horaEmision,
-            $this->fmt($factura->subtotal),
-            '01', $this->fmt($factura->iva),
-            '04', $this->fmt($factura->reteica),
-            '03', '0.00',
-            $this->fmt($factura->total),
-            $nitOfe,
-            $numAdq,
-            $claveTec,
-            $ambiente === 'produccion' ? '1' : '2',
-        ]);
-
-        return hash('sha384', $cadena);
-    }
-
-    private function fmt(float $v): string
-    {
-        return number_format($v, 2, '.', '');
+        return $this->soapProvider->calcularCufe($factura, $empresa);
     }
 }
