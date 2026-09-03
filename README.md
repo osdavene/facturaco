@@ -1,27 +1,31 @@
-# FacturaCO
+# FacCol
 
-Sistema de gestión empresarial colombiano. Facturación, inventario, contabilidad, nómina y pagos en línea. Multi-empresa con aislamiento por tenant.
+**Sistema Integral de Facturación Electrónica & Gestión Comercial para Colombia 🇨🇴**
 
-**Stack:** Laravel 13 · PHP 8.3 · PostgreSQL · Tailwind CSS · Alpine.js · Railway
+Facturación, inventario, punto de venta (POS), contabilidad, nómina y pagos en línea. Plataforma SaaS multi-empresa con aislamiento por tenant y panel Backoffice.
+
+**Stack:** Laravel 13 · PHP 8.4 · PostgreSQL · Tailwind CSS · Alpine.js · Railway
 
 ---
 
-## Módulos
+## Módulos Principales
 
 | Módulo | Descripción |
 |---|---|
-| Facturación | Facturas, cotizaciones, remisiones, notas crédito |
-| Recibos de Caja | Registro de pagos recibidos |
-| Clientes / Proveedores | Terceros con tipo de persona, régimen, retenciones |
-| Inventario | Productos, categorías, unidades, movimientos con kardex |
-| Órdenes de Compra | Solicitudes a proveedores |
-| Contabilidad | Plan de cuentas, asientos automáticos por documento |
-| Nómina | Empleados, liquidación mensual, colilla de pago |
-| Reportes | Ventas, cartera, inventario, impuestos |
-| Pagos en línea | Integración Wompi (PSE, Nequi, tarjeta) |
-| Usuarios y Roles | Spatie Permission · propietario / admin / operador |
-| Multi-empresa | Grupos con matriz y filiales, contexto por sesión |
-| Backoffice | Panel de superadmin para gestionar empresas y módulos |
+| **Facturación** | Facturas electrónicas con QR, cotizaciones, remisiones, notas de crédito |
+| **Envío Digital** | Despacho por correo electrónico con PDF adjunto (sin necesidad de imprimir) |
+| **Punto de Venta (POS)** | Emisión rápida de tickets y control de caja |
+| **Recibos de Caja** | Registro y control de pagos recibidos |
+| **Clientes / Proveedores** | Terceros con tipo de persona, régimen tributario y retenciones |
+| **Inventario** | Control de stock en tiempo real, categorías, unidades y kardex |
+| **Órdenes de Compra** | Solicitudes y abastecimiento a proveedores |
+| **Contabilidad** | Plan de cuentas y asientos automáticos por documento |
+| **Nómina** | Empleados, liquidación mensual y colillas de pago |
+| **Reportes** | Ventas, cartera, inventario e impuestos exportables a PDF |
+| **Pagos en Línea** | Integración Wompi (PSE, Nequi, tarjetas de crédito/débito) |
+| **Usuarios y Roles** | Spatie Permission · propietario / admin / operador |
+| **Multi-empresa** | Grupos con matriz y filiales, cambio de contexto en 1 clic |
+| **Backoffice** | Panel de superadministrador: planes por meses, monitor SMTP, clientes |
 
 ---
 
