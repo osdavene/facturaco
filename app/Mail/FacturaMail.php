@@ -58,11 +58,21 @@ class FacturaMail extends Mailable
             'Total: $'  . number_format($factura->total, 0, ',', '.'),
         ]);
 
-        return [
+        $attachments = [
             Attachment::fromData(
                 fn () => $pdf->output('facturas.pdf', compact('factura', 'empresa', 'qrBase64')),
                 'Factura-' . $factura->numero . '.pdf',
             )->withMime('application/pdf'),
         ];
+
+        try {
+            $xml = app(\App\Services\DianService::class)->generarXml($factura);
+            $attachments[] = Attachment::fromData(
+                fn () => $xml,
+                'Factura-' . $factura->numero . '.xml',
+            )->withMime('application/xml');
+        } catch (\Throwable) {}
+
+        return $attachments;
     }
 }

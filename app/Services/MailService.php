@@ -129,6 +129,21 @@ class MailService
             $pdfContent = $pdf->output('facturas.pdf', compact('factura', 'empresa', 'qrBase64'));
             $pdfBase64 = base64_encode($pdfContent);
 
+            $attachments = [
+                [
+                    'filename' => "Factura-{$factura->numero}.pdf",
+                    'content'  => $pdfBase64,
+                ],
+            ];
+
+            try {
+                $xml = app(\App\Services\DianService::class)->generarXml($factura);
+                $attachments[] = [
+                    'filename' => "Factura-{$factura->numero}.xml",
+                    'content'  => base64_encode($xml),
+                ];
+            } catch (\Throwable) {}
+
             $htmlBody = view('emails.factura', compact('factura', 'empresa', 'mensaje'))->render();
 
             $response = \Illuminate\Support\Facades\Http::withToken($pass)
@@ -138,12 +153,7 @@ class MailService
                     'to'          => [$email],
                     'subject'     => "Factura {$factura->numero} — {$empresa->razon_social}",
                     'html'        => $htmlBody,
-                    'attachments' => [
-                        [
-                            'filename' => "Factura-{$factura->numero}.pdf",
-                            'content'  => $pdfBase64,
-                        ],
-                    ],
+                    'attachments' => $attachments,
                 ]);
 
             if (! $response->successful()) {
