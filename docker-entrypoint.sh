@@ -5,7 +5,7 @@ cd /var/www/html
 
 APP_PORT="8080"
 
-echo "=== Iniciando FacturaCO en puerto ${APP_PORT} ==="
+echo "=== Iniciando FacCol en puerto ${APP_PORT} ==="
 
 # Configurar Nginx
 cat > /etc/nginx/sites-available/default << NGINX
@@ -44,7 +44,7 @@ NGINX
 
 # Generar .env con variables de Railway
 cat > .env << EOF
-APP_NAME="${APP_NAME:-FacturaCO}"
+APP_NAME="${APP_NAME:-FacCol}"
 APP_ENV=production
 APP_KEY="${APP_KEY}"
 APP_DEBUG=false

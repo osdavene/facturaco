@@ -2,7 +2,7 @@
 set -e
 cd /var/www/html
 
-echo "=== FacturaCO v7 iniciando ==="
+echo "=== FacCol v7 iniciando ==="
 
 # Configurar puerto de Apache
 APACHE_PORT="${PORT:-80}"
@@ -12,7 +12,7 @@ sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${APACHE_PORT}>/" \
 
 # Generar .env
 cat > .env << ENVEOF
-APP_NAME="${APP_NAME:-FacturaCO}"
+APP_NAME="${APP_NAME:-FacCol}"
 APP_ENV=production
 APP_KEY="${APP_KEY}"
 APP_DEBUG=false
@@ -44,9 +44,9 @@ LOG_LEVEL=error
 
 MAIL_MAILER=log
 MAIL_FROM_ADDRESS="facturacion@mundovirtual.co"
-MAIL_FROM_NAME="FacturaCO"
+MAIL_FROM_NAME="FacCol"
 
-VITE_APP_NAME="FacturaCO"
+VITE_APP_NAME="FacCol"
 ENVEOF
 
 echo "=== Puerto Apache: ${APACHE_PORT} ==="
