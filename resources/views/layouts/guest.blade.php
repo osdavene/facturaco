@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'FacturaCO') }}</title>
+        <title>{{ config('app.name', 'FacCol') }}</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
             <div class="flex justify-center mb-6">
                 <a href="/" class="inline-flex items-center gap-3">
                     <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center font-display font-black text-black text-xl">FC</div>
-                    <span class="font-display font-black text-2xl text-white">Factura<span class="text-amber-500">CO</span></span>
+                    <span class="font-display font-black text-2xl text-white tracking-tight">Fac<span class="text-amber-500">Col</span></span>
                 </a>
             </div>
 

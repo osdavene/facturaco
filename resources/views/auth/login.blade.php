@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaCO — Iniciar Sesión</title>
+    <title>FacCol — Iniciar Sesión</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -28,10 +28,10 @@
                 <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center
                             font-display font-black text-black text-xl">FC</div>
                 <div>
-                    <div class="font-display font-black text-2xl text-white">
-                        Factura<span class="text-amber-500">CO</span>
+                    <div class="font-display font-black text-2xl text-white tracking-tight">
+                        Fac<span class="text-amber-500">Col</span>
                     </div>
-                    <div class="text-xs text-slate-500">Sistema Empresarial</div>
+                    <div class="text-xs text-slate-500">Facturación & Gestión Comercial</div>
                 </div>
             </div>
 
@@ -70,7 +70,7 @@
 
         {{-- Footer --}}
         <div class="relative z-10 text-xs text-slate-600">
-            FacturaCO © {{ now()->year }} · Hecho en Colombia 🇨🇴
+            FacCol © {{ now()->year }} · Hecho en Colombia 🇨🇴
         </div>
     </div>
 
@@ -82,8 +82,8 @@
             <div class="flex items-center gap-3 mb-10 lg:hidden">
                 <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center
                             font-display font-black text-black text-lg">FC</div>
-                <div class="font-display font-black text-xl text-white">
-                    Factura<span class="text-amber-500">CO</span>
+                <div class="font-display font-black text-xl text-white tracking-tight">
+                    Fac<span class="text-amber-500">Col</span>
                 </div>
             </div>
 

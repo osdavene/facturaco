@@ -83,7 +83,7 @@ class EmpresaController extends Controller
 
             $mail->paraEmpresa($empresa)
                  ->raw(
-                     "Correo de prueba de FacturaCO.\n\nSi recibes este mensaje, la configuración de correo de {$empresa->razon_social} está funcionando correctamente.\n\nServidor: {$empresa->mail_host}:{$empresa->mail_port}\nRemitente: {$fromAddress}",
+                     "Correo de prueba de FacCol.\n\nSi recibes este mensaje, la configuración de correo de {$empresa->razon_social} está funcionando correctamente.\n\nServidor: {$empresa->mail_host}:{$empresa->mail_port}\nRemitente: {$fromAddress}",
                      function ($message) use ($request, $empresa, $fromAddress, $fromName) {
                          $message->to($request->email_prueba)
                                  ->from($fromAddress, $fromName)

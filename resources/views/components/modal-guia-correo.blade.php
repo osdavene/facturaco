@@ -72,7 +72,7 @@
                         <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 font-bold flex items-center justify-center flex-shrink-0 text-xs">2</span>
                         <div>
                             <p class="font-semibold text-white">Crea una Contraseña de Aplicación</p>
-                            <p class="text-slate-400 mt-0.5">Ingresa al enlace directo <a href="https://myaccount.google.com/apppasswords" target="_blank" class="text-rose-400 underline">myaccount.google.com/apppasswords</a>. En el nombre de la app escribe <code>FacturaCO</code> y haz clic en <strong>Crear</strong>.</p>
+                            <p class="text-slate-400 mt-0.5">Ingresa al enlace directo <a href="https://myaccount.google.com/apppasswords" target="_blank" class="text-rose-400 underline">myaccount.google.com/apppasswords</a>. En el nombre de la app escribe <code>FacCol</code> y haz clic en <strong>Crear</strong>.</p>
                         </div>
                     </div>
 
@@ -80,7 +80,7 @@
                         <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 font-bold flex items-center justify-center flex-shrink-0 text-xs">3</span>
                         <div>
                             <p class="font-semibold text-white">Copia los 16 caracteres e ingresa los datos</p>
-                            <p class="text-slate-400 mt-0.5">Google te mostrará una clave amarilla de 16 letras (ejemplo: <code>abcd efgh ijkl mnop</code>). Pégala en el campo de contraseña en FacturaCO.</p>
+                            <p class="text-slate-400 mt-0.5">Google te mostrará una clave amarilla de 16 letras (ejemplo: <code>abcd efgh ijkl mnop</code>). Pégala en el campo de contraseña en FacCol.</p>
                         </div>
                     </div>
                 </div>
@@ -164,7 +164,7 @@
                         <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center flex-shrink-0 text-xs">1</span>
                         <div>
                             <p class="font-semibold text-white">Generar Contraseña de Aplicación en Zoho</p>
-                            <p class="text-slate-400 mt-0.5">Ve a <a href="https://accounts.zoho.com" target="_blank" class="text-amber-400 underline">accounts.zoho.com</a> > <strong>Seguridad</strong> > <strong>Contraseñas específicas de la aplicación</strong> y crea una para FacturaCO.</p>
+                            <p class="text-slate-400 mt-0.5">Ve a <a href="https://accounts.zoho.com" target="_blank" class="text-amber-400 underline">accounts.zoho.com</a> > <strong>Seguridad</strong> > <strong>Contraseñas específicas de la aplicación</strong> y crea una para FacCol.</p>
                         </div>
                     </div>
                 </div>

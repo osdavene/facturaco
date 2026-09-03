@@ -59,7 +59,7 @@
                                 {{ $emp->nombre_comercial ?: $emp->razon_social }}
                             </div>
                             <div class="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
-                                <span>Factura<span class="text-amber-500">CO</span></span>
+                                <span class="font-bold tracking-tight">Fac<span class="text-amber-500">Col</span></span>
                             </div>
                         </div>
                         <i class="fas fa-chevron-down text-slate-600 text-[10px] flex-shrink-0
@@ -125,8 +125,8 @@
                         @endif
                     </div>
                     <div class="min-w-0">
-                        <div class="font-display font-black text-lg text-white leading-tight">
-                            Factura<span class="text-amber-500">CO</span>
+                        <div class="font-display font-black text-lg text-white leading-tight tracking-tight">
+                            Fac<span class="text-amber-500">Col</span>
                         </div>
                         <div class="text-[10px] text-slate-500 tracking-wide truncate">
                             {{ $emp->nombre_comercial ?: $emp->razon_social }}
@@ -714,7 +714,7 @@
             <footer class="px-4 lg:px-7 py-3 border-t border-[#1e2d47]">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
                     <span class="text-xs text-slate-600">
-                        FacturaCO © {{ now()->year }} · {{ $emp->razon_social }}
+                        FacCol © {{ now()->year }} · {{ $emp->razon_social }}
                     </span>
                     <span class="text-xs text-slate-600">
                         NIT: {{ $emp->nit_formateado }}

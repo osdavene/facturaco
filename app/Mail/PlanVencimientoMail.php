@@ -25,10 +25,10 @@ class PlanVencimientoMail extends Mailable
     public function envelope(): Envelope
     {
         $asunto = $this->diasRestantes <= 0
-            ? "⚠️ Tu plan en FacturaCO ha vencido hoy — Renueva para mantener tu servicio activo"
+            ? "⚠️ Tu plan en FacCol ha vencido hoy — Renueva para mantener tu servicio activo"
             : ($this->diasRestantes === 1
-                ? "⚡ Tu plan en FacturaCO vence mañana — Renueva tu suscripción"
-                : "📅 Recordatorio: Tu plan en FacturaCO vence en {$this->diasRestantes} días");
+                ? "⚡ Tu plan en FacCol vence mañana — Renueva tu suscripción"
+                : "📅 Recordatorio: Tu plan en FacCol vence en {$this->diasRestantes} días");
 
         return new Envelope(
             subject: $asunto,

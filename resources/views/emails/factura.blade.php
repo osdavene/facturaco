@@ -113,7 +113,7 @@
                 <span class="footer-company">{{ $empresa->razon_social }}</span><br>
                 {{ $empresa->direccion }} · {{ $empresa->municipio }}, {{ $empresa->departamento }}<br>
                 Tel: {{ $empresa->telefono }} · {{ $empresa->email }}<br><br>
-                Este correo fue generado automáticamente por <strong>FacturaCO</strong>.
+                Este correo fue generado automáticamente por <strong>FacCol</strong>.
                 Por favor no responda si no reconoce esta factura.
             </p>
         </div>

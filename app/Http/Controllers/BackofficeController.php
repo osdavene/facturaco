@@ -551,10 +551,10 @@ class BackofficeController extends Controller
             \App\Services\MailConfigService::aplicarConfiguracion();
 
             \Illuminate\Support\Facades\Mail::raw(
-                "¡Hola! Este es un correo de prueba enviado desde tu plataforma FacturaCO.\n\nTu servidor de correo SMTP está funcionando correctamente.\nFecha y hora: " . now()->format('d/m/Y H:i:s'),
+                "¡Hola! Este es un correo de prueba enviado desde tu plataforma FacCol.\n\nTu servidor de correo SMTP está funcionando correctamente.\nFecha y hora: " . now()->format('d/m/Y H:i:s'),
                 function ($message) use ($request) {
                     $message->to($request->email_destino)
-                            ->subject('✅ Prueba Exitosa de Correo — FacturaCO');
+                            ->subject('✅ Prueba Exitosa de Correo — FacCol');
                 }
             );
 
