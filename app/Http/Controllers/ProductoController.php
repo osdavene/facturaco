@@ -8,12 +8,16 @@ use App\Models\Categoria;
 use App\Models\MovimientoInventario;
 use App\Models\Producto;
 use App\Models\UnidadMedida;
+use App\Services\ImageOptimizerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductoController extends Controller
 {
+    public function __construct(
+        private ImageOptimizerService $imageOptimizer
+    ) {}
     public function index(Request $request)
     {
         $soloArchivados = $request->estado === 'archivado';
@@ -59,7 +63,7 @@ class ProductoController extends Controller
         $data['es_servicio'] = $request->boolean('es_servicio');
 
         if ($request->hasFile('imagen')) {
-            $data['imagen'] = $request->file('imagen')->store('productos', 'public');
+            $data['imagen'] = $this->imageOptimizer->optimizarYGuardar($request->file('imagen'), 'productos', 1000, 80);
         }
 
         DB::transaction(function() use ($data, $request) {
@@ -130,7 +134,7 @@ class ProductoController extends Controller
             if ($inventario->imagen) {
                 Storage::disk('public')->delete($inventario->imagen);
             }
-            $data['imagen'] = $request->file('imagen')->store('productos', 'public');
+            $data['imagen'] = $this->imageOptimizer->optimizarYGuardar($request->file('imagen'), 'productos', 1000, 80);
         }
 
         DB::transaction(function() use ($data, $request, $inventario) {

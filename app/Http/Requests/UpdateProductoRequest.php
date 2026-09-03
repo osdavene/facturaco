@@ -35,7 +35,7 @@ class UpdateProductoRequest extends FormRequest
             'activo'           => 'boolean',
             'es_servicio'      => 'boolean',
             'observaciones'    => 'nullable|string',
-            'imagen'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'imagen'           => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:10240',
             'eliminar_imagen'  => 'nullable|boolean',
         ];
     }
