@@ -140,7 +140,12 @@ class NominaController extends Controller
             'fecha_pago'  => $nomina->fecha_pago ?? now()->toDateString(),
         ]);
 
-        return back()->with('success', 'Nómina marcada como pagada.');
+        // Generar asiento contable automático en Libro Diario
+        try {
+            (new \App\Services\ContabilidadService())->asientoNomina($nomina);
+        } catch (\Throwable $e) {}
+
+        return back()->with('success', 'Nómina marcada como pagada y asiento contable generado en el Libro Diario.');
     }
 
     public function anular(Nomina $nomina)
@@ -162,6 +167,93 @@ class NominaController extends Controller
         $empresa = \App\Models\Empresa::obtener();
 
         return view('nomina.colilla', compact('nomina', 'liquidacion', 'empresa'));
+    }
+
+    public function enviarColilla(Nomina $nomina, NominaEmpleado $liquidacion, \App\Services\MailService $mailer)
+    {
+        abort_if($liquidacion->nomina_id !== $nomina->id, 404);
+        $liquidacion->load('empleado');
+        $empresa = \App\Models\Empresa::obtener();
+
+        if (empty($liquidacion->empleado?->email)) {
+            return back()->with('error', "El empleado {$liquidacion->empleado?->nombre_completo} no tiene correo electrónico.");
+        }
+
+        try {
+            $mailer->enviarColillaPago($nomina, $liquidacion, $empresa);
+            return back()->with('success', "Desprendible de pago enviado a {$liquidacion->empleado->email}.");
+        } catch (\Throwable $e) {
+            return back()->with('error', "Error enviando correo: " . $e->getMessage());
+        }
+    }
+
+    public function enviarColillasTodas(Nomina $nomina, \App\Services\MailService $mailer)
+    {
+        $nomina->load('liquidaciones.empleado');
+        $empresa = \App\Models\Empresa::obtener();
+        $enviados = 0;
+        $fallidos = 0;
+
+        foreach ($nomina->liquidaciones as $liq) {
+            if (!empty($liq->empleado?->email)) {
+                try {
+                    $mailer->enviarColillaPago($nomina, $liq, $empresa);
+                    $enviados++;
+                } catch (\Throwable) {
+                    $fallidos++;
+                }
+            } else {
+                $fallidos++;
+            }
+        }
+
+        return back()->with('success', "Envío masivo completado: {$enviados} desprendibles enviados correctamente" . ($fallidos > 0 ? " ({$fallidos} sin correo o fallaron)." : "."));
+    }
+
+    public function exportarBanco(Nomina $nomina)
+    {
+        $nomina->load('liquidaciones.empleado');
+        $empresa = \App\Models\Empresa::obtener();
+
+        $filename = 'Dispersion_Nomina_' . \Illuminate\Support\Str::slug($nomina->nombre) . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($nomina, $empresa) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF"); // UTF-8 BOM
+
+            fputcsv($file, ['EMPRESA:', $empresa->razon_social, 'NIT:', $empresa->nit . '-' . $empresa->digito_verificacion], ';');
+            fputcsv($file, ['PERIODO:', $nomina->nombre, 'FECHA PAGO:', $nomina->fecha_pago ? $nomina->fecha_pago->format('Y-m-d') : date('Y-m-d')], ';');
+            fputcsv($file, [], ';');
+
+            fputcsv($file, ['Tipo Doc', 'Número Documento', 'Nombre del Empleado', 'Banco', 'Tipo Cuenta', 'Número de Cuenta', 'Valor Neto a Pagar (COP)'], ';');
+
+            foreach ($nomina->liquidaciones as $l) {
+                $emp = $l->empleado;
+                fputcsv($file, [
+                    $emp->tipo_documento ?? 'CC',
+                    $emp->numero_documento ?? '',
+                    $emp->nombre_completo ?? '',
+                    $emp->banco ?? 'No registrado',
+                    ucfirst($emp->tipo_cuenta ?? 'Ahorros'),
+                    $emp->numero_cuenta ?? 'Sin cuenta',
+                    number_format($l->neto_pagar, 2, ',', ''),
+                ], ';');
+            }
+
+            fputcsv($file, [
+                'TOTAL A DISPERSAR', '', '', '', '', '',
+                number_format($nomina->total_neto, 2, ',', ''),
+            ], ';');
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function destroy(Nomina $nomina)

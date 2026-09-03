@@ -59,6 +59,10 @@ class NominaService
         $salarioBase = (float) $empleado->salario_base;
         $esIntegral  = $empleado->tipo_salario === 'integral';
 
+        $smmlv = (float) (\App\Models\ConfiguracionPlataforma::get('smmlv', self::SMMLV));
+        $auxilioTransValor = (float) (\App\Models\ConfiguracionPlataforma::get('auxilio_transporte', self::AUXILIO_TRANSPORTE));
+        $topeAuxilio = $smmlv * 2;
+
         // Valor hora (mes de 240 horas: 30 días x 8 horas)
         $valorHora = $salarioBase / 240;
 
@@ -68,8 +72,8 @@ class NominaService
         // ── AUXILIO DE TRANSPORTE ─────────────────────────────────
         // No aplica: salario integral, salario > 2 SMMLV, vacaciones, incapacidad
         $auxilioTransporte = 0;
-        if (!$esIntegral && $salarioBase <= self::TOPE_AUXILIO && $diasTrabajados > 0) {
-            $auxilioTransporte = round((self::AUXILIO_TRANSPORTE / 30) * $diasTrabajados);
+        if (!$esIntegral && $salarioBase <= $topeAuxilio && $diasTrabajados > 0) {
+            $auxilioTransporte = round(($auxilioTransValor / 30) * $diasTrabajados);
         }
 
         // ── HORAS EXTRAS ─────────────────────────────────────────
@@ -87,7 +91,7 @@ class NominaService
 
         // ── IBC (Ingreso Base de Cotización) ──────────────────────
         // Para cotización SS: devengado SIN auxilio de transporte, mínimo 1 SMMLV
-        $ibc = max(self::SMMLV, $salarioBasico + $valorHorasExtras + $comisiones + $bonificaciones + $otrosDevengados);
+        $ibc = max($smmlv, $salarioBasico + $valorHorasExtras + $comisiones + $bonificaciones + $otrosDevengados);
 
         // Para salario integral: IBC = 70% del salario integral
         if ($esIntegral) {
@@ -98,11 +102,10 @@ class NominaService
         $dedSalud   = round($ibc * 0.04);
         $dedPension = round($ibc * 0.04);
 
-        // Fondo de Solidaridad Pensional: 1% si IBC > 4 SMMLV, +0.2% adicional por cada SMMLV adicional hasta 20 SMMLV
+        // Fondo de Solidaridad Pensional: 1% si IBC > 4 SMMLV
         $fondoSolidaridad = 0;
-        if ($ibc > 4 * self::SMMLV) {
+        if ($ibc > 4 * $smmlv) {
             $fondoSolidaridad = round($ibc * 0.01);
-            // Subcuenta de subsistencia: 0.2% adicional por cada SMMLV > 16 SMMLV (simplificado)
         }
 
         $totalDeducciones = $dedSalud + $dedPension + $fondoSolidaridad

@@ -22,6 +22,8 @@ Route::prefix('nomina')->name('nomina.')->middleware('modulo:nomina')->group(fun
         Route::post('/{nomina}/pagar',               [NominaController::class, 'marcarPagada'])       ->name('pagar')->whereNumber('nomina');
         Route::post('/{nomina}/anular',              [NominaController::class, 'anular'])             ->name('anular')->whereNumber('nomina');
         Route::patch('/{nomina}/liquidacion/{liquidacion}', [NominaController::class, 'actualizarLiquidacion'])->name('liquidacion.update')->whereNumber('nomina')->whereNumber('liquidacion');
+        Route::post('/{nomina}/colilla/{liquidacion}/enviar', [NominaController::class, 'enviarColilla'])->name('colilla.enviar')->whereNumber('nomina')->whereNumber('liquidacion');
+        Route::post('/{nomina}/colillas/enviar-todas', [NominaController::class, 'enviarColillasTodas'])->name('colillas.enviar-todas')->whereNumber('nomina');
     });
 
     // Solo lectura
@@ -29,6 +31,7 @@ Route::prefix('nomina')->name('nomina.')->middleware('modulo:nomina')->group(fun
         Route::get('/empleados',                       [NominaEmpleadoController::class, 'index']) ->name('empleados.index');
         Route::get('/',                                [NominaController::class, 'index'])         ->name('index');
         Route::get('/{nomina}',                        [NominaController::class, 'show'])          ->name('show')->whereNumber('nomina');
+        Route::get('/{nomina}/exportar-banco',         [NominaController::class, 'exportarBanco'])  ->name('exportar-banco')->whereNumber('nomina');
         Route::get('/{nomina}/colilla/{liquidacion}',  [NominaController::class, 'colilla'])       ->name('colilla')->whereNumber('nomina')->whereNumber('liquidacion');
     });
 });

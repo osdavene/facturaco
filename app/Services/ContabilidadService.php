@@ -23,6 +23,26 @@ class ContabilidadService
     const CUENTA_RETEICA        = '236805'; // ReteICA
     const CUENTA_RETEIVA        = '236905'; // ReteIVA
 
+    // Cuentas de Nómina PUC Colombia
+    const CUENTA_GASTO_SUELDOS        = '510506'; // Sueldos
+    const CUENTA_GASTO_HORAS_EXTRAS   = '510515'; // Horas extras y recargos
+    const CUENTA_GASTO_COMISIONES     = '510518'; // Comisiones
+    const CUENTA_GASTO_AUX_TRANSPORTE = '510527'; // Auxilio de transporte
+    const CUENTA_GASTO_CESANTIAS      = '510530'; // Cesantías
+    const CUENTA_GASTO_INT_CESANTIAS  = '510533'; // Intereses sobre cesantías
+    const CUENTA_GASTO_PRIMA          = '510536'; // Prima de servicios
+    const CUENTA_GASTO_VACACIONES     = '510539'; // Vacaciones
+    const CUENTA_GASTO_ARL            = '510568'; // Aportes a ARL
+    const CUENTA_GASTO_SALUD_EMP      = '510569'; // Aportes a EPS
+    const CUENTA_GASTO_PENSION_EMP    = '510570'; // Aportes a Pensión
+    const CUENTA_GASTO_CAJA_COMP      = '510572'; // Aportes a Caja de Compensación
+    const CUENTA_PASIVO_SALUD         = '237005'; // Aportes EPS por pagar
+    const CUENTA_PASIVO_ARL           = '237006'; // ARL por pagar
+    const CUENTA_PASIVO_CAJA          = '237010'; // Caja de Compensación por pagar
+    const CUENTA_PASIVO_PENSION       = '238030'; // Fondos de Pensión por pagar
+    const CUENTA_PASIVO_PROVISIONES   = '261005'; // Provisiones para prestaciones sociales
+    const CUENTA_SALARIOS_POR_PAGAR   = '250505'; // Salarios por pagar
+
     // ── Asiento por factura de venta ──────────────────────────────
 
     public function asientoFactura(Factura $factura): ?AsientoContable
@@ -181,6 +201,154 @@ class ContabilidadService
 
             // CR: Clientes (disminuye la cuenta por cobrar)
             $lineas[] = ['cuenta_id' => $cuentaClientes->id, 'descripcion' => 'Abono por Nota Crédito — ' . $nota->cliente_nombre, 'debito' => 0, 'credito' => $total];
+
+            return $this->guardarLineas($asiento, $lineas);
+        });
+    }
+
+    // ── Asiento por liquidación de nómina ─────────────────────────
+
+    public function asientoNomina(\App\Models\Nomina $nomina): ?AsientoContable
+    {
+        if ($nomina->estado === 'anulada') return null;
+
+        return DB::transaction(function () use ($nomina) {
+            $nomina->loadMissing('liquidaciones.empleado');
+            $empresaId = session('empresa_activa_id') ?? 1;
+
+            $totalSueldos       = (float) $nomina->liquidaciones->sum('salario_basico');
+            $totalAuxTransporte = (float) $nomina->liquidaciones->sum('auxilio_transporte');
+            $totalHorasExtras   = (float) $nomina->liquidaciones->sum('valor_horas_extras');
+            $totalComisiones    = (float) $nomina->liquidaciones->sum('comisiones');
+            $totalBonific       = (float) $nomina->liquidaciones->sum('bonificaciones');
+            $totalOtrosDev      = (float) $nomina->liquidaciones->sum('otros_devengados');
+
+            $totalDedSalud      = (float) $nomina->liquidaciones->sum('deduccion_salud');
+            $totalDedPension    = (float) $nomina->liquidaciones->sum('deduccion_pension');
+            $totalFondoSol      = (float) $nomina->liquidaciones->sum('fondo_solidaridad');
+            $totalReteFte       = (float) $nomina->liquidaciones->sum('retencion_fuente');
+            $totalOtrasDed      = (float) $nomina->liquidaciones->sum('otras_deducciones');
+
+            $totalAporSaludEmp  = (float) $nomina->liquidaciones->sum('aporte_salud_empleador');
+            $totalAporPensEmp   = (float) $nomina->liquidaciones->sum('aporte_pension_empleador');
+            $totalAporArl       = (float) $nomina->liquidaciones->sum('aporte_arl');
+            $totalAporCaja      = (float) $nomina->liquidaciones->sum('aporte_caja_compensacion');
+            $totalAporSena      = (float) $nomina->liquidaciones->sum('aporte_sena');
+            $totalAporIcbf      = (float) $nomina->liquidaciones->sum('aporte_icbf');
+
+            $totalCesantias     = (float) $nomina->liquidaciones->sum('acumulado_cesantias');
+            $totalIntCesantias  = (float) $nomina->liquidaciones->sum('acumulado_intereses_cesantias');
+            $totalPrima         = (float) $nomina->liquidaciones->sum('acumulado_prima');
+            $totalVacaciones    = (float) $nomina->liquidaciones->sum('acumulado_vacaciones');
+
+            $totalNeto          = (float) $nomina->total_neto;
+
+            $asiento = $this->crearCabecera([
+                'empresa_id'      => $empresaId,
+                'fecha'           => $nomina->fecha_pago ?? now()->toDateString(),
+                'descripcion'     => 'Liquidación de Nómina — ' . $nomina->nombre . ' (' . $nomina->liquidaciones->count() . ' empleados)',
+                'tipo'            => 'nomina',
+                'referencia_tipo' => 'Nomina',
+                'referencia_id'   => $nomina->id,
+            ]);
+
+            $lineas = [];
+
+            // ── DÉBITOS (Gastos) ──
+            $cSueldos = $this->cuenta($empresaId, self::CUENTA_GASTO_SUELDOS, 'Sueldos y Salarios', 'gasto', 'debito');
+            if ($cSueldos && ($totalSueldos + $totalBonific + $totalOtrosDev) > 0) {
+                $lineas[] = ['cuenta_id' => $cSueldos->id, 'descripcion' => 'Sueldos y devengados de nómina', 'debito' => $totalSueldos + $totalBonific + $totalOtrosDev, 'credito' => 0];
+            }
+
+            if ($totalAuxTransporte > 0) {
+                $cAux = $this->cuenta($empresaId, self::CUENTA_GASTO_AUX_TRANSPORTE, 'Auxilio de Transporte', 'gasto', 'debito');
+                if ($cAux) $lineas[] = ['cuenta_id' => $cAux->id, 'descripcion' => 'Auxilio de transporte empleados', 'debito' => $totalAuxTransporte, 'credito' => 0];
+            }
+
+            if (($totalHorasExtras + $totalComisiones) > 0) {
+                $cHE = $this->cuenta($empresaId, self::CUENTA_GASTO_HORAS_EXTRAS, 'Horas Extras y Recargos', 'gasto', 'debito');
+                if ($cHE) $lineas[] = ['cuenta_id' => $cHE->id, 'descripcion' => 'Horas extras y comisiones', 'debito' => $totalHorasExtras + $totalComisiones, 'credito' => 0];
+            }
+
+            // Aportes Empleador (Gastos)
+            if ($totalAporSaludEmp > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_GASTO_SALUD_EMP, 'Aportes EPS Empleador', 'gasto', 'debito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Aporte salud empleador (8.5%)', 'debito' => $totalAporSaludEmp, 'credito' => 0];
+            }
+            if ($totalAporPensEmp > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_GASTO_PENSION_EMP, 'Aportes Pensión Empleador', 'gasto', 'debito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Aporte pensión empleador (12%)', 'debito' => $totalAporPensEmp, 'credito' => 0];
+            }
+            if ($totalAporArl > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_GASTO_ARL, 'Aportes ARL', 'gasto', 'debito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Aporte ARL riesgos laborales', 'debito' => $totalAporArl, 'credito' => 0];
+            }
+            if (($totalAporCaja + $totalAporSena + $totalAporIcbf) > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_GASTO_CAJA_COMP, 'Parafiscales (Caja/Sena/ICBF)', 'gasto', 'debito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Aporte parafiscales', 'debito' => $totalAporCaja + $totalAporSena + $totalAporIcbf, 'credito' => 0];
+            }
+
+            // Provisiones Prestaciones Sociales (Gastos)
+            $totalProv = $totalCesantias + $totalIntCesantias + $totalPrima + $totalVacaciones;
+            if ($totalCesantias > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_GASTO_CESANTIAS, 'Cesantías', 'gasto', 'debito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Provisión mensual cesantías', 'debito' => $totalCesantias, 'credito' => 0];
+            }
+            if ($totalIntCesantias > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_GASTO_INT_CESANTIAS, 'Intereses sobre Cesantías', 'gasto', 'debito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Provisión intereses cesantías', 'debito' => $totalIntCesantias, 'credito' => 0];
+            }
+            if ($totalPrima > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_GASTO_PRIMA, 'Prima de Servicios', 'gasto', 'debito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Provisión prima de servicios', 'debito' => $totalPrima, 'credito' => 0];
+            }
+            if ($totalVacaciones > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_GASTO_VACACIONES, 'Vacaciones', 'gasto', 'debito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Provisión vacaciones', 'debito' => $totalVacaciones, 'credito' => 0];
+            }
+
+            // ── CRÉDITOS (Pasivos y Bancos) ──
+            // Salud por pagar (Empleado + Empresa)
+            if (($totalDedSalud + $totalAporSaludEmp) > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_PASIVO_SALUD, 'Aportes a EPS por pagar', 'pasivo', 'credito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Aportes EPS por pagar (Empresa + Empleado)', 'debito' => 0, 'credito' => $totalDedSalud + $totalAporSaludEmp];
+            }
+
+            // Pensión por pagar (Empleado + Empresa + Fondo Solidaridad)
+            if (($totalDedPension + $totalAporPensEmp + $totalFondoSol) > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_PASIVO_PENSION, 'Fondos de Pensión por pagar', 'pasivo', 'credito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Aportes Pensión por pagar (Empresa + Empleado)', 'debito' => 0, 'credito' => $totalDedPension + $totalAporPensEmp + $totalFondoSol];
+            }
+
+            // ARL por pagar
+            if ($totalAporArl > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_PASIVO_ARL, 'ARL por pagar', 'pasivo', 'credito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Aportes ARL por pagar', 'debito' => 0, 'credito' => $totalAporArl];
+            }
+
+            // Parafiscales por pagar
+            if (($totalAporCaja + $totalAporSena + $totalAporIcbf) > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_PASIVO_CAJA, 'Parafiscales por pagar', 'pasivo', 'credito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Caja de Compensación y parafiscales por pagar', 'debito' => 0, 'credito' => $totalAporCaja + $totalAporSena + $totalAporIcbf];
+            }
+
+            // Retefuente y otras deducciones
+            if (($totalReteFte + $totalOtrasDed) > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_RETEFUENTE, 'Retenciones y deducciones por pagar', 'pasivo', 'credito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Retención fuente y deducciones nómina', 'debito' => 0, 'credito' => $totalReteFte + $totalOtrasDed];
+            }
+
+            // Provisiones prestaciones sociales (Pasivo estimado)
+            if ($totalProv > 0) {
+                $c = $this->cuenta($empresaId, self::CUENTA_PASIVO_PROVISIONES, 'Provisiones prestaciones sociales', 'pasivo', 'credito');
+                if ($c) $lineas[] = ['cuenta_id' => $c->id, 'descripcion' => 'Provisión pasivo prestaciones (Cesantías, Prima, Vacaciones)', 'debito' => 0, 'credito' => $totalProv];
+            }
+
+            // Salarios por pagar / Salida de Bancos (Neto pagado)
+            $cBancos = $this->cuenta($empresaId, self::CUENTA_BANCOS, 'Bancos Nacionales', 'activo', 'debito');
+            if ($cBancos && $totalNeto > 0) {
+                $lineas[] = ['cuenta_id' => $cBancos->id, 'descripcion' => 'Pago neto de nómina a empleados', 'debito' => 0, 'credito' => $totalNeto];
+            }
 
             return $this->guardarLineas($asiento, $lineas);
         });

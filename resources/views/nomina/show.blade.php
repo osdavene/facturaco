@@ -24,6 +24,24 @@
     </div>
 
     <div class="flex items-center gap-2 flex-wrap">
+        <a href="{{ route('nomina.exportar-banco', $nomina) }}"
+           class="inline-flex items-center gap-2 bg-[#1a2235] hover:bg-[#222f48] border border-[#1e2d47]
+                  hover:border-emerald-500/50 text-emerald-400 font-semibold px-3.5 py-2 rounded-xl text-xs transition-colors">
+            <i class="fas fa-file-excel"></i> Dispersión Bancaria
+        </a>
+
+        @if($nomina->estado !== 'borrador')
+        <form method="POST" action="{{ route('nomina.colillas.enviar-todas', $nomina) }}">
+            @csrf
+            <button type="submit"
+                    onclick="return confirm('¿Enviar desprendibles de pago a todos los empleados por correo electrónico?')"
+                    class="inline-flex items-center gap-2 bg-[#1a2235] hover:bg-[#222f48] border border-[#1e2d47]
+                           hover:border-amber-500/50 text-amber-400 font-semibold px-3.5 py-2 rounded-xl text-xs transition-colors">
+                <i class="fas fa-envelope-open-text"></i> Enviar Colillas (Todos)
+            </button>
+        </form>
+        @endif
+
         <span class="badge bg-{{ $nomina->estado_color }}-500/10 text-{{ $nomina->estado_color }}-{{ in_array($nomina->estado_color,['slate']) ? '400':'500' }} text-sm px-3 py-1">
             {{ $nomina->estado_label }}
         </span>
@@ -44,7 +62,7 @@
         <form method="POST" action="{{ route('nomina.pagar', $nomina) }}">
             @csrf
             <button type="submit"
-                    onclick="return confirm('¿Marcar como pagada?')"
+                    onclick="return confirm('¿Marcar como pagada y generar asiento contable?')"
                     class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500
                            text-white font-semibold px-4 py-2 rounded-xl transition-colors text-sm">
                 <i class="fas fa-money-check-alt"></i> Marcar Pagada
@@ -143,12 +161,26 @@
                     </td>
                     <td class="px-5 py-4 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            {{-- Colilla --}}
+                            {{-- Colilla imprimir --}}
                             <a href="{{ route('nomina.colilla', [$nomina, $liq]) }}" target="_blank"
-                               title="Ver colilla"
+                               title="Ver e imprimir colilla"
                                class="btn-icon hover:text-emerald-400 hover:border-emerald-500/50">
                                 <i class="fas fa-receipt text-xs"></i>
                             </a>
+
+                            {{-- Enviar colilla por correo --}}
+                            @if(!empty($liq->empleado?->email))
+                            <form method="POST" action="{{ route('nomina.colilla.enviar', [$nomina, $liq]) }}" class="inline">
+                                @csrf
+                                <button type="submit"
+                                        title="Enviar colilla a {{ $liq->empleado->email }}"
+                                        onclick="return confirm('¿Enviar desprendible a {{ $liq->empleado->email }}?')"
+                                        class="btn-icon hover:text-blue-400 hover:border-blue-500/50">
+                                    <i class="fas fa-paper-plane text-xs"></i>
+                                </button>
+                            </form>
+                            @endif
+
                             {{-- Editar novedades --}}
                             @if($nomina->estado === 'borrador')
                             <button onclick="abrirEditar({{ $liq->id }}, {{ json_encode($liq) }})"

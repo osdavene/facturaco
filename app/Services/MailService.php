@@ -171,4 +171,69 @@ class MailService
 
         return true;
     }
+
+    /**
+     * Envía la colilla de pago por correo al empleado.
+     */
+    public function enviarColillaPago(\App\Models\Nomina $nomina, \App\Models\NominaEmpleado $liquidacion, Empresa $empresa): bool
+    {
+        $empleado = $liquidacion->empleado;
+        if (! $empleado || empty($empleado->email)) {
+            throw new \RuntimeException("El empleado no tiene correo electrónico registrado.");
+        }
+
+        $email = $empleado->email;
+
+        // Determinar credenciales
+        if ($this->tieneSmtpPropio($empresa)) {
+            $host = $empresa->mail_host;
+            $user = $empresa->mail_username;
+            $pass = $empresa->mail_password;
+            $from = $empresa->mail_from_address ?: $empresa->email;
+            $name = $empresa->mail_from_name ?: $empresa->razon_social;
+        } else {
+            $host = \App\Models\ConfiguracionPlataforma::get('mail_host', config('mail.mailers.smtp.host'));
+            $user = \App\Models\ConfiguracionPlataforma::get('mail_username', config('mail.mailers.smtp.username'));
+            $pass = \App\Models\ConfiguracionPlataforma::get('mail_password', config('mail.mailers.smtp.password'));
+            $from = \App\Models\ConfiguracionPlataforma::get('mail_from_address', config('mail.from.address', 'onboarding@resend.dev'));
+            $name = \App\Models\ConfiguracionPlataforma::get('mail_from_name', config('mail.from.name', 'FacCol'));
+        }
+
+        $pdf = app(PdfService::class);
+        $pdfContent = $pdf->output('nomina.colilla', compact('nomina', 'liquidacion', 'empresa'));
+        $pdfBase64  = base64_encode($pdfContent);
+
+        $htmlBody = view('emails.colilla', compact('nomina', 'liquidacion', 'empresa', 'empleado'))->render();
+
+        if (str_contains(strtolower((string)$host), 'resend') || strtolower((string)$user) === 'resend' || str_starts_with((string)$pass, 're_')) {
+            $response = \Illuminate\Support\Facades\Http::withToken($pass)
+                ->acceptJson()
+                ->post('https://api.resend.com/emails', [
+                    'from'        => "{$name} <{$from}>",
+                    'to'          => [$email],
+                    'subject'     => "Desprendible de Pago {$nomina->nombre} — {$empleado->nombre_completo}",
+                    'html'        => $htmlBody,
+                    'attachments' => [
+                        [
+                            'filename' => "Colilla-{$empleado->numero_documento}-{$nomina->id}.pdf",
+                            'content'  => $pdfBase64,
+                        ],
+                    ],
+                ]);
+
+            if (! $response->successful()) {
+                $err = $response->json('message') ?? ($response->json('error') ?? $response->body());
+                throw new \RuntimeException($err);
+            }
+
+            return true;
+        }
+
+        // Envío SMTP estándar
+        $this->paraEmpresa($empresa)
+             ->to($email)
+             ->send(new \App\Mail\ColillaPagoMail($nomina, $liquidacion, $empresa));
+
+        return true;
+    }
 }
