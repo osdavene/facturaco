@@ -68,10 +68,16 @@
     .totales .total-row td { background:#f59e0b; font-weight:bold;
                               font-size:13px; padding:8px; border:none; }
 
-    .qr-box { border:1px solid #e5e7eb; border-radius:6px; padding:10px;
-              display:inline-block; text-align:center; }
+    .qr-box { border:1px solid #e2e8f0; border-radius:8px; padding:10px;
+              display:inline-block; text-align:center; background:#ffffff; }
     .qr-box img { display:block; margin:0 auto; }
-    .qr-label { font-size:8px; color:#999; margin-top:5px; }
+    .qr-label { font-size:8px; color:#475569; margin-top:5px; font-weight:600; }
+
+    .cufe-box { background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px;
+                padding:8px 12px; margin-top:12px; margin-bottom:12px; }
+    .cufe-title { font-size:8px; font-weight:bold; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
+    .cufe-text { font-family:DejaVu Sans Mono, monospace; font-size:7.5px; color:#334155; word-wrap:break-word; word-break:break-all; line-height:1.3; }
+    .cufe-meta { font-size:7.5px; color:#059669; font-weight:600; margin-top:4px; }
 
     .obs-box { background:#f8f9fa; border-radius:5px; padding:9px 11px; margin-top:12px; }
     .obs-title { font-size:9px; font-weight:bold; text-transform:uppercase;
@@ -106,7 +112,7 @@
             @endif
             <div class="empresa-datos">
                 NIT: {{ $empresa->nit_formateado }} —
-                {{ $empresa->regimen === 'responsable_iva' ? 'Responsable de IVA' : 'Régimen Simple' }}
+                {{ $empresa->regimen === 'responsable_iva' ? 'Responsable de IVA' : 'No Responsable de IVA' }}
                 @if($empresa->direccion)
                 <br>{{ $empresa->direccion }}{{ $empresa->municipio ? ', '.$empresa->municipio : '' }}
                 {{ $empresa->departamento ? '- '.$empresa->departamento : '' }}
@@ -121,11 +127,11 @@
             </div>
         </div>
         <div class="header-right">
-            <div class="factura-tipo">{{ strtoupper($factura->tipo) }}</div>
+            <div class="factura-tipo">{{ $factura->enviada_dian ? 'FACTURA ELECTRÓNICA DE VENTA' : strtoupper($factura->tipo) }}</div>
             <div class="factura-num">{{ $factura->numero }}</div>
             @if($empresa->resolucion_numero)
             <div class="factura-res">
-                Res. DIAN N° {{ number_format($empresa->resolucion_numero, 0, ',', '.') }}
+                Res. DIAN N° {{ is_numeric($empresa->resolucion_numero) ? number_format((float)$empresa->resolucion_numero, 0, ',', '.') : $empresa->resolucion_numero }}
                 @if($empresa->resolucion_fecha)
                 <br>del {{ $empresa->resolucion_fecha->format('d/m/Y') }}
                 @endif
@@ -138,6 +144,11 @@
                 <span class="badge badge-{{ $factura->estado }}">
                     {{ strtoupper($factura->estado) }}
                 </span>
+                @if($factura->enviada_dian)
+                <span class="badge badge-pagada" style="background:#d1fae5;color:#065f46;margin-left:4px;">
+                    DIAN ✓
+                </span>
+                @endif
             </div>
         </div>
     </div>
@@ -241,7 +252,7 @@
     {{-- ═══ TOTALES + QR ═══ --}}
     <div class="bottom-grid">
 
-        {{-- QR izquierda --}}
+        {{-- Totales izquierda --}}
         <div class="bottom-left">
             <div class="totales">
                 <table>
@@ -258,7 +269,7 @@
                     </tr>
                     @endif
                     <tr>
-                        <td class="label">IVA</td>
+                        <td class="label">IVA (19%)</td>
                         <td class="valor" style="color:#2563eb;">
                             +${{ number_format($factura->iva, 0, ',', '.') }}
                         </td>
@@ -294,15 +305,26 @@
             @isset($qrBase64)
             <div class="qr-box">
                 <img src="data:image/png;base64,{{ $qrBase64 }}"
-                    width="110" height="110" alt="QR Verificación">
+                    width="105" height="105" alt="QR Verificación DIAN">
                 <div class="qr-label">
-                    Verificación de documento<br>
+                    {{ $factura->cufe ? 'Validación Oficial DIAN' : 'Verificación Documento' }}<br>
                     {{ $factura->numero }}
                 </div>
             </div>
             @endisset
         </div>
     </div>
+
+    {{-- ═══ CUFE OFICIAL DIAN ═══ --}}
+    @if($factura->cufe)
+    <div class="cufe-box">
+        <div class="cufe-title">CUFE (Código Único de Facturación Electrónica):</div>
+        <div class="cufe-text">{{ $factura->cufe }}</div>
+        @if($factura->fecha_dian)
+        <div class="cufe-meta">✓ Documento validado y firmado electrónicamente por la DIAN el {{ $factura->fecha_dian->format('d/m/Y \a \l\a\s H:i:s') }}</div>
+        @endif
+    </div>
+    @endif
 
     {{-- ═══ OBSERVACIONES ═══ --}}
     @if($factura->observaciones)

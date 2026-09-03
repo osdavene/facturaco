@@ -175,14 +175,19 @@ class FacturaController extends Controller
         $factura->load(['items', 'cliente']);
         $empresa = Empresa::obtener();
 
-        $qrBase64 = $this->pdf->qrBase64([
-            'Factura: ' . $factura->numero,
-            'NIT: '     . $empresa->nit_formateado,
-            'Cliente: ' . $factura->cliente_nombre,
-            'Fecha: '   . $factura->fecha_emision->format('d/m/Y'),
-            'Total: $'  . number_format($factura->total, 0, ',', '.'),
-            'Estado: '  . strtoupper($factura->estado),
-        ]);
+        if ($factura->cufe) {
+            $qrContent = "NumFac: {$factura->numero}\nFecFac: {$factura->fecha_emision->format('Y-m-d')}\nNitFac: {$empresa->nit}\nDocAdq: {$factura->cliente_documento}\nValFac: " . number_format($factura->subtotal, 2, '.', '') . "\nValIva: " . number_format($factura->iva, 2, '.', '') . "\nValOtroIm: 0.00\nValTotal: " . number_format($factura->total, 2, '.', '') . "\nCUFE: {$factura->cufe}\nQRCode: https://catalogo-vpfe-hab.dian.gov.co/document/searchqr?documentkey={$factura->cufe}";
+            $qrBase64 = $this->pdf->qrBase64([$qrContent]);
+        } else {
+            $qrBase64 = $this->pdf->qrBase64([
+                'Factura: ' . $factura->numero,
+                'NIT: '     . $empresa->nit_formateado,
+                'Cliente: ' . $factura->cliente_nombre,
+                'Fecha: '   . $factura->fecha_emision->format('d/m/Y'),
+                'Total: $'  . number_format($factura->total, 0, ',', '.'),
+                'Estado: '  . strtoupper($factura->estado),
+            ]);
+        }
 
         return $this->pdf->stream(
             'facturas.pdf',
