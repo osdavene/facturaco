@@ -90,4 +90,75 @@ class MailService
 
         return ! empty($masterHost) && ! empty($masterUser);
     }
+
+    /**
+     * Envía una factura por correo con su PDF adjunto, usando Resend API o SMTP según corresponda.
+     */
+    public function enviarFactura(\App\Models\Factura $factura, Empresa $empresa, string $email, string $mensaje = ''): bool
+    {
+        if (! $this->estaConfigurado($empresa)) {
+            throw new \RuntimeException(
+                "No hay un servidor de correo configurado ni en la empresa ni en la plataforma."
+            );
+        }
+
+        $factura->loadMissing(['items', 'cliente']);
+
+        // Determinar credenciales
+        if ($this->tieneSmtpPropio($empresa)) {
+            $host = $empresa->mail_host;
+            $user = $empresa->mail_username;
+            $pass = $empresa->mail_password;
+            $from = $empresa->mail_from_address ?: $empresa->email;
+            $name = $empresa->mail_from_name ?: $empresa->razon_social;
+        } else {
+            $host = \App\Models\ConfiguracionPlataforma::get('mail_host', config('mail.mailers.smtp.host'));
+            $user = \App\Models\ConfiguracionPlataforma::get('mail_username', config('mail.mailers.smtp.username'));
+            $pass = \App\Models\ConfiguracionPlataforma::get('mail_password', config('mail.mailers.smtp.password'));
+            $from = \App\Models\ConfiguracionPlataforma::get('mail_from_address', config('mail.from.address', 'onboarding@resend.dev'));
+            $name = \App\Models\ConfiguracionPlataforma::get('mail_from_name', config('mail.from.name', 'FacCol'));
+        }
+
+        // Si es Resend (API Key o usuario resend), enviar vía Resend HTTPS REST API (Puerto 443)
+        if (str_contains(strtolower((string)$host), 'resend') || strtolower((string)$user) === 'resend' || str_starts_with((string)$pass, 're_')) {
+            $pdf = app(PdfService::class);
+            $qrContent = $factura->cufe
+                ? "NumFac: {$factura->numero}\nFecFac: {$factura->fecha_emision->format('Y-m-d')}\nNitFac: {$empresa->nit}\nDocAdq: {$factura->cliente_documento}\nValFac: " . number_format($factura->subtotal, 2, '.', '') . "\nValIva: " . number_format($factura->iva, 2, '.', '') . "\nValOtroIm: 0.00\nValTotal: " . number_format($factura->total, 2, '.', '') . "\nCUFE: {$factura->cufe}\nQRCode: https://catalogo-vpfe-hab.dian.gov.co/document/searchqr?documentkey={$factura->cufe}"
+                : "Factura: {$factura->numero}\nNIT: {$empresa->nit_formateado}\nCliente: {$factura->cliente_nombre}\nTotal: $" . number_format($factura->total, 0, ',', '.');
+            $qrBase64 = $pdf->qrBase64([$qrContent]);
+            $pdfContent = $pdf->output('facturas.pdf', compact('factura', 'empresa', 'qrBase64'));
+            $pdfBase64 = base64_encode($pdfContent);
+
+            $htmlBody = view('emails.factura', compact('factura', 'empresa', 'mensaje'))->render();
+
+            $response = \Illuminate\Support\Facades\Http::withToken($pass)
+                ->acceptJson()
+                ->post('https://api.resend.com/emails', [
+                    'from'        => "{$name} <{$from}>",
+                    'to'          => [$email],
+                    'subject'     => "Factura {$factura->numero} — {$empresa->razon_social}",
+                    'html'        => $htmlBody,
+                    'attachments' => [
+                        [
+                            'filename' => "Factura-{$factura->numero}.pdf",
+                            'content'  => $pdfBase64,
+                        ],
+                    ],
+                ]);
+
+            if (! $response->successful()) {
+                $err = $response->json('message') ?? ($response->json('error') ?? $response->body());
+                throw new \RuntimeException($err);
+            }
+
+            return true;
+        }
+
+        // Envío SMTP estándar
+        $this->paraEmpresa($empresa)
+             ->to($email)
+             ->send(new \App\Mail\FacturaMail($factura, $empresa, $mensaje));
+
+        return true;
+    }
 }

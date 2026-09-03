@@ -221,16 +221,20 @@ class FacturaController extends Controller
         $empresa = Empresa::obtener();
 
         if (! $mail->estaConfigurado($empresa)) {
-            return back()->with('error', 'El correo SMTP no está configurado. Ve a Empresa → Configuración de Correo y completa los datos.');
+            return back()->with('error', 'No hay ningún servidor de correo configurado. Configura el correo en Backoffice o en Datos de Empresa.');
         }
 
-        EnviarFacturaJob::dispatch($factura, $empresa, $request->email, $request->mensaje ?? '');
+        try {
+            $mail->enviarFactura($factura, $empresa, $request->email, $request->mensaje ?? '');
 
-        if ($factura->estado === 'borrador') {
-            $factura->update(['estado' => 'emitida']);
+            if ($factura->estado === 'borrador') {
+                $factura->update(['estado' => 'emitida']);
+            }
+
+            return redirect()->route('facturas.show', $factura)
+                ->with('success', "¡Factura {$factura->numero} enviada con éxito a {$request->email} con el PDF adjunto!");
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Error al enviar correo: ' . $e->getMessage());
         }
-
-        return redirect()->route('facturas.show', $factura)
-            ->with('success', 'Factura en cola de envío a '.$request->email.'. Llegará en unos momentos.');
     }
 }
