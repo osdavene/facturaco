@@ -24,6 +24,10 @@ Route::prefix('nomina')->name('nomina.')->middleware('modulo:nomina')->group(fun
         Route::patch('/{nomina}/liquidacion/{liquidacion}', [NominaController::class, 'actualizarLiquidacion'])->name('liquidacion.update')->whereNumber('nomina')->whereNumber('liquidacion');
         Route::post('/{nomina}/colilla/{liquidacion}/enviar', [NominaController::class, 'enviarColilla'])->name('colilla.enviar')->whereNumber('nomina')->whereNumber('liquidacion');
         Route::post('/{nomina}/colillas/enviar-todas', [NominaController::class, 'enviarColillasTodas'])->name('colillas.enviar-todas')->whereNumber('nomina');
+
+        // Configuración de parámetros
+        Route::get('/configuracion',   [\App\Http\Controllers\NominaConfiguracionController::class, 'index']) ->name('configuracion.index');
+        Route::put('/configuracion',   [\App\Http\Controllers\NominaConfiguracionController::class, 'update'])->name('configuracion.update');
     });
 
     // Solo lectura
@@ -32,6 +36,16 @@ Route::prefix('nomina')->name('nomina.')->middleware('modulo:nomina')->group(fun
         Route::get('/',                                [NominaController::class, 'index'])         ->name('index');
         Route::get('/liquidacion-definitiva',          [\App\Http\Controllers\LiquidacionDefinitivaController::class, 'index'])   ->name('liquidacion-definitiva.index');
         Route::post('/liquidacion-definitiva/imprimir',[\App\Http\Controllers\LiquidacionDefinitivaController::class, 'imprimir'])->name('liquidacion-definitiva.imprimir');
+
+        // Certificados Laborales
+        Route::get('/certificados',                    [\App\Http\Controllers\CertificadoLaboralController::class, 'index'])       ->name('certificados.index');
+        Route::post('/certificados/generar',           [\App\Http\Controllers\CertificadoLaboralController::class, 'generar'])     ->name('certificados.generar');
+        Route::post('/certificados/enviar',            [\App\Http\Controllers\CertificadoLaboralController::class, 'enviarCorreo'])->name('certificados.enviar');
+
+        // Reportes e Informes PILA
+        Route::get('/reportes',                        [\App\Http\Controllers\ReporteNominaController::class, 'index'])   ->name('reportes.index');
+        Route::get('/reportes/exportar',               [\App\Http\Controllers\ReporteNominaController::class, 'exportar'])->name('reportes.exportar');
+
         Route::get('/{nomina}',                        [NominaController::class, 'show'])          ->name('show')->whereNumber('nomina');
         Route::get('/{nomina}/exportar-banco',         [NominaController::class, 'exportarBanco'])  ->name('exportar-banco')->whereNumber('nomina');
         Route::get('/{nomina}/colilla/{liquidacion}',  [NominaController::class, 'colilla'])       ->name('colilla')->whereNumber('nomina')->whereNumber('liquidacion');

@@ -213,6 +213,23 @@
                                 :active="request()->routeIs('nomina.liquidacion-definitiva.*')">
                         Liquidación Definitiva
                     </x-nav-item>
+                    <x-nav-item href="{{ route('nomina.certificados.index') }}"
+                                icon="fa-file-signature"
+                                :active="request()->routeIs('nomina.certificados.*')">
+                        Certificados Laborales
+                    </x-nav-item>
+                    <x-nav-item href="{{ route('nomina.reportes.index') }}"
+                                icon="fa-chart-pie"
+                                :active="request()->routeIs('nomina.reportes.*')">
+                        Informe y PILA
+                    </x-nav-item>
+                    @can('gestionar nomina')
+                    <x-nav-item href="{{ route('nomina.configuracion.index') }}"
+                                icon="fa-sliders-h"
+                                :active="request()->routeIs('nomina.configuracion.*')">
+                        Parámetros Laborales
+                    </x-nav-item>
+                    @endcan
                 </x-nav-section>
                 @endcan
 
