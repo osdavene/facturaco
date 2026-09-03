@@ -100,16 +100,19 @@
             <div class="logo-box">
                 @if($empresa->logo_base64)
                     <img src="{{ $empresa->logo_base64 }}" style="max-height:85px; max-width:240px; object-fit:contain; margin-bottom:8px;">
+                    <div class="empresa-nombre">{{ $empresa->razon_social }}</div>
+                    @if($empresa->nombre_comercial && $empresa->nombre_comercial !== $empresa->razon_social)
+                    <div class="empresa-sub">{{ $empresa->nombre_comercial }}</div>
+                    @endif
                 @else
                     <div class="logo-texto">
                         {{ $empresa->nombre_comercial ?: $empresa->razon_social }}
                     </div>
+                    @if($empresa->nombre_comercial && $empresa->nombre_comercial !== $empresa->razon_social)
+                    <div class="empresa-sub">{{ $empresa->razon_social }}</div>
+                    @endif
                 @endif
             </div>
-            <div class="empresa-nombre">{{ $empresa->razon_social }}</div>
-            @if($empresa->nombre_comercial && $empresa->nombre_comercial !== $empresa->razon_social)
-            <div class="empresa-sub">{{ $empresa->nombre_comercial }}</div>
-            @endif
             <div class="empresa-datos">
                 NIT: {{ $empresa->nit_formateado }} —
                 {{ $empresa->regimen === 'responsable_iva' ? 'Responsable de IVA' : 'No Responsable de IVA' }}
