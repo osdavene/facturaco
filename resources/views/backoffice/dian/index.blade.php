@@ -154,10 +154,17 @@
                 <div>
                     <label class="form-label font-semibold text-slate-300">Correo / Username Factus</label>
                     <input type="email" name="dian_factus_username" value="{{ old('dian_factus_username', $factusUsername) }}"
-                           placeholder="cuenta@empresa.com" class="form-input">
+                           placeholder="sandboxv2@factus.com.co" class="form-input">
                 </div>
 
-                <div class="sm:col-span-2 lg:col-span-3">
+                <div>
+                    <label class="form-label font-semibold text-slate-300">Contraseña Factus</label>
+                    <input type="password" name="dian_factus_password" placeholder="••••••••••••••••"
+                           class="form-input">
+                    <p class="text-[11px] text-slate-500 mt-1">Déjalo en blanco para mantener la contraseña actual.</p>
+                </div>
+
+                <div class="sm:col-span-2 lg:col-span-2">
                     <label class="form-label font-semibold text-slate-300">Token de Acceso Directo / API Key (Opcional)</label>
                     <input type="password" name="dian_factus_token" value="{{ old('dian_factus_token', $factusToken) }}"
                            placeholder="Bearer token o API Key directa" class="form-input font-mono text-xs">
