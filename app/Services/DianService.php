@@ -71,6 +71,11 @@ class DianService
         return $this->soapProvider->generarXml($factura);
     }
 
+    public function firmarXml(string $xml): string
+    {
+        return $this->soapProvider->firmarXml($xml);
+    }
+
     public function calcularCufe(Factura $factura, Empresa $empresa): string
     {
         return $this->soapProvider->calcularCufe($factura, $empresa);
