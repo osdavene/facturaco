@@ -154,8 +154,9 @@
 
     {{-- Items --}}
     <div class="card overflow-hidden mb-4">
-        <div class="px-5 py-4 border-b border-[#1e2d47]">
+        <div class="px-5 py-4 border-b border-[#1e2d47] flex items-center justify-between">
             <div class="font-display font-bold text-base">Productos / Servicios</div>
+            <span class="text-xs text-slate-500 font-mono">{{ $cotizacion->items->count() }} ítem(s)</span>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full">
@@ -169,7 +170,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($cotizacion->items as $item)
+                    @forelse($cotizacion->items as $item)
                     <tr class="border-b border-[#1e2d47]/50">
                         <td class="px-5 py-3">
                             <div class="text-sm font-medium" style="color:#e2e8f0">{{ $item->descripcion }}</div>
@@ -190,7 +191,13 @@
                             ${{ number_format($item->total, 0, ',', '.') }}
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-slate-500 text-sm">
+                            Esta cotización no contiene ítems detallados.
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
