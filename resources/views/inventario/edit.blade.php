@@ -32,19 +32,45 @@
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="form-label">Código *</label>
-                    <input type="text" name="codigo"
-                           value="{{ old('codigo', $inventario->codigo) }}"
-                           style="text-transform:uppercase"
-                           class="form-input @error('codigo') border-red-500 @enderror">
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="form-label mb-0">Código *</label>
+                        <button type="button" onclick="abrirEscaner('codigo')"
+                                class="text-[11px] text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-1 font-medium">
+                            <i class="fas fa-camera text-[10px] text-amber-500"></i> Escanear
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input type="text" name="codigo" id="codigo"
+                               value="{{ old('codigo', $inventario->codigo) }}"
+                               style="text-transform:uppercase"
+                               class="form-input pr-10 @error('codigo') border-red-500 @enderror">
+                        <button type="button" onclick="abrirEscaner('codigo')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-amber-400 transition-colors"
+                                title="Escanear con cámara">
+                            <i class="fas fa-barcode text-sm"></i>
+                        </button>
+                    </div>
                     @error('codigo') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="form-label">Código de Barras</label>
-                    <input type="text" name="codigo_barras"
-                           value="{{ old('codigo_barras', $inventario->codigo_barras) }}"
-                           style="text-transform:uppercase"
-                           class="form-input">
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="form-label mb-0">Código de Barras / QR</label>
+                        <button type="button" onclick="abrirEscaner('codigo_barras')"
+                                class="text-[11px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1 font-semibold">
+                            <i class="fas fa-camera text-[10px]"></i> Escanear con Cámara
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input type="text" name="codigo_barras" id="codigo_barras"
+                               value="{{ old('codigo_barras', $inventario->codigo_barras) }}"
+                               style="text-transform:uppercase"
+                               class="form-input pr-10">
+                        <button type="button" onclick="abrirEscaner('codigo_barras')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-amber-400 transition-colors"
+                                title="Escanear con cámara">
+                            <i class="fas fa-qrcode text-base"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="sm:col-span-2">
                     <label class="form-label">Nombre *</label>
@@ -424,5 +450,6 @@ function renderProveedoresProducto() {
 
 renderProveedoresProducto();
 </script>
+<x-barcode-scanner-modal />
 @endpush
 @endsection

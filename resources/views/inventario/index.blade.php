@@ -58,11 +58,16 @@
     <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
-            <input type="text" name="buscar" value="{{ request('buscar') }}"
-                   placeholder="Buscar por nombre, código..."
+            <input type="text" name="buscar" id="buscar-inventario" value="{{ request('buscar') }}"
+                   placeholder="Buscar por nombre, código de barras, SKU..."
                    class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl
-                          pl-9 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-600
+                          pl-9 pr-10 py-2.5 text-sm text-slate-200 placeholder-slate-600
                           focus:outline-none focus:border-amber-500">
+            <button type="button" onclick="abrirEscanerInventario()"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-400 transition-colors p-1"
+                    title="Escanear código de barras con la cámara">
+                <i class="fas fa-barcode text-sm"></i>
+            </button>
         </div>
         <select name="categoria_id"
                 class="form-input text-slate-300 focus:outline-none focus:border-amber-500">
@@ -265,6 +270,19 @@
             class="inline-flex items-center gap-2 px-4 py-2 bg-[#1a2235] border border-[#1e2d47]
                    hover:border-slate-500 text-slate-400 rounded-xl text-sm transition-colors">
         <i class="fas fa-times text-xs"></i> Cancelar
-    </button>
 </div>
+
+@push('scripts')
+<script>
+function abrirEscanerInventario() {
+    abrirEscaner('buscar-inventario');
+    const input = document.getElementById('buscar-inventario');
+    const observer = new MutationObserver(() => {});
+    input.addEventListener('change', () => {
+        document.getElementById('filtros').submit();
+    }, { once: true });
+}
+</script>
+<x-barcode-scanner-modal />
+@endpush
 @endsection
