@@ -25,4 +25,8 @@ Route::middleware(['auth', 'backoffice'])->prefix('backoffice')->name('backoffic
     Route::get('/dian',                            [BackofficeController::class, 'dianIndex'])       ->name('dian');
     Route::post('/dian',                           [BackofficeController::class, 'dianGuardar'])     ->name('dian.guardar');
     Route::post('/dian/probar',                    [BackofficeController::class, 'dianProbar'])      ->name('dian.probar');
+    Route::get('/planes',                          [BackofficeController::class, 'planesIndex'])     ->name('planes');
+    Route::post('/planes',                         [BackofficeController::class, 'planesStore'])     ->name('planes.store');
+    Route::put('/planes/{plan}',                   [BackofficeController::class, 'planesUpdate'])    ->name('planes.update');
+    Route::delete('/planes/{plan}',                [BackofficeController::class, 'planesDestroy'])   ->name('planes.destroy');
 });

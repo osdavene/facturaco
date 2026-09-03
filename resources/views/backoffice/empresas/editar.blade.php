@@ -85,6 +85,43 @@
             </div>
         </div>
 
+        {{-- Plan y Límites SaaS --}}
+        <div class="card p-6 space-y-5 mt-5">
+            <h2 class="font-display font-bold text-base flex items-center gap-2">
+                <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
+                Plan SaaS y Límites de Facturación DIAN
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Plan Asignado</label>
+                    <select name="plan_id" class="form-input">
+                        <option value="">— Sin Plan (Facturas Ilimitadas) —</option>
+                        @foreach($planes as $p)
+                            <option value="{{ $p->id }}" {{ old('plan_id', $empresa->plan_id) == $p->id ? 'selected' : '' }}>
+                                {{ $p->nombre }} ({{ $p->precio_formateado }} · {{ $p->limite_facturas_texto }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="form-label">Fecha de Vencimiento</label>
+                    <input type="date" name="plan_vencimiento"
+                           value="{{ old('plan_vencimiento', $empresa->plan_vencimiento?->format('Y-m-d')) }}"
+                           class="form-input">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="form-label">Facturas Extra / Recargas Adicionales</label>
+                    <input type="number" name="plan_facturas_adicionales"
+                           value="{{ old('plan_facturas_adicionales', $empresa->plan_facturas_adicionales ?? 0) }}"
+                           min="0" placeholder="0" class="form-input">
+                    <p class="text-[11px] text-slate-500 mt-1">Facturas extra adicionales al límite mensual del plan.</p>
+                </div>
+            </div>
+        </div>
+
         <div class="flex justify-end mt-4">
             <button type="submit"
                     class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600

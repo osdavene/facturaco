@@ -24,12 +24,15 @@ class Empresa extends Model
         'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
         'wompi_public_key', 'wompi_currency', 'wompi_events_key',
         'empresa_padre_id', 'timezone',
+        'plan_id', 'plan_vencimiento', 'plan_facturas_adicionales',
     ];
 
     protected $casts = [
         'resolucion_fecha'       => 'date',
         'resolucion_vencimiento' => 'date',
         'factura_electronica'    => 'boolean',
+        'plan_vencimiento'       => 'date',
+        'plan_facturas_adicionales' => 'integer',
     ];
 
     protected $hidden = [
@@ -38,6 +41,11 @@ class Empresa extends Model
     ];
 
     // ── Relaciones ────────────────────────────────────────────────
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class, 'plan_id');
+    }
 
     public function usuarios()
     {
@@ -171,5 +179,50 @@ class Empresa extends Model
                 'iva_defecto'     => 19,
             ]
         );
+    }
+
+    // ── Helpers de Cuotas y Planes ────────────────────────────────
+
+    public function facturasEmitidasMes(): int
+    {
+        return $this->facturas()
+            ->whereMonth('fecha_emision', now()->month)
+            ->whereYear('fecha_emision', now()->year)
+            ->count();
+    }
+
+    public function limiteFacturasMes(): ?int
+    {
+        if (! $this->plan) {
+            return null; // Ilimitado si no tiene plan asignado
+        }
+
+        $base = $this->plan->limite_facturas_mes;
+        if ($base === null) {
+            return null;
+        }
+
+        return $base + (int)($this->plan_facturas_adicionales ?? 0);
+    }
+
+    public function puedeEmitirFactura(): bool
+    {
+        $limite = $this->limiteFacturasMes();
+        if ($limite === null) {
+            return true;
+        }
+
+        return $this->facturasEmitidasMes() < $limite;
+    }
+
+    public function porcentajeUsoFacturas(): float
+    {
+        $limite = $this->limiteFacturasMes();
+        if (! $limite) {
+            return 0;
+        }
+
+        $usadas = $this->facturasEmitidasMes();
+        return min(100, round(($usadas / $limite) * 100, 1));
     }
 }

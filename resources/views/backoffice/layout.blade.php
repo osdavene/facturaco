@@ -52,6 +52,13 @@
                 <span>Empresas</span>
             </a>
 
+            <a href="{{ route('backoffice.planes') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors
+                      {{ request()->routeIs('backoffice.planes*') ? 'bg-amber-500/10 text-amber-500' : 'text-slate-500 hover:bg-[#1a2235] hover:text-slate-200' }}">
+                <i class="fas fa-cubes-stacked w-4 text-center"></i>
+                <span>Planes & Paquetes</span>
+            </a>
+
             <a href="{{ route('backoffice.usuarios') }}"
                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors
                       {{ request()->routeIs('backoffice.usuarios*') ? 'bg-amber-500/10 text-amber-500' : 'text-slate-500 hover:bg-[#1a2235] hover:text-slate-200' }}">

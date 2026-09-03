@@ -456,6 +456,16 @@
                 {{-- Acciones derecha --}}
                 <div class="ml-auto flex items-center gap-2 flex-shrink-0">
 
+                    {{-- Plan y Consumo de Facturas --}}
+                    @if($emp->plan)
+                    <div class="hidden xl:flex items-center gap-2 text-xs bg-[#1a2235] border border-[#1e2d47] px-3 py-1.5 rounded-lg text-slate-300">
+                        <i class="fas fa-cube text-amber-500 text-[10px]"></i>
+                        <span class="font-semibold text-white">{{ $emp->plan->nombre }}</span>
+                        <span class="text-slate-600">·</span>
+                        <span class="text-emerald-400 font-mono">{{ $emp->facturasEmitidasMes() }}/{{ $emp->limiteFacturasMes() ?? '∞' }} fac</span>
+                    </div>
+                    @endif
+
                     {{-- Estado DIAN (solo desktop) --}}
                     @if($emp->resolucion_vencimiento)
                         @if(!$emp->resolucion_vigente)

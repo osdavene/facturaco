@@ -27,9 +27,18 @@
                     {{ strtoupper(substr($emp->razon_social, 0, 2)) }}
                 </div>
                 <div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <p class="font-semibold">{{ $emp->razon_social }}</p>
                         <span class="text-[10px] px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full font-semibold">Matriz</span>
+                        @if($emp->plan)
+                        <span class="text-[10px] px-2 py-0.5 bg-{{ $emp->plan->color }}-500/10 text-{{ $emp->plan->color }}-400 border border-{{ $emp->plan->color }}-500/20 rounded-full font-medium">
+                            <i class="fas fa-cube text-[9px] mr-0.5"></i>{{ $emp->plan->nombre }} ({{ $emp->plan->limite_facturas_texto }})
+                        </span>
+                        @else
+                        <span class="text-[10px] px-2 py-0.5 bg-slate-700 text-slate-400 rounded-full font-medium">
+                            Sin Plan
+                        </span>
+                        @endif
                     </div>
                     <p class="text-slate-500 text-xs mt-0.5">
                         NIT: {{ $emp->nit }}
@@ -92,9 +101,14 @@
                 <div class="flex items-center gap-3 ml-6">
                     <i class="fas fa-code-branch text-slate-600 text-xs"></i>
                     <div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <p class="text-sm font-medium text-slate-300">{{ $filial->razon_social }}</p>
                             <span class="text-[10px] px-2 py-0.5 bg-[#1a2235] text-slate-500 rounded-full">Filial</span>
+                            @if($filial->plan)
+                            <span class="text-[10px] px-2 py-0.5 bg-{{ $filial->plan->color }}-500/10 text-{{ $filial->plan->color }}-400 rounded-full font-medium">
+                                {{ $filial->plan->nombre }}
+                            </span>
+                            @endif
                         </div>
                         <p class="text-xs text-slate-600">NIT: {{ $filial->nit }}</p>
                     </div>

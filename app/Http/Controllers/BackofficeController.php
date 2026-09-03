@@ -32,12 +32,12 @@ class BackofficeController extends Controller
         $totalUsuarios = User::where('is_superadmin', false)->count();
 
         $empresas = Empresa::whereNull('empresa_padre_id')
-            ->with(['filiales.usuarios', 'filiales'])
+            ->with(['filiales.usuarios', 'filiales.plan', 'plan'])
             ->withCount(['filiales', 'usuarios'])
             ->orderBy('razon_social')
             ->get();
 
-        $todasEmpresas = Empresa::orderBy('razon_social')->get();
+        $todasEmpresas = Empresa::with('plan')->orderBy('razon_social')->get();
 
         $usuarios = User::where('is_superadmin', false)
             ->with(['empresas', 'roles'])
@@ -55,7 +55,7 @@ class BackofficeController extends Controller
     public function empresasIndex()
     {
         $empresas = Empresa::whereNull('empresa_padre_id')
-            ->with('filiales')
+            ->with(['filiales.plan', 'plan'])
             ->withCount('usuarios')
             ->orderBy('razon_social')
             ->get();
@@ -98,19 +98,23 @@ class BackofficeController extends Controller
             ->get();
 
         $adminUsuarios = $empresa->usuarios()->wherePivot('rol', 'admin')->get();
+        $planes = \App\Models\Plan::where('activo', true)->orderBy('orden')->get();
 
-        return view('backoffice.empresas.editar', compact('empresa', 'matrices', 'adminUsuarios'));
+        return view('backoffice.empresas.editar', compact('empresa', 'matrices', 'adminUsuarios', 'planes'));
     }
 
     public function empresasUpdate(Request $request, Empresa $empresa)
     {
         $data = $request->validate([
-            'razon_social'     => 'required|string|max:200',
-            'nit'              => 'required|string|max:20',
-            'email'            => 'nullable|email|max:200',
-            'telefono'         => 'nullable|string|max:20',
-            'municipio'        => 'nullable|string|max:100',
-            'empresa_padre_id' => 'nullable|exists:empresa,id',
+            'razon_social'               => 'required|string|max:200',
+            'nit'                        => 'required|string|max:20',
+            'email'                      => 'nullable|email|max:200',
+            'telefono'                   => 'nullable|string|max:20',
+            'municipio'                  => 'nullable|string|max:100',
+            'empresa_padre_id'           => 'nullable|exists:empresa,id',
+            'plan_id'                    => 'nullable|exists:planes,id',
+            'plan_vencimiento'           => 'nullable|date',
+            'plan_facturas_adicionales'  => 'nullable|integer|min:0',
         ]);
 
         if (isset($data['empresa_padre_id']) && $data['empresa_padre_id'] == $empresa->id) {
@@ -119,7 +123,7 @@ class BackofficeController extends Controller
 
         $empresa->update($data);
 
-        return redirect()->route('backoffice.empresas')->with('success', 'Empresa actualizada.');
+        return redirect()->route('backoffice.empresas')->with('success', 'Empresa y plan actualizados.');
     }
 
     public function empresasDestroy(Empresa $empresa)
@@ -387,5 +391,90 @@ class BackofficeController extends Controller
         } catch (\Throwable $e) {
             return back()->with('error', 'Error al probar conexión: ' . $e->getMessage());
         }
+    }
+
+    // ── Gestión de Planes y Paquetes ───────────────────────────────────────
+
+    public function planesIndex()
+    {
+        $planes = \App\Models\Plan::withCount('empresas')
+            ->orderBy('orden')
+            ->orderBy('precio')
+            ->get();
+
+        $totalEmpresasConPlan = Empresa::whereNotNull('plan_id')->count();
+
+        return view('backoffice.planes.index', compact('planes', 'totalEmpresasConPlan'));
+    }
+
+    public function planesStore(Request $request)
+    {
+        $data = $request->validate([
+            'nombre'               => 'required|string|max:100',
+            'descripcion'          => 'nullable|string|max:500',
+            'precio'               => 'required|numeric|min:0',
+            'limite_facturas_mes'  => 'nullable|integer|min:1',
+            'limite_usuarios'      => 'nullable|integer|min:1',
+            'limite_productos'     => 'nullable|integer|min:1',
+            'color'                => 'required|string|in:blue,amber,emerald,purple,rose,indigo',
+            'soporta_dian'         => 'nullable|boolean',
+            'soporta_pos'          => 'nullable|boolean',
+            'soporta_nomina'       => 'nullable|boolean',
+            'soporta_contabilidad' => 'nullable|boolean',
+            'destacado'            => 'nullable|boolean',
+            'activo'               => 'nullable|boolean',
+            'orden'                => 'nullable|integer',
+        ]);
+
+        $data['soporta_dian']         = $request->boolean('soporta_dian');
+        $data['soporta_pos']          = $request->boolean('soporta_pos');
+        $data['soporta_nomina']       = $request->boolean('soporta_nomina');
+        $data['soporta_contabilidad'] = $request->boolean('soporta_contabilidad');
+        $data['destacado']            = $request->boolean('destacado');
+        $data['activo']               = $request->boolean('activo', true);
+
+        \App\Models\Plan::create($data);
+
+        return redirect()->route('backoffice.planes')->with('success', 'Plan creado exitosamente.');
+    }
+
+    public function planesUpdate(Request $request, \App\Models\Plan $plan)
+    {
+        $data = $request->validate([
+            'nombre'               => 'required|string|max:100',
+            'descripcion'          => 'nullable|string|max:500',
+            'precio'               => 'required|numeric|min:0',
+            'limite_facturas_mes'  => 'nullable|integer|min:1',
+            'limite_usuarios'      => 'nullable|integer|min:1',
+            'limite_productos'     => 'nullable|integer|min:1',
+            'color'                => 'required|string|in:blue,amber,emerald,purple,rose,indigo',
+            'soporta_dian'         => 'nullable|boolean',
+            'soporta_pos'          => 'nullable|boolean',
+            'soporta_nomina'       => 'nullable|boolean',
+            'soporta_contabilidad' => 'nullable|boolean',
+            'destacado'            => 'nullable|boolean',
+            'activo'               => 'nullable|boolean',
+            'orden'                => 'nullable|integer',
+        ]);
+
+        $data['soporta_dian']         = $request->boolean('soporta_dian');
+        $data['soporta_pos']          = $request->boolean('soporta_pos');
+        $data['soporta_nomina']       = $request->boolean('soporta_nomina');
+        $data['soporta_contabilidad'] = $request->boolean('soporta_contabilidad');
+        $data['destacado']            = $request->boolean('destacado');
+        $data['activo']               = $request->boolean('activo', true);
+
+        $plan->update($data);
+
+        return redirect()->route('backoffice.planes')->with('success', 'Plan actualizado.');
+    }
+
+    public function planesDestroy(\App\Models\Plan $plan)
+    {
+        $nombre = $plan->nombre;
+        $plan->empresas()->update(['plan_id' => null]);
+        $plan->delete();
+
+        return redirect()->route('backoffice.planes')->with('success', "Plan '{$nombre}' eliminado.");
     }
 }
