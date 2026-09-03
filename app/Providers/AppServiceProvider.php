@@ -55,5 +55,44 @@ class AppServiceProvider extends ServiceProvider
         Producto::observe(AuditoriaObserver::class);
         Categoria::observe(AuditoriaObserver::class);
         UnidadMedida::observe(AuditoriaObserver::class);
+
+        // Registro automático de accesos (Login / Logout)
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Login::class, function ($event) {
+            try {
+                if (! $event->user) return;
+                $req = request();
+                $ua = $req ? $req->userAgent() : '';
+                [$navegador, $dispositivo] = \App\Models\LoginLog::parsearUserAgent($ua);
+
+                \App\Models\LoginLog::create([
+                    'user_id'     => $event->user->id,
+                    'ip_address'  => $req ? $req->ip() : '127.0.0.1',
+                    'user_agent'  => $ua,
+                    'navegador'   => $navegador,
+                    'dispositivo' => $dispositivo,
+                    'accion'      => 'login',
+                    'fecha_hora'  => now('America/Bogota'),
+                ]);
+            } catch (\Throwable) {}
+        });
+
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Logout::class, function ($event) {
+            try {
+                if (! $event->user) return;
+                $req = request();
+                $ua = $req ? $req->userAgent() : '';
+                [$navegador, $dispositivo] = \App\Models\LoginLog::parsearUserAgent($ua);
+
+                \App\Models\LoginLog::create([
+                    'user_id'     => $event->user->id,
+                    'ip_address'  => $req ? $req->ip() : '127.0.0.1',
+                    'user_agent'  => $ua,
+                    'navegador'   => $navegador,
+                    'dispositivo' => $dispositivo,
+                    'accion'      => 'logout',
+                    'fecha_hora'  => now('America/Bogota'),
+                ]);
+            } catch (\Throwable) {}
+        });
     }
 }

@@ -114,7 +114,17 @@
          BLOQUE 2: HISTORIAL
     ════════════════════════════════════════════════════════ --}}
     <div>
-        <h2 class="font-display font-bold text-xl mb-4">Historial de Accesos</h2>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+                <h2 class="font-display font-bold text-xl">Historial de Ingresos y Salidas</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Registro en tiempo real de accesos, dispositivos, direcciones IP y horarios de turnos</p>
+            </div>
+            <a href="{{ route('auditoria.index') }}"
+               class="inline-flex items-center gap-2 bg-[#1a2235] hover:bg-[#222f48] border border-[#1e2d47]
+                      hover:border-amber-500/50 text-amber-400 font-semibold text-xs px-3.5 py-2 rounded-xl transition-colors">
+                <i class="fas fa-clipboard-list"></i> Ver Auditoría de Operaciones
+            </a>
+        </div>
 
         {{-- Filtros --}}
         <form method="GET" action="{{ route('sesiones.index') }}"
@@ -136,8 +146,8 @@
                             class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-3 py-2
                                    text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
                         <option value="">Todas</option>
-                        <option value="login"  {{ request('accion') === 'login'  ? 'selected' : '' }}>Login</option>
-                        <option value="logout" {{ request('accion') === 'logout' ? 'selected' : '' }}>Logout</option>
+                        <option value="login"  {{ request('accion') === 'login'  ? 'selected' : '' }}>Login (Ingreso)</option>
+                        <option value="logout" {{ request('accion') === 'logout' ? 'selected' : '' }}>Logout (Salida)</option>
                     </select>
                 </div>
 
@@ -183,8 +193,8 @@
                 <thead>
                     <tr class="border-b border-[#1e2d47] text-xs text-slate-500 uppercase tracking-wider">
                         <th class="px-5 py-3 text-left">Usuario</th>
-                        <th class="px-5 py-3 text-left hidden md:table-cell">IP</th>
-                        <th class="px-5 py-3 text-left hidden lg:table-cell">Navegador</th>
+                        <th class="px-5 py-3 text-left hidden md:table-cell">Dirección IP</th>
+                        <th class="px-5 py-3 text-left hidden lg:table-cell">Navegador y Equipo</th>
                         <th class="px-5 py-3 text-center">Acción</th>
                         <th class="px-5 py-3 text-right">Fecha y Hora</th>
                     </tr>
@@ -193,32 +203,47 @@
                     @foreach($historial as $log)
                     <tr class="hover:bg-[#1a2235] transition-colors">
                         <td class="px-5 py-3">
-                            <div class="font-semibold text-slate-200 text-sm">{{ $log->user->name ?? '—' }}</div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-semibold text-slate-200 text-sm">{{ $log->user->name ?? '—' }}</span>
+                                @if($log->user?->cargo)
+                                <span class="text-[10px] bg-[#1e2d47] text-slate-400 px-1.5 py-0.5 rounded font-medium">{{ $log->user->cargo }}</span>
+                                @endif
+                            </div>
                             <div class="text-xs text-slate-500">{{ $log->user->email ?? '' }}</div>
                         </td>
                         <td class="px-5 py-3 text-slate-400 text-xs hidden md:table-cell font-mono">
-                            {{ $log->ip_address ?? '—' }}
+                            <div class="inline-flex items-center gap-1 bg-[#141c2e] px-2 py-0.5 rounded border border-[#1e2d47]">
+                                <i class="fas fa-network-wired text-[10px] text-slate-500"></i>
+                                {{ $log->ip_address ?? '127.0.0.1' }}
+                            </div>
                         </td>
                         <td class="px-5 py-3 hidden lg:table-cell">
-                            <div class="text-xs text-slate-400">{{ $log->navegador }}</div>
-                            <div class="text-xs text-slate-600">{{ $log->dispositivo }}</div>
+                            <div class="text-xs text-slate-300 font-medium flex items-center gap-1.5">
+                                <i class="fas fa-globe text-slate-500 text-[11px]"></i>
+                                {{ $log->navegador }}
+                            </div>
+                            <div class="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
+                                <i class="fas fa-desktop text-slate-600 text-[10px]"></i>
+                                {{ $log->dispositivo }}
+                            </div>
                         </td>
                         <td class="px-5 py-3 text-center">
                             @if($log->accion === 'login')
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1
-                                         bg-emerald-500/10 text-emerald-400 rounded-lg text-xs font-semibold">
-                                <i class="fas fa-sign-in-alt"></i> Login
+                                         bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-semibold">
+                                <i class="fas fa-sign-in-alt"></i> Ingreso
                             </span>
                             @else
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1
-                                         bg-slate-500/10 text-slate-400 rounded-lg text-xs font-semibold">
-                                <i class="fas fa-sign-out-alt"></i> Logout
+                                         bg-slate-500/10 text-slate-400 border border-slate-500/20 rounded-lg text-xs font-semibold">
+                                <i class="fas fa-sign-out-alt"></i> Salida
                             </span>
                             @endif
                         </td>
                         <td class="px-5 py-3 text-right text-xs text-slate-400">
-                            <div>{{ $log->fecha_hora->format('d/m/Y') }}</div>
-                            <div class="text-slate-600">{{ $log->fecha_hora->format('h:i:s A') }}</div>
+                            <div class="font-medium text-slate-200">{{ $log->fecha_hora->format('d/m/Y') }}</div>
+                            <div class="text-amber-400/80 font-mono">{{ $log->fecha_hora->format('h:i:s A') }}</div>
+                            <div class="text-[11px] text-slate-500">{{ $log->fecha_hora->diffForHumans() }}</div>
                         </td>
                     </tr>
                     @endforeach

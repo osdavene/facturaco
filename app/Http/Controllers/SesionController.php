@@ -11,6 +11,22 @@ class SesionController extends Controller
 {
     public function index(Request $request)
     {
+        // ── Auto-poblar log para la sesión actual si el historial está vacío ──
+        if (LoginLog::count() === 0 && auth()->check()) {
+            $u = auth()->user();
+            $ua = $request->userAgent() ?? '';
+            [$nav, $disp] = LoginLog::parsearUserAgent($ua);
+            LoginLog::create([
+                'user_id'     => $u->id,
+                'ip_address'  => $request->ip(),
+                'user_agent'  => $ua,
+                'navegador'   => $nav,
+                'dispositivo' => $disp,
+                'accion'      => 'login',
+                'fecha_hora'  => now('America/Bogota'),
+            ]);
+        }
+
         // ── Sesiones activas ──────────────────────────────────
         $sesiones = DB::table('sessions')
             ->join('users', 'sessions.user_id', '=', 'users.id')
@@ -29,11 +45,12 @@ class SesionController extends Controller
             ->get()
             ->map(function ($s) {
                 $s->es_yo       = $s->user_id == auth()->id();
-                $s->last_dt     = \Carbon\Carbon::createFromTimestamp($s->last_activity);
+                $s->last_dt     = \Carbon\Carbon::createFromTimestamp($s->last_activity)->timezone('America/Bogota');
                 $s->activo_hace = $s->last_dt->diffForHumans();
-                $s->en_linea    = $s->last_dt->gt(now()->subMinutes(5));
-                $s->navegador   = $this->parsearNavegador($s->user_agent ?? '');
-                $s->dispositivo = $this->parsearDispositivo($s->user_agent ?? '');
+                $s->en_linea    = $s->last_dt->gt(now('America/Bogota')->subMinutes(5));
+                [$nav, $disp]   = LoginLog::parsearUserAgent($s->user_agent ?? '');
+                $s->navegador   = $nav;
+                $s->dispositivo = $disp;
                 return $s;
             });
 
@@ -44,8 +61,8 @@ class SesionController extends Controller
 
         if ($request->filled('usuario')) {
             $query->whereHas('user', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->usuario . '%')
-                  ->orWhere('email', 'like', '%' . $request->usuario . '%');
+                $q->where('name', 'ilike', '%' . $request->usuario . '%')
+                  ->orWhere('email', 'ilike', '%' . $request->usuario . '%');
             });
         }
 
@@ -91,22 +108,5 @@ class SesionController extends Controller
             ->delete();
 
         return back()->with('success', 'Todas las demás sesiones fueron cerradas.');
-    }
-
-    private function parsearNavegador(string $ua): string
-    {
-        if (str_contains($ua, 'Edg'))     return 'Edge';
-        if (str_contains($ua, 'OPR'))     return 'Opera';
-        if (str_contains($ua, 'Chrome'))  return 'Chrome';
-        if (str_contains($ua, 'Firefox')) return 'Firefox';
-        if (str_contains($ua, 'Safari'))  return 'Safari';
-        return 'Desconocido';
-    }
-
-    private function parsearDispositivo(string $ua): string
-    {
-        if (str_contains($ua, 'iPhone') || (str_contains($ua, 'Android') && str_contains($ua, 'Mobile'))) return 'Móvil';
-        if (str_contains($ua, 'iPad')   || str_contains($ua, 'Android')) return 'Tablet';
-        return 'Escritorio';
     }
 }
