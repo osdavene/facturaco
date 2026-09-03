@@ -95,9 +95,10 @@
             </thead>
             <tbody>
                 @forelse($remisiones as $remision)
-                <tr class="table-row">
+                <tr class="table-row cursor-pointer hover:bg-[#141d2e] transition-colors group"
+                    onclick="if(!event.target.closest('a, button')) window.location.href='{{ route('remisiones.show', $remision) }}'">
                     <td class="px-5 py-4">
-                        <div class="font-mono text-sm font-semibold text-amber-500">
+                        <div class="font-mono text-sm font-semibold text-amber-500 group-hover:underline">
                             {{ $remision->numero }}
                         </div>
                     </td>

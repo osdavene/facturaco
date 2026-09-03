@@ -101,13 +101,14 @@
             </thead>
             <tbody>
                 @forelse($cotizaciones as $cotizacion)
-                <tr class="table-row">
-                    <td class="px-4 py-4">
+                <tr class="table-row cursor-pointer hover:bg-[#141d2e] transition-colors group"
+                    onclick="if(!event.target.closest('input, a, button, .bulk-item')) window.location.href='{{ route('cotizaciones.show', $cotizacion) }}'">
+                    <td class="px-4 py-4" onclick="event.stopPropagation()">
                         <input type="checkbox" class="bulk-item w-4 h-4 rounded border-[#2d3f5c]
                                bg-[#1a2235] accent-amber-500 cursor-pointer" value="{{ $cotizacion->id }}">
                     </td>
                     <td class="px-5 py-4">
-                        <div class="font-mono text-sm font-semibold text-blue-400">
+                        <div class="font-mono text-sm font-semibold text-blue-400 group-hover:underline">
                             {{ $cotizacion->numero }}
                         </div>
                     </td>
