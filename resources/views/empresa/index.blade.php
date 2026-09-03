@@ -177,14 +177,21 @@
                     Resolución DIAN — Factura Electrónica
                 </h2>
 
-                <div class="flex items-center gap-3 mb-5 p-3 bg-[#1a2235] rounded-xl">
-                    <input type="checkbox" name="factura_electronica" value="1"
-                           id="factura_electronica"
-                           class="w-4 h-4 accent-amber-500"
-                           {{ old('factura_electronica', $empresa->factura_electronica) ? 'checked':'' }}>
-                    <label for="factura_electronica" class="text-sm text-slate-300 cursor-pointer">
-                        Habilitado para <strong>Factura Electrónica DIAN</strong>
-                    </label>
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5 p-3.5 bg-[#1a2235] border border-[#1e2d47] rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" name="factura_electronica" value="1"
+                               id="factura_electronica"
+                               class="w-4 h-4 accent-amber-500"
+                               {{ old('factura_electronica', $empresa->factura_electronica) ? 'checked':'' }}>
+                        <label for="factura_electronica" class="text-sm text-slate-300 cursor-pointer">
+                            Habilitado para <strong>Factura Electrónica DIAN</strong>
+                        </label>
+                    </div>
+                    <button type="button" onclick="cargarResolucionPruebas()"
+                            class="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5">
+                        <i class="fas fa-magic text-xs"></i>
+                        <span>Cargar Resolución Oficial de Pruebas (Sandbox)</span>
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1012,8 +1019,21 @@ function toggleEventsKey() {
         input.type = 'password';
         icon.classList.replace('fa-eye-slash', 'fa-eye');
     }
+function cargarResolucionPruebas() {
+    document.getElementById('factura_electronica').checked = true;
+    document.querySelector('input[name="prefijo_factura"]').value = 'SETP';
+    document.querySelector('input[name="resolucion_numero"]').value = '18760000001';
+    document.querySelector('input[name="resolucion_fecha"]').value = '2019-01-19';
+    document.querySelector('input[name="resolucion_vencimiento"]').value = '2030-01-19';
+    document.querySelector('input[name="consecutivo_desde"]').value = '990000000';
+    document.querySelector('input[name="consecutivo_hasta"]').value = '995000000';
+    
+    // Feedback visual
+    const btn = event.currentTarget;
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check text-xs"></i> ¡Cargada!';
+    setTimeout(() => { btn.innerHTML = oldText; }, 2000);
 }
-
 </script>
 @endpush
 
