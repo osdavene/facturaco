@@ -16,10 +16,22 @@ Route::prefix('contabilidad')->name('contabilidad.')->middleware('can:ver recibo
     });
 
     Route::prefix('libro-diario')->name('libro-diario.')->group(function () {
-        Route::get('/',          [AsientoContableController::class, 'index'])->name('index');
-        Route::get('/{asiento}', [AsientoContableController::class, 'show']) ->name('show');
+        Route::get('/',                     [AsientoContableController::class, 'index'])   ->name('index');
+        Route::get('/crear',                [AsientoContableController::class, 'create'])  ->name('create')->middleware('can:crear recibos');
+        Route::post('/',                    [AsientoContableController::class, 'store'])   ->name('store') ->middleware('can:crear recibos');
+        Route::get('/exportar',             [AsientoContableController::class, 'exportar'])->name('exportar');
+        Route::get('/{asiento}',            [AsientoContableController::class, 'show'])    ->name('show');
+        Route::delete('/{asiento}/anular',  [AsientoContableController::class, 'anular'])  ->name('anular')->middleware('can:crear recibos');
     });
 
-    Route::get('/balance', [ReporteContableController::class, 'balance'])->name('reportes.balance');
-    Route::get('/pyg',     [ReporteContableController::class, 'pyg'])    ->name('reportes.pyg');
+    // Reportes Contables
+    Route::get('/balance-prueba',          [ReporteContableController::class, 'balancePrueba'])       ->name('reportes.balance-prueba');
+    Route::get('/balance-prueba/exportar', [ReporteContableController::class, 'exportarBalancePrueba'])->name('reportes.balance-prueba.exportar');
+
+    Route::get('/auxiliar',                [ReporteContableController::class, 'auxiliar'])            ->name('reportes.auxiliar');
+    Route::get('/auxiliar/exportar',       [ReporteContableController::class, 'exportarAuxiliar'])     ->name('reportes.auxiliar.exportar');
+
+    Route::get('/balance',                 [ReporteContableController::class, 'balance'])             ->name('reportes.balance');
+    Route::get('/pyg',                     [ReporteContableController::class, 'pyg'])                 ->name('reportes.pyg');
 });
+

@@ -128,6 +128,10 @@ class NotaCreditoController extends Controller
                 $nuevoPagado = max(0, $factura->total_pagado - ($subtotal + $totalIva));
                 $factura->update(['total_pagado' => $nuevoPagado]);
             }
+
+            try {
+                (new \App\Services\ContabilidadService())->asientoNotaCredito($nota);
+            } catch (\Throwable) {}
         });
 
         return redirect()->route('notas_credito.index')

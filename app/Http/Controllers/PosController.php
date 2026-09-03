@@ -153,6 +153,10 @@ class PosController extends Controller
                 }
             }
 
+            try {
+                (new \App\Services\ContabilidadService())->asientoFactura($factura);
+            } catch (\Throwable) {}
+
             return $factura->id;
         });
 

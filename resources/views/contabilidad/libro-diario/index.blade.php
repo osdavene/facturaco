@@ -7,7 +7,19 @@
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
         <h1 class="font-display font-bold text-2xl">Libro Diario</h1>
-        <p class="text-slate-500 text-sm mt-1">Asientos contables generados automáticamente</p>
+        <p class="text-slate-500 text-sm mt-1">Asientos y comprobantes contables por partida doble</p>
+    </div>
+    <div class="flex items-center gap-2.5">
+        <a href="{{ route('contabilidad.libro-diario.exportar', request()->query()) }}"
+           class="inline-flex items-center gap-2 bg-[#1a2235] hover:bg-[#222f48] border border-[#1e2d47]
+                  hover:border-emerald-500/50 text-emerald-400 font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+        </a>
+        <a href="{{ route('contabilidad.libro-diario.create') }}"
+           class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600
+                  text-black font-bold px-4 py-2.5 rounded-xl text-sm transition-colors shadow-lg shadow-amber-500/20">
+            <i class="fas fa-plus"></i> Nuevo Asiento
+        </a>
     </div>
 </div>
 

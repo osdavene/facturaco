@@ -263,6 +263,16 @@
                                 :active="request()->routeIs('contabilidad.libro-diario.*')">
                         Libro Diario
                     </x-nav-item>
+                    <x-nav-item href="{{ route('contabilidad.reportes.balance-prueba') }}"
+                                icon="fa-scale-balanced"
+                                :active="request()->routeIs('contabilidad.reportes.balance-prueba*')">
+                        Balance de Prueba
+                    </x-nav-item>
+                    <x-nav-item href="{{ route('contabilidad.reportes.auxiliar') }}"
+                                icon="fa-table-list"
+                                :active="request()->routeIs('contabilidad.reportes.auxiliar*')">
+                        Libro Auxiliar
+                    </x-nav-item>
                     <x-nav-item href="{{ route('contabilidad.reportes.balance') }}"
                                 icon="fa-balance-scale"
                                 :active="request()->routeIs('contabilidad.reportes.balance')">
