@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use App\Models\Cotizacion;
 use App\Models\CotizacionItem;
 use App\Http\Requests\StoreCotizacionRequest;
