@@ -11,6 +11,22 @@ class StoreRemisionRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('items') && is_array($this->items)) {
+            $items = $this->items;
+            foreach ($items as $k => $item) {
+                if (isset($item['precio_unitario']) && is_string($item['precio_unitario'])) {
+                    $items[$k]['precio_unitario'] = (float) str_replace(['.', '$', ' '], '', str_replace(',', '.', $item['precio_unitario']));
+                }
+                if (isset($item['cantidad']) && is_string($item['cantidad'])) {
+                    $items[$k]['cantidad'] = (float) str_replace(['.', '$', ' '], '', str_replace(',', '.', $item['cantidad']));
+                }
+            }
+            $this->merge(['items' => $items]);
+        }
+    }
+
     public function rules(): array
     {
         return [

@@ -419,6 +419,53 @@ function agregarItem(data = {}) {
     calcularTotales();
 }
 
+function formatMiles(val) {
+    if (val === '' || val === null || val === undefined) return '0';
+    const num = parseFloat(val);
+    if (isNaN(num)) return '0';
+    const partes = num.toString().split('.');
+    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return partes.join(',');
+}
+
+function parseMiles(str) {
+    if (!str) return 0;
+    const limpio = str.toString().replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, '');
+    return parseFloat(limpio) || 0;
+}
+
+function handlePrecioInput(id, input) {
+    const raw = parseMiles(input.value);
+    const item = items.find(i => i.id === id);
+    if (item) {
+        item.precio_unitario = raw;
+        item.sin_precio = raw === 0;
+        const hidden = document.getElementById('precio-raw-' + id);
+        if (hidden) hidden.value = raw;
+        actualizarFilaTotales(id);
+        calcularTotales();
+    }
+}
+
+function cambiarCantidadItem(id, delta) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    const actual = parseFloat(item.cantidad) || 1;
+    const nueva = Math.max(1, parseFloat((actual + delta).toFixed(2)));
+    item.cantidad = nueva;
+    renderItems();
+    calcularTotales();
+}
+
+function updateCantidadItem(id, val) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    const parsed = parseFloat(val.toString().replace(',', '.')) || 1;
+    item.cantidad = Math.max(0.01, parsed);
+    actualizarFilaTotales(id);
+    calcularTotales();
+}
+
 function eliminarItem(id) {
     items = items.filter(i => i.id !== id);
     renderItems();
@@ -433,7 +480,7 @@ function updateItem(id, campo, valor) {
         : valor;
     if (campo === 'precio_unitario') {
         if (item.precio_unitario > 0) item.sin_precio = false;
-        const input = document.querySelector(`tr[data-id="${id}"] input[name*="precio_unitario"]`);
+        const input = document.getElementById('precio-display-' + id);
         if (input) {
             input.classList.toggle('border-amber-500', item.sin_precio && item.precio_unitario === 0);
             input.classList.toggle('text-amber-400',   item.sin_precio && item.precio_unitario === 0);
@@ -499,25 +546,34 @@ function renderItems() {
                      style="min-width:320px">
                 </div>
             </td>
-            <td class="py-2 px-2 w-20">
-                <input type="text"
-                       inputmode="decimal"
-                       name="items[${idx}][cantidad]"
-                       value="${item.cantidad}"
-                       onchange="updateItem(${item.id},'cantidad',this.value)"
-                       class="w-full bg-transparent border-b border-[#1e2d47] text-sm text-slate-200
-                              text-center py-1 focus:outline-none focus:border-amber-500">
+            <td class="py-2 px-1 w-24">
+                <div class="flex items-center bg-[#141c2e] border border-[#1e2d47] rounded-lg overflow-hidden">
+                    <button type="button" onclick="cambiarCantidadItem(${item.id}, -1)"
+                            class="w-6 h-7 flex items-center justify-center text-slate-400 hover:text-amber-400 hover:bg-[#1e2d47] transition-colors flex-shrink-0">
+                        <i class="fas fa-minus text-[9px]"></i>
+                    </button>
+                    <input type="text"
+                           inputmode="decimal"
+                           name="items[${idx}][cantidad]"
+                           value="${item.cantidad}"
+                           onchange="updateCantidadItem(${item.id}, this.value)"
+                           class="w-10 bg-transparent text-xs sm:text-sm text-slate-200 text-center py-0.5 focus:outline-none font-semibold">
+                    <button type="button" onclick="cambiarCantidadItem(${item.id}, 1)"
+                            class="w-6 h-7 flex items-center justify-center text-slate-400 hover:text-amber-400 hover:bg-[#1e2d47] transition-colors flex-shrink-0">
+                        <i class="fas fa-plus text-[9px]"></i>
+                    </button>
+                </div>
             </td>
-            <td class="py-2 px-2 w-28">
+            <td class="py-2 px-2 w-32">
+                <input type="hidden" name="items[${idx}][precio_unitario]" id="precio-raw-${item.id}" value="${item.precio_unitario}">
                 <input type="text"
-                       inputmode="decimal"
-                       name="items[${idx}][precio_unitario]"
-                       value="${item.precio_unitario}"
-                       onchange="updateItem(${item.id},'precio_unitario',this.value)"
-                       class="w-full bg-transparent border-b text-sm text-right py-1 focus:outline-none transition-colors
-                              ${item.sin_precio && item.precio_unitario===0
-                                ? 'border-amber-500 text-amber-400 focus:border-amber-300'
-                                : 'border-[#1e2d47] text-slate-200 focus:border-amber-500'}">
+                       inputmode="numeric"
+                       id="precio-display-${item.id}"
+                       value="${formatMiles(item.precio_unitario)}"
+                       oninput="handlePrecioInput(${item.id}, this)"
+                       onblur="this.value = formatMiles(items.find(i=>i.id===${item.id})?.precio_unitario ?? 0)"
+                       placeholder="0"
+                       class="w-full bg-[#141c2e] border ${item.sin_precio && item.precio_unitario===0 ? 'border-amber-500 text-amber-400' : 'border-[#1e2d47] text-slate-200'} rounded-lg text-sm text-right px-2.5 py-1.5 focus:outline-none focus:border-amber-500 font-mono font-semibold transition-colors">
             </td>
             <td class="py-2 px-2 w-16 hidden sm:table-cell">
                 <input type="text"
