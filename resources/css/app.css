@@ -24,6 +24,23 @@ textarea::placeholder {
     opacity: 1 !important;
 }
 
+/* ══ Búsquedas en Mayúsculas automáticas ══ */
+input[placeholder*="Buscar"],
+input[placeholder*="buscar"],
+input[type="search"],
+#busqueda-global,
+input[id*="buscar"],
+input[name*="buscar"] {
+    text-transform: uppercase;
+}
+
+input[placeholder*="Buscar"]::placeholder,
+input[placeholder*="buscar"]::placeholder,
+input[type="search"]::placeholder,
+#busqueda-global::placeholder {
+    text-transform: none;
+}
+
 /* Inputs deshabilitados */
 input[disabled], textarea[disabled], select[disabled] {
     color: #475569 !important;

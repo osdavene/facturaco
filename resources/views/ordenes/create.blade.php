@@ -266,7 +266,7 @@ let timerProv;
 document.getElementById('buscar-proveedor').addEventListener('input', function() {
     clearTimeout(timerProv);
     const q = this.value.trim();
-    if (q.length < 2) { document.getElementById('resultados-proveedor').classList.add('hidden'); return; }
+    if (q.length < 1) { document.getElementById('resultados-proveedor').classList.add('hidden'); return; }
     timerProv = setTimeout(async () => {
         const res  = await fetch(`/api/proveedores/buscar?q=${encodeURIComponent(q)}`);
         const data = await res.json();
@@ -279,7 +279,7 @@ document.getElementById('buscar-proveedor').addEventListener('input', function()
                 <div class="text-xs text-slate-500">${p.tipo_documento}: ${p.numero_documento}</div>
             </div>`).join('');
         div.classList.remove('hidden');
-    }, 300);
+    }, 160);
 });
 
 function seleccionarProveedor(p) {
@@ -315,7 +315,7 @@ let timerProd;
 document.getElementById('buscar-producto').addEventListener('input', function() {
     clearTimeout(timerProd);
     const q = this.value.trim();
-    if (q.length < 2) { document.getElementById('resultados-producto').classList.add('hidden'); return; }
+    if (q.length < 1) { document.getElementById('resultados-producto').classList.add('hidden'); return; }
     timerProd = setTimeout(async () => {
         const res  = await fetch(`/api/productos/buscar?q=${encodeURIComponent(q)}`);
         const data = await res.json();
@@ -333,7 +333,7 @@ document.getElementById('buscar-producto').addEventListener('input', function() 
                 </div>
             </div>`).join('');
         div.classList.remove('hidden');
-    }, 300);
+    }, 160);
 });
 
 async function agregarProducto(p) {

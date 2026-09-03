@@ -330,7 +330,7 @@ let timerCli;
 document.getElementById('buscar-cliente').addEventListener('input', function() {
     clearTimeout(timerCli);
     const q = this.value.trim();
-    if (q.length < 2) { document.getElementById('resultados-cliente').classList.add('hidden'); return; }
+    if (q.length < 1) { document.getElementById('resultados-cliente').classList.add('hidden'); return; }
     timerCli = setTimeout(async () => {
         const res  = await fetch(`/api/clientes/buscar?q=${encodeURIComponent(q)}`);
         const data = await res.json();
@@ -346,7 +346,7 @@ document.getElementById('buscar-cliente').addEventListener('input', function() {
                 <div class="text-xs text-slate-500">${c.tipo_documento}: ${c.numero_documento}</div>
             </div>`).join('');
         div.classList.remove('hidden');
-    }, 300);
+    }, 160);
 });
 
 function seleccionarCliente(c) {
@@ -366,7 +366,7 @@ let timerProd;
 document.getElementById('buscar-producto').addEventListener('input', function() {
     clearTimeout(timerProd);
     const q = this.value.trim();
-    if (q.length < 2) { document.getElementById('resultados-producto').classList.add('hidden'); return; }
+    if (q.length < 1) { document.getElementById('resultados-producto').classList.add('hidden'); return; }
     timerProd = setTimeout(async () => {
         const res  = await fetch(`/api/productos/buscar?q=${encodeURIComponent(q)}`);
         const data = await res.json();
@@ -385,7 +385,7 @@ document.getElementById('buscar-producto').addEventListener('input', function() 
                 </div>
             </div>`).join('');
         div.classList.remove('hidden');
-    }, 300);
+    }, 160);
 });
 
 function agregarProducto(p) {

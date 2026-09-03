@@ -18,7 +18,7 @@ class BusquedaController extends Controller
     {
         $q = trim($request->q ?? '');
 
-        if (strlen($q) < 2) {
+        if (strlen($q) < 1) {
             return response()->json(['resultados' => [], 'query' => $q]);
         }
 

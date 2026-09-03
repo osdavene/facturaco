@@ -293,7 +293,7 @@ let timerCliente;
 document.getElementById('buscar-cliente').addEventListener('input', function() {
     clearTimeout(timerCliente);
     const q = this.value.trim();
-    if (q.length < 2) {
+    if (q.length < 1) {
         document.getElementById('resultados-cliente').classList.add('hidden');
         return;
     }
@@ -311,7 +311,7 @@ document.getElementById('buscar-cliente').addEventListener('input', function() {
                 <div class="text-xs text-slate-500">${c.tipo_documento}: ${c.numero_documento}</div>
             </div>`).join('');
         div.classList.remove('hidden');
-    }, 300);
+    }, 160);
 });
 
 function seleccionarCliente(c) {
@@ -352,7 +352,7 @@ let timerProducto;
 document.getElementById('buscar-producto').addEventListener('input', function() {
     clearTimeout(timerProducto);
     const q = this.value.trim();
-    if (q.length < 2) {
+    if (q.length < 1) {
         document.getElementById('resultados-producto').classList.add('hidden');
         return;
     }
@@ -590,7 +590,7 @@ function buscarEnLinea(itemId, q) {
     clearTimeout(timerLinea[itemId]);
     const dropdown = document.getElementById('dropdown-linea-' + itemId);
     if (!dropdown) return;
-    if (q.length < 2) { dropdown.classList.add('hidden'); return; }
+    if (q.length < 1) { dropdown.classList.add('hidden'); return; }
 
     timerLinea[itemId] = setTimeout(async () => {
         const res  = await fetch(`/api/productos/buscar?q=${encodeURIComponent(q)}&lista_precio=${listaPrecios}`);
@@ -610,7 +610,7 @@ function buscarEnLinea(itemId, q) {
                 </div>
             </div>`).join('');
         dropdown.classList.remove('hidden');
-    }, 280);
+    }, 160);
 }
 
 function seleccionarEnLinea(itemId, p) {

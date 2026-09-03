@@ -802,7 +802,7 @@
             clearTimeout(timer);
             clearBtn.classList.toggle('hidden', q.length === 0);
 
-            if (q.length < 2) {
+            if (q.length < 1) {
                 dropdown.classList.add('hidden');
                 dropdown.innerHTML = '';
                 loading.classList.add('hidden');
@@ -893,7 +893,7 @@
                     clearBtn.classList.remove('hidden');
                     console.error('Error búsqueda:', err);
                 }
-            }, 350);
+            }, 180);
         });
 
         // Escape cierra
@@ -930,6 +930,32 @@
         if (dropdown)   dropdown.classList.add('hidden');
         if (clearBtn)   clearBtn.classList.add('hidden');
     }
+
+    // ── Manejador Universal de Mayúsculas en Buscadores de Todo el Sistema ──
+    document.addEventListener('input', function(e) {
+        const target = e.target;
+        if (!target || target.tagName !== 'INPUT') return;
+        if (['password', 'email', 'url', 'number', 'date', 'time', 'datetime-local', 'file', 'checkbox', 'radio'].includes(target.type)) return;
+        if (target.dataset.noUppercase !== undefined) return;
+
+        const isSearch = target.type === 'search' ||
+                         (target.placeholder && target.placeholder.toLowerCase().includes('buscar')) ||
+                         (target.id && (target.id.includes('buscar') || target.id.includes('busqueda') || target.id.includes('search'))) ||
+                         (target.name && (target.name.includes('buscar') || target.name.includes('search') || target.name.includes('q'))) ||
+                         target.hasAttribute('data-uppercase');
+
+        if (isSearch) {
+            const start = target.selectionStart;
+            const end = target.selectionEnd;
+            const upper = target.value.toUpperCase();
+            if (target.value !== upper) {
+                target.value = upper;
+                if (start !== null && end !== null) {
+                    target.setSelectionRange(start, end);
+                }
+            }
+        }
+    });
     </script>
 
     @stack('scripts')

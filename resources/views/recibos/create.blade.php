@@ -270,7 +270,7 @@ let timerCliente;
 document.getElementById('buscar-cliente').addEventListener('input', function() {
     clearTimeout(timerCliente);
     const q = this.value.trim();
-    if (q.length < 2) {
+    if (q.length < 1) {
         document.getElementById('resultados-cliente').classList.add('hidden');
         return;
     }
@@ -289,7 +289,7 @@ document.getElementById('buscar-cliente').addEventListener('input', function() {
                 <div class="text-xs text-slate-500">${c.tipo_documento}: ${c.numero_documento}</div>
             </div>`).join('');
         div.classList.remove('hidden');
-    }, 300);
+    }, 160);
 });
 
 function seleccionarCliente(c) {
@@ -312,7 +312,7 @@ let timerFactura;
 document.getElementById('buscar-factura').addEventListener('input', function() {
     clearTimeout(timerFactura);
     const q = this.value.trim();
-    if (q.length < 2) {
+    if (q.length < 1) {
         document.getElementById('resultados-factura').classList.add('hidden');
         return;
     }
@@ -336,7 +336,7 @@ document.getElementById('buscar-factura').addEventListener('input', function() {
                 </div>
             </div>`).join('');
         div.classList.remove('hidden');
-    }, 300);
+    }, 160);
 });
 
 function seleccionarFactura(f) {

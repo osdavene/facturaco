@@ -329,7 +329,7 @@ let timerPP;
 document.getElementById('buscar-prov-prod').addEventListener('input', function() {
     clearTimeout(timerPP);
     const q = this.value.trim();
-    if (q.length < 2) { document.getElementById('res-prov-prod').classList.add('hidden'); return; }
+    if (q.length < 1) { document.getElementById('res-prov-prod').classList.add('hidden'); return; }
     timerPP = setTimeout(async () => {
         const res  = await fetch(`/api/proveedores/buscar?q=${encodeURIComponent(q)}`);
         const data = await res.json();
@@ -345,7 +345,7 @@ document.getElementById('buscar-prov-prod').addEventListener('input', function()
                 <div class="text-xs text-slate-500">${p.tipo_documento}: ${p.numero_documento}</div>
             </div>`).join('');
         div.classList.remove('hidden');
-    }, 300);
+    }, 160);
 });
 
 document.addEventListener('click', e => {
