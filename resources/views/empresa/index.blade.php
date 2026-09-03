@@ -249,12 +249,13 @@
                                style="color:#e2e8f0">
                     </div>
                     <div class="sm:col-span-2 lg:col-span-3">
-                        <label class="form-label">
-                            Clave Técnica DIAN
+                        <label class="form-label flex items-center justify-between">
+                            <span>Clave Técnica DIAN</span>
+                            <span class="text-[11px] text-slate-500 font-normal">Opcional (Solo si tu software usa conexión SOAP directa)</span>
                         </label>
                         <input type="text" name="clave_tecnica"
                                value="{{ old('clave_tecnica', $empresa->clave_tecnica) }}"
-                               placeholder="CLAVE TÉCNICA PROPORCIONADA POR LA DIAN"
+                               placeholder="Opcional — No requerida si FacturaCO gestiona tu emisión DIAN"
                                data-uppercase
                                class="form-input"
                                style="color:#e2e8f0">

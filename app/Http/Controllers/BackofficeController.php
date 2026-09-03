@@ -308,4 +308,84 @@ class BackofficeController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $nombre . '"',
         ]);
     }
+
+    // ── Gestión DIAN & Folios API ──────────────────────────────────────────
+
+    public function dianIndex()
+    {
+        $totalFacturasDian = \App\Models\Factura::where('enviada_dian', true)->count();
+        $totalFacturasMes  = \App\Models\Factura::where('enviada_dian', true)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $empresas = Empresa::withCount([
+            'facturas as facturas_dian_total' => fn($q) => $q->where('enviada_dian', true),
+            'facturas as facturas_dian_mes'   => fn($q) => $q->where('enviada_dian', true)
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year),
+        ])->orderBy('razon_social')->get();
+
+        $proveedorActivo = \App\Models\ConfiguracionPlataforma::get('dian_proveedor', config('dian.proveedor', 'factus'));
+        $factusAmbiente  = \App\Models\ConfiguracionPlataforma::get('dian_factus_ambiente', config('dian.factus.ambiente', 'sandbox'));
+        $factusClientId  = \App\Models\ConfiguracionPlataforma::get('dian_factus_client_id', config('dian.factus.client_id', ''));
+        $factusUsername  = \App\Models\ConfiguracionPlataforma::get('dian_factus_username', config('dian.factus.username', ''));
+        $factusToken     = \App\Models\ConfiguracionPlataforma::get('dian_factus_token', config('dian.factus.api_token', ''));
+        $factusRangeId   = \App\Models\ConfiguracionPlataforma::get('dian_factus_range_id', config('dian.factus.numbering_range_id', 1));
+
+        return view('backoffice.dian.index', compact(
+            'totalFacturasDian', 'totalFacturasMes', 'empresas',
+            'proveedorActivo', 'factusAmbiente', 'factusClientId',
+            'factusUsername', 'factusToken', 'factusRangeId'
+        ));
+    }
+
+    public function dianGuardar(Request $request)
+    {
+        $data = $request->validate([
+            'dian_proveedor'        => 'required|in:factus,directo',
+            'dian_factus_ambiente'  => 'required|in:sandbox,produccion',
+            'dian_factus_client_id' => 'nullable|string|max:255',
+            'dian_factus_client_secret' => 'nullable|string|max:255',
+            'dian_factus_username'  => 'nullable|string|max:255',
+            'dian_factus_password'  => 'nullable|string|max:255',
+            'dian_factus_token'     => 'nullable|string|max:1000',
+            'dian_factus_range_id'  => 'nullable|integer',
+        ]);
+
+        foreach ($data as $key => $val) {
+            if ($val !== null && $val !== '') {
+                \App\Models\ConfiguracionPlataforma::set($key, $val, 'dian');
+            } elseif (in_array($key, ['dian_factus_token', 'dian_factus_client_secret', 'dian_factus_password'])) {
+                // Keep existing secret if not provided
+            } else {
+                \App\Models\ConfiguracionPlataforma::set($key, '', 'dian');
+            }
+        }
+
+        return redirect()->route('backoffice.dian')->with('success', 'Configuración de integración DIAN guardada con éxito.');
+    }
+
+    public function dianProbar()
+    {
+        try {
+            $dian = app(\App\Services\DianService::class);
+            $provider = $dian->getProvider();
+
+            if (! $provider->estaConfigurado()) {
+                return back()->with('error', 'Faltan credenciales maestras para conectarse a la API de la DIAN / Factus.');
+            }
+
+            if ($provider instanceof \App\Services\Dian\FactusProvider) {
+                $token = $provider->obtenerToken();
+                if ($token) {
+                    return back()->with('success', '¡Conexión exitosa con Factus API! Token de autenticación obtenido correctamente.');
+                }
+            }
+
+            return back()->with('success', '¡Proveedor DIAN verificado y listo para emitir facturas!');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Error al probar conexión: ' . $e->getMessage());
+        }
+    }
 }
