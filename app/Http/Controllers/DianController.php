@@ -12,30 +12,46 @@ class DianController extends Controller
 {
     public function __construct(private DianService $dian) {}
 
-    // ── Envío asíncrono ───────────────────────────────────────────────────────
-
     public function enviar(Factura $factura)
     {
         if (! $this->dian->estaConfigurado()) {
-            return back()->with('error', 'La integración DIAN no está configurada. Define DIAN_CERTIFICADO_PATH y DIAN_CERTIFICADO_PASSWORD.');
+            return back()->with('error', 'La integración DIAN no está configurada en Backoffice.');
         }
 
         if ($factura->enviada_dian) {
             return back()->with('info', 'Esta factura ya fue enviada a la DIAN. CUFE: ' . $factura->cufe);
         }
 
-        if (! in_array($factura->estado, ['emitida', 'pagada'])) {
+        if (! in_array($factura->estado, ['emitida', 'pagada', 'borrador'])) {
             return back()->with('error', 'Solo se pueden enviar facturas emitidas o pagadas a la DIAN.');
         }
 
-        EnviarDianJob::dispatch($factura);
+        try {
+            $resultado = $this->dian->enviar($factura);
 
-        // Evento pendiente para que el usuario vea que está en cola
-        DianEvento::registrar($factura, DianEvento::TIPO_ENVIO, DianEvento::ESTADO_PENDIENTE, [
-            'descripcion' => 'Envío encolado',
-        ]);
+            $factura->update([
+                'cufe'         => $resultado['cufe'],
+                'enviada_dian' => true,
+                'fecha_dian'   => now(),
+                'estado'       => in_array($factura->estado, ['pagada', 'emitida']) ? $factura->estado : 'emitida',
+            ]);
 
-        return back()->with('info', 'Factura enviada a la cola de envío DIAN. El estado se actualizará en unos momentos.');
+            DianEvento::registrar($factura, DianEvento::TIPO_ENVIO, DianEvento::ESTADO_EXITOSO, [
+                'cufe'             => $resultado['cufe'],
+                'codigo_respuesta' => $resultado['codigo'],
+                'descripcion'      => $resultado['descripcion'],
+                'payload'          => $resultado,
+            ]);
+
+            return back()->with('success', '¡Factura validada y aprobada por la DIAN exitosamente! CUFE: ' . substr((string)$resultado['cufe'], 0, 16) . '...');
+        } catch (\Throwable $e) {
+            DianEvento::registrar($factura, DianEvento::TIPO_ENVIO, DianEvento::ESTADO_FALLIDO, [
+                'descripcion' => $e->getMessage(),
+                'errores'     => [$e->getMessage()],
+            ]);
+
+            return back()->with('error', 'Error al enviar a la DIAN: ' . $e->getMessage());
+        }
     }
 
     // ── Consulta de estado ────────────────────────────────────────────────────
