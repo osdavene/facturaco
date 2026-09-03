@@ -176,24 +176,31 @@ class Empresa extends Model
             return null;
         }
 
+        if (str_starts_with($this->logo, 'data:image')) {
+            return $this->logo;
+        }
+
         try {
+            $posiblesRutas = [
+                storage_path('app/public/' . ltrim($this->logo, '/')),
+                public_path('storage/' . ltrim($this->logo, '/')),
+                storage_path('app/' . ltrim($this->logo, '/')),
+                public_path(ltrim($this->logo, '/')),
+            ];
+
+            foreach ($posiblesRutas as $ruta) {
+                if (file_exists($ruta) && is_file($ruta) && is_readable($ruta)) {
+                    $content = @file_get_contents($ruta);
+                    if ($content !== false && strlen($content) > 0) {
+                        $mime = mime_content_type($ruta) ?: 'image/png';
+                        return 'data:' . $mime . ';base64,' . base64_encode($content);
+                    }
+                }
+            }
+
             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->logo)) {
                 $content = \Illuminate\Support\Facades\Storage::disk('public')->get($this->logo);
                 $mime    = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($this->logo) ?: 'image/png';
-                return 'data:' . $mime . ';base64,' . base64_encode($content);
-            }
-
-            $fullPath = storage_path('app/public/' . $this->logo);
-            if (file_exists($fullPath)) {
-                $content = file_get_contents($fullPath);
-                $mime    = mime_content_type($fullPath) ?: 'image/png';
-                return 'data:' . $mime . ';base64,' . base64_encode($content);
-            }
-
-            $publicPath = public_path('storage/' . $this->logo);
-            if (file_exists($publicPath)) {
-                $content = file_get_contents($publicPath);
-                $mime    = mime_content_type($publicPath) ?: 'image/png';
                 return 'data:' . $mime . ';base64,' . base64_encode($content);
             }
         } catch (\Throwable) {

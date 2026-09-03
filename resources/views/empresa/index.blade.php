@@ -410,11 +410,11 @@
             <div class="card p-6">
                 <h3 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <i class="fas fa-image text-amber-500 text-sm"></i>
-                          {{-- Preview actual --}}
+                {{-- Preview actual --}}
                 <div class="flex flex-col items-center mb-4">
                     @if($empresa->logo)
                     <div class="relative mb-3">
-                        <img src="{{ Storage::url($empresa->logo) }}"
+                        <img src="{{ $empresa->logo_base64 ?: Storage::url($empresa->logo) }}"
                              alt="Logo"
                              class="w-32 h-32 object-contain rounded-xl bg-white p-2">
                         <button type="submit"

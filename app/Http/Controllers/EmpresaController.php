@@ -23,10 +23,10 @@ class EmpresaController extends Controller
 
         // Logo
         if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
-            if ($empresa->logo) {
-                Storage::disk('public')->delete($empresa->logo);
-            }
-            $data['logo'] = $request->file('logo')->store('empresa', 'public');
+            $file = $request->file('logo');
+            $mime = $file->getMimeType() ?: 'image/png';
+            $base64 = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            $data['logo'] = $base64;
         } else {
             unset($data['logo']);
         }
@@ -55,11 +55,13 @@ class EmpresaController extends Controller
     public function deleteLogo()
     {
         $empresa = Empresa::obtener();
-        if ($empresa->logo) {
+        if ($empresa->logo && !str_starts_with($empresa->logo, 'data:image')) {
             Storage::disk('public')->delete($empresa->logo);
-            $empresa->update(['logo' => null]);
         }
-        return back()->with('success', 'Logo eliminado.');
+        $empresa->update(['logo' => null]);
+
+        return redirect()->route('empresa.index')
+            ->with('success', 'Logo eliminado correctamente.');
     }
 
     public function probarMail(Request $request, MailService $mail)
