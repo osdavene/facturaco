@@ -195,33 +195,37 @@
                     @endcan
                 </x-nav-section>
 
-                {{-- NÓMINA --}}
+                {{-- RECURSOS HUMANOS --}}
                 @can('ver nomina')
-                <x-nav-section label="Nómina">
-                    <x-nav-item href="{{ route('nomina.index') }}"
-                                icon="fa-file-invoice-dollar"
-                                :active="request()->routeIs('nomina.index') || request()->routeIs('nomina.show') || request()->routeIs('nomina.create')">
-                        Períodos de Nómina
-                    </x-nav-item>
+                <x-nav-section label="Recursos Humanos">
                     <x-nav-item href="{{ route('nomina.empleados.index') }}"
-                                icon="fa-id-badge"
+                                icon="fa-users"
                                 :active="request()->routeIs('nomina.empleados.*')">
                         Empleados
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('nomina.liquidacion-definitiva.index') }}"
-                                icon="fa-calculator"
-                                :active="request()->routeIs('nomina.liquidacion-definitiva.*')">
-                        Liquidación Definitiva
                     </x-nav-item>
                     <x-nav-item href="{{ route('nomina.certificados.index') }}"
                                 icon="fa-file-signature"
                                 :active="request()->routeIs('nomina.certificados.*')">
                         Certificados Laborales
                     </x-nav-item>
+                    <x-nav-item href="{{ route('nomina.liquidacion-definitiva.index') }}"
+                                icon="fa-calculator"
+                                :active="request()->routeIs('nomina.liquidacion-definitiva.*')">
+                        Liquidación Definitiva
+                    </x-nav-item>
+                </x-nav-section>
+
+                {{-- NÓMINA --}}
+                <x-nav-section label="Nómina">
+                    <x-nav-item href="{{ route('nomina.index') }}"
+                                icon="fa-file-invoice-dollar"
+                                :active="request()->routeIs('nomina.index') || request()->routeIs('nomina.show') || request()->routeIs('nomina.create')">
+                        Liquidación de Nómina
+                    </x-nav-item>
                     <x-nav-item href="{{ route('nomina.reportes.index') }}"
                                 icon="fa-chart-pie"
                                 :active="request()->routeIs('nomina.reportes.*')">
-                        Informe y PILA
+                        Informes y PILA
                     </x-nav-item>
                     @can('gestionar nomina')
                     <x-nav-item href="{{ route('nomina.configuracion.index') }}"
