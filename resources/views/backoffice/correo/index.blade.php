@@ -55,6 +55,7 @@
                 <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
                     Configuración Rápida con 1 Clic (Presets)
                 </p>
+                <div class="flex flex-wrap gap-2">
                     <button type="button" @click="aplicarPreset('resend')"
                             class="px-3.5 py-2 bg-[#1a2235] hover:bg-emerald-500/10 hover:text-emerald-400 border border-[#1e2d47] hover:border-emerald-500/30 rounded-xl text-xs font-semibold text-slate-300 transition-colors flex items-center gap-2">
                         <i class="fas fa-bolt text-emerald-400"></i>
@@ -252,7 +253,7 @@ function correoConfigManager() {
         aplicarPreset(tipo) {
             if (tipo === 'resend') {
                 this.form.host = 'smtp.resend.com';
-                this.form.port = '465';
+                this.form.port = '2465';
                 this.form.encryption = 'ssl';
                 this.form.username = 'resend';
                 this.form.from_address = 'onboarding@resend.dev';
