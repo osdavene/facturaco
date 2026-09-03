@@ -138,13 +138,40 @@
 <header class="sticky top-0 z-40 bg-[#111827]/95 backdrop-blur border-b border-[#1e2d47] px-6 py-3">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
 
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-                <i class="fas fa-layer-group text-black text-xs"></i>
-            </div>
-            <span class="font-display font-black text-white text-base">BackOffice</span>
-            <span class="text-[#1e2d47]">·</span>
-            <span class="text-slate-500 text-sm hidden sm:block">Panel de plataforma</span>
+        <div class="flex items-center gap-6">
+            <a href="{{ route('backoffice.dashboard') }}" class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-layer-group text-black text-xs"></i>
+                </div>
+                <div>
+                    <span class="font-display font-black text-white text-base">BackOffice</span>
+                    <span class="text-slate-500 text-xs hidden sm:inline ml-1">· Panel Maestro</span>
+                </div>
+            </a>
+
+            {{-- Links de navegación directa --}}
+            <nav class="hidden md:flex items-center gap-1 pl-4 border-l border-[#1e2d47]">
+                <a href="{{ route('backoffice.dashboard') }}"
+                   class="px-3 py-1.5 rounded-lg text-xs font-semibold {{ request()->routeIs('backoffice.dashboard') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-[#1a2235]' }} transition-colors">
+                    <i class="fas fa-gauge-high mr-1"></i>Panel
+                </a>
+                <a href="{{ route('backoffice.empresas') }}"
+                   class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#1a2235] transition-colors">
+                    <i class="fas fa-building mr-1"></i>Empresas
+                </a>
+                <a href="{{ route('backoffice.planes') }}"
+                   class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#1a2235] transition-colors">
+                    <i class="fas fa-cubes-stacked mr-1 text-amber-500"></i>Planes & Paquetes
+                </a>
+                <a href="{{ route('backoffice.dian') }}"
+                   class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#1a2235] transition-colors">
+                    <i class="fas fa-file-invoice-dollar mr-1 text-emerald-400"></i>Integración DIAN
+                </a>
+                <a href="{{ route('backoffice.backup') }}"
+                   class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#1a2235] transition-colors">
+                    <i class="fas fa-database mr-1 text-blue-400"></i>Backup
+                </a>
+            </nav>
         </div>
 
         <div class="flex items-center gap-2">
@@ -207,44 +234,96 @@
     </div>
     @endif
 
-    {{-- Stats (clicables → llevan al tab) --}}
+    {{-- Stats (clicables → llevan al tab o sección) --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        @php
-        $stats = [
-            ['label'=>'Empresas totales',  'valor'=>$totalEmpresas, 'icon'=>'fa-building',    'color'=>'blue',   'tab'=>'empresas'],
-            ['label'=>'Matrices',          'valor'=>$totalMatrices, 'icon'=>'fa-sitemap',     'color'=>'amber',  'tab'=>'empresas'],
-            ['label'=>'Filiales',          'valor'=>$totalFiliales, 'icon'=>'fa-code-branch', 'color'=>'amber',  'tab'=>'empresas'],
-            ['label'=>'Usuarios clientes', 'valor'=>$totalUsuarios, 'icon'=>'fa-users',       'color'=>'emerald','tab'=>'usuarios'],
-        ];
-        @endphp
-        @foreach($stats as $s)
-        <button @click="tab = '{{ $s['tab'] }}'"
-                class="card p-5 text-left
-                       hover:border-amber-500/40 transition-colors cursor-pointer group">
+        
+        {{-- Empresas --}}
+        <button @click="tab = 'empresas'"
+                class="card p-5 text-left hover:border-amber-500/40 transition-colors cursor-pointer group">
             <div class="flex items-center justify-between mb-3">
-                <span class="text-slate-500 text-xs">{{ $s['label'] }}</span>
-                <div class="w-8 h-8 bg-{{ $s['color'] }}-500/10 rounded-lg flex items-center justify-center
-                            group-hover:bg-{{ $s['color'] }}-500/20 transition-colors">
-                    <i class="fas {{ $s['icon'] }} text-{{ $s['color'] }}-500 text-xs"></i>
+                <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Empresas</span>
+                <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                    <i class="fas fa-building text-blue-500 text-xs"></i>
                 </div>
             </div>
-            <p class="font-display font-black text-3xl text-white">{{ $s['valor'] }}</p>
+            <p class="font-display font-black text-3xl text-white">{{ $totalEmpresas }}</p>
+            <p class="text-[11px] text-slate-500 mt-1">{{ $totalMatrices }} matrices · {{ $totalFiliales }} filiales</p>
         </button>
-        @endforeach
+
+        {{-- Planes SaaS --}}
+        <a href="{{ route('backoffice.planes') }}"
+           class="card p-5 text-left hover:border-amber-500/40 transition-colors cursor-pointer group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Planes & Paquetes</span>
+                <div class="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
+                    <i class="fas fa-cubes-stacked text-amber-500 text-xs"></i>
+                </div>
+            </div>
+            <p class="font-display font-black text-3xl text-white">{{ $totalPlanes }}</p>
+            <p class="text-[11px] text-amber-400/90 mt-1 flex items-center gap-1">
+                <span>Gestionar paquetes</span>
+                <i class="fas fa-arrow-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </p>
+        </a>
+
+        {{-- Integración DIAN --}}
+        <a href="{{ route('backoffice.dian') }}"
+           class="card p-5 text-left hover:border-emerald-500/40 transition-colors cursor-pointer group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Integración DIAN</span>
+                <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                    <i class="fas fa-file-invoice-dollar text-emerald-500 text-xs"></i>
+                </div>
+            </div>
+            <p class="font-display font-black text-3xl text-white">{{ $totalFacturasDian }}</p>
+            <p class="text-[11px] text-emerald-400 mt-1 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>API {{ ucfirst($proveedorActivo) }} ({{ ucfirst($factusAmbiente) }})</span>
+            </p>
+        </a>
+
+        {{-- Usuarios --}}
+        <button @click="tab = 'usuarios'"
+                class="card p-5 text-left hover:border-purple-500/40 transition-colors cursor-pointer group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Usuarios Clientes</span>
+                <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                    <i class="fas fa-users text-purple-500 text-xs"></i>
+                </div>
+            </div>
+            <p class="font-display font-black text-3xl text-white">{{ $totalUsuarios }}</p>
+            <p class="text-[11px] text-slate-500 mt-1">Cuentas activas en la plataforma</p>
+        </button>
+
     </div>
 
-    {{-- Tabs --}}
-    <div class="flex items-center gap-1 mb-6 card p-1.5 w-fit">
-        @foreach([['resumen','fa-gauge-high','Resumen'],['empresas','fa-building','Empresas'],['usuarios','fa-users','Usuarios']] as [$t,$icon,$label])
-        <button @click="tab = '{{ $t }}'"
-                :class="tab === '{{ $t }}'
-                    ? 'bg-amber-500 text-black font-bold shadow-lg'
-                    : 'text-slate-400 hover:text-white hover:bg-[#1a2235]'"
-                class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all">
-            <i class="fas {{ $icon }} text-xs"></i>
-            {{ $label }}
-        </button>
-        @endforeach
+    {{-- Tabs y Accesos Rápidos --}}
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div class="flex items-center gap-1 card p-1.5 w-fit">
+            @foreach([['resumen','fa-gauge-high','Resumen'],['empresas','fa-building','Empresas'],['usuarios','fa-users','Usuarios']] as [$t,$icon,$label])
+            <button @click="tab = '{{ $t }}'"
+                    :class="tab === '{{ $t }}'
+                        ? 'bg-amber-500 text-black font-bold shadow-lg'
+                        : 'text-slate-400 hover:text-white hover:bg-[#1a2235]'"
+                    class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all">
+                <i class="fas {{ $icon }} text-xs"></i>
+                {{ $label }}
+            </button>
+            @endforeach
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a href="{{ route('backoffice.dian') }}"
+               class="px-3.5 py-2 bg-[#1a2235] hover:bg-[#24314d] border border-[#1e2d47] text-slate-300 hover:text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-2">
+                <i class="fas fa-file-invoice-dollar text-emerald-400"></i>
+                <span>Configurar DIAN / Factus</span>
+            </a>
+            <a href="{{ route('backoffice.planes') }}"
+               class="px-3.5 py-2 bg-[#1a2235] hover:bg-[#24314d] border border-[#1e2d47] text-slate-300 hover:text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-2">
+                <i class="fas fa-cubes-stacked text-amber-400"></i>
+                <span>Ver Planes SaaS</span>
+            </a>
+        </div>
     </div>
 
     {{-- ── TAB: RESUMEN ───────────────────────────────────────��─── --}}

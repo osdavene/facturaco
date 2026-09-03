@@ -30,6 +30,10 @@ class BackofficeController extends Controller
         $totalMatrices = Empresa::whereNull('empresa_padre_id')->count();
         $totalFiliales = Empresa::whereNotNull('empresa_padre_id')->count();
         $totalUsuarios = User::where('is_superadmin', false)->count();
+        $totalPlanes   = \App\Models\Plan::count();
+        $totalFacturasDian = \App\Models\Factura::where('enviada_dian', true)->count();
+        $proveedorActivo   = \App\Models\ConfiguracionPlataforma::get('dian_proveedor', config('dian.proveedor', 'factus'));
+        $factusAmbiente    = \App\Models\ConfiguracionPlataforma::get('dian_factus_ambiente', config('dian.factus.ambiente', 'sandbox'));
 
         $empresas = Empresa::whereNull('empresa_padre_id')
             ->with(['filiales.usuarios', 'filiales.plan', 'plan'])
@@ -38,6 +42,7 @@ class BackofficeController extends Controller
             ->get();
 
         $todasEmpresas = Empresa::with('plan')->orderBy('razon_social')->get();
+        $planes        = \App\Models\Plan::withCount('empresas')->orderBy('orden')->get();
 
         $usuarios = User::where('is_superadmin', false)
             ->with(['empresas', 'roles'])
@@ -46,7 +51,8 @@ class BackofficeController extends Controller
 
         return view('backoffice.panel', compact(
             'totalEmpresas', 'totalMatrices', 'totalFiliales', 'totalUsuarios',
-            'empresas', 'todasEmpresas', 'usuarios'
+            'totalPlanes', 'totalFacturasDian', 'proveedorActivo', 'factusAmbiente',
+            'empresas', 'todasEmpresas', 'planes', 'usuarios'
         ));
     }
 
