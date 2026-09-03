@@ -23,6 +23,7 @@ Route::middleware(['auth', 'backoffice'])->prefix('backoffice')->name('backoffic
     Route::delete('/usuarios/{usuario}',           [BackofficeController::class, 'usuarioDestroy']) ->name('usuarios.destroy');
     Route::get('/backup',                          [BackofficeController::class, 'backupIndex'])     ->name('backup');
     Route::get('/backup/descargar',                [BackofficeController::class, 'backupDescargar']) ->name('backup.descargar');
+    Route::post('/backup/importar',                 [BackofficeController::class, 'backupImportar'])  ->name('backup.importar');
     Route::get('/dian',                            [BackofficeController::class, 'dianIndex'])       ->name('dian');
     Route::post('/dian',                           [BackofficeController::class, 'dianGuardar'])     ->name('dian.guardar');
     Route::post('/dian/probar',                    [BackofficeController::class, 'dianProbar'])      ->name('dian.probar');

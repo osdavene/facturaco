@@ -23,6 +23,11 @@ class BackupController extends Controller
         return $this->backupAction->descargarJson();
     }
 
+    public function descargarSql()
+    {
+        return $this->backupAction->descargarSql();
+    }
+
     public function descargarCsv(Request $request)
     {
         $request->validate([

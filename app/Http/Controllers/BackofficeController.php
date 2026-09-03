@@ -274,24 +274,33 @@ class BackofficeController extends Controller
     public function backupIndex()
     {
         $tablas = [
-            'empresa'                => 'Empresas',
-            'users'                  => 'Usuarios',
-            'clientes'               => 'Clientes',
-            'proveedores'            => 'Proveedores',
-            'productos'              => 'Productos',
-            'categorias'             => 'Categorías',
-            'unidades_medida'        => 'Unidades de Medida',
-            'facturas'               => 'Facturas',
-            'factura_items'          => 'Ítems de Facturas',
-            'cotizaciones'           => 'Cotizaciones',
-            'cotizacion_items'       => 'Ítems de Cotizaciones',
-            'ordenes_compra'         => 'Órdenes de Compra',
-            'orden_compra_items'     => 'Ítems de Órdenes',
-            'recibos_caja'           => 'Recibos de Caja',
-            'remisiones'             => 'Remisiones',
-            'remision_items'         => 'Ítems de Remisiones',
-            'movimientos_inventario' => 'Movimientos de Inventario',
-            'login_logs'             => 'Accesos',
+            'empresa'                 => 'Empresas Registradas',
+            'users'                   => 'Usuarios y Accesos',
+            'clientes'                => 'Clientes',
+            'proveedores'             => 'Proveedores',
+            'productos'               => 'Productos y Servicios',
+            'categorias'              => 'Categorías',
+            'unidades_medida'         => 'Unidades de Medida',
+            'resoluciones_dian'        => 'Resoluciones DIAN',
+            'facturas'                => 'Facturas Electrónicas',
+            'factura_items'           => 'Ítems de Facturas',
+            'notas_credito'           => 'Notas Crédito',
+            'nota_credito_items'      => 'Ítems de Notas Crédito',
+            'cotizaciones'            => 'Cotizaciones',
+            'cotizacion_items'        => 'Ítems de Cotizaciones',
+            'ordenes_compra'          => 'Órdenes de Compra',
+            'orden_compra_items'      => 'Ítems de Órdenes',
+            'recibos_caja'            => 'Recibos de Caja',
+            'remisiones'              => 'Remisiones',
+            'remision_items'          => 'Ítems de Remisiones',
+            'movimientos_inventario'  => 'Movimientos de Inventario',
+            'puc_cuentas'             => 'Plan Único de Cuentas (PUC)',
+            'asientos_contables'      => 'Asientos Contables',
+            'asiento_contable_lineas' => 'Líneas Contables',
+            'empleados'               => 'Empleados (RRHH)',
+            'nominas'                 => 'Períodos de Nómina',
+            'nomina_empleado'         => 'Liquidaciones de Nómina',
+            'login_logs'              => 'Historial de Conexiones',
         ];
 
         $conteos = [];
@@ -314,9 +323,33 @@ class BackofficeController extends Controller
         $nombre = 'backoffice_backup_completo_' . now()->format('Y-m-d_His') . '.sql';
 
         return response($sql, 200, [
-            'Content-Type'        => 'text/plain; charset=UTF-8',
+            'Content-Type'        => 'application/sql; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $nombre . '"',
         ]);
+    }
+
+    public function backupImportar(Request $request)
+    {
+        $request->validate([
+            'archivo_sql' => 'required|file|mimes:txt,sql|max:51200', // max 50MB
+        ], [
+            'archivo_sql.required' => 'Debes seleccionar un archivo SQL para importar.',
+            'archivo_sql.max'      => 'El archivo no debe superar los 50 MB.',
+        ]);
+
+        try {
+            $contenido = file_get_contents($request->file('archivo_sql')->getRealPath());
+            $resultado = $this->backupSql->importarSql($contenido);
+
+            $msg = "Base de datos importada exitosamente. Se ejecutaron {$resultado['ejecutadas']} sentencias SQL.";
+            if (!empty($resultado['errores'])) {
+                $msg .= " (Con " . count($resultado['errores']) . " advertencias/errores no críticos).";
+            }
+
+            return back()->with('success', $msg);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al importar la base de datos: ' . $e->getMessage());
+        }
     }
 
     // ── Gestión DIAN & Folios API ──────────────────────────────────────────

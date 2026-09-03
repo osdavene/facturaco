@@ -34,6 +34,7 @@ Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria
 // ── Backup ────────────────────────────────────────────────────────────────
 Route::get('/backup',      [BackupController::class, 'index'])        ->name('backup.index')->middleware('can:ver usuarios');
 Route::get('/backup/json', [BackupController::class, 'descargarJson'])->name('backup.json') ->middleware('can:ver usuarios');
+Route::get('/backup/sql',  [BackupController::class, 'descargarSql']) ->name('backup.sql')  ->middleware('can:ver usuarios');
 Route::post('/backup/csv', [BackupController::class, 'descargarCsv']) ->name('backup.csv')  ->middleware('can:ver usuarios');
 
 // ── Búsqueda global ───────────────────────────────────────────────────────
