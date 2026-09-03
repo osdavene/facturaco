@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Empresa — FacturaCO</title>
+    <title>Crear Empresa — FacCol</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -14,8 +14,8 @@
 
         {{-- Logo --}}
         <div class="text-center mb-8">
-            <div class="font-display font-black text-3xl text-white mb-1">
-                Factura<span class="text-amber-500">CO</span>
+            <div class="font-display font-black text-3xl text-white mb-1 tracking-tight">
+                Fac<span class="text-amber-500">Col</span>
             </div>
             <p class="text-slate-500 text-sm">Configura tu empresa para comenzar</p>
         </div>

@@ -137,12 +137,12 @@
                         <div>
                             <label class="form-label">Correo Remitente (From Address) *</label>
                             <input type="email" name="mail_from_address" x-model="form.from_address" required
-                                   placeholder="notificaciones@facturaco.co" class="form-input">
+                                   placeholder="notificaciones@faccol.co" class="form-input">
                         </div>
                         <div>
                             <label class="form-label">Nombre Remitente (From Name) *</label>
                             <input type="text" name="mail_from_name" x-model="form.from_name" required
-                                   placeholder="FacturaCO Notificaciones" class="form-input">
+                                   placeholder="FacCol Notificaciones" class="form-input">
                         </div>
                     </div>
 

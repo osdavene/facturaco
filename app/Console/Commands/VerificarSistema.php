@@ -8,13 +8,14 @@ use App\Models\Empresa;
 class VerificarSistema extends Command
 {
     protected $signature   = 'sistema:verificar';
-    protected $description = 'Verifica el estado del sistema FacturaCO';
+    protected $description = 'Verifica el estado del sistema FacCol';
 
-    public function handle()
+    public function handle(): int
     {
         $empresa = Empresa::obtener();
+        $this->newLine();
         $this->info('═══════════════════════════════════════');
-        $this->info('  FacturaCO — Estado del Sistema');
+        $this->info('  FacCol — Estado del Sistema');
         $this->info('═══════════════════════════════════════');
         $this->info('  Empresa:  ' . $empresa->razon_social);
         $this->info('  NIT:      ' . $empresa->nit_formateado);

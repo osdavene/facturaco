@@ -27,7 +27,8 @@ class DianService
      */
     public function getProvider(?string $nombre = null): DianProviderInterface
     {
-        $driver = $nombre ?: config('dian.proveedor', 'factus');
+        $driver = $nombre
+            ?: \App\Models\ConfiguracionPlataforma::get('dian_proveedor', config('dian.proveedor', 'factus'));
 
         if (! isset($this->providers[$driver])) {
             throw new InvalidArgumentException("El proveedor DIAN [{$driver}] no está soportado.");

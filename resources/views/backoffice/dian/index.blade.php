@@ -103,7 +103,7 @@
                     Credenciales Maestras del Proveedor (Factus)
                 </h2>
                 <p class="text-xs text-slate-400 mt-0.5">
-                    Estas credenciales serán usadas automáticamente por todas las empresas creadas en FacturaCO.
+                    Estas credenciales serán usadas automáticamente por todas las empresas creadas en FacCol.
                 </p>
             </div>
         </div>

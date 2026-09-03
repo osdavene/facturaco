@@ -498,7 +498,7 @@ class BackofficeController extends Controller
         $mailEncryption = \App\Models\ConfiguracionPlataforma::get('mail_encryption', config('mail.mailers.smtp.encryption', 'tls'));
         $mailUsername   = \App\Models\ConfiguracionPlataforma::get('mail_username', config('mail.mailers.smtp.username', ''));
         $mailFromAddress = \App\Models\ConfiguracionPlataforma::get('mail_from_address', config('mail.from.address', ''));
-        $mailFromName   = \App\Models\ConfiguracionPlataforma::get('mail_from_name', config('mail.from.name', 'FacturaCO Notificaciones'));
+        $mailFromName   = \App\Models\ConfiguracionPlataforma::get('mail_from_name', config('mail.from.name', 'FacCol Notificaciones'));
 
         $empresasPorVencer = Empresa::whereNotNull('plan_vencimiento')
             ->whereNotNull('plan_id')

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaCO — Error del servidor</title>
+    <title>FacCol — Error del servidor</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -75,7 +75,7 @@
         </div>
 
         <div class="mt-12 flex items-center justify-center gap-2 text-slate-700">
-            <span class="font-display font-black text-sm">FacturaCO</span>
+            <span class="font-display font-black text-sm">FacCol</span>
             <span class="text-xs">· Error 500</span>
         </div>
 

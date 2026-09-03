@@ -70,7 +70,7 @@
         {{-- Preview SQL --}}
         <div class="px-6 pb-5">
             <div class="bg-[#1a2235] rounded-xl px-5 py-4 font-mono text-xs text-slate-500 leading-relaxed">
-                <span class="text-slate-600">-- BACKUP COMPLETO — FacturaCO (BackOffice)</span><br>
+                <span class="text-slate-600">-- BACKUP COMPLETO — FacCol (BackOffice)</span><br>
                 <span class="text-slate-600">-- Fecha: {{ now()->format('d/m/Y H:i:s') }}</span><br>
                 <span class="text-slate-600">-- ────────────────────────────────────────</span><br>
                 <span class="text-emerald-400">INSERT INTO</span> <span class="text-amber-400">"empresa"</span>

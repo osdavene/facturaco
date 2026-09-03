@@ -12,29 +12,35 @@ use RuntimeException;
 
 class FactusProvider implements DianProviderInterface
 {
-    private string $baseUrl;
-    private ?string $apiToken;
-
-    public function __construct()
+    private function getAmbiente(): string
     {
-        $ambiente = config('dian.factus.ambiente', 'sandbox');
-        $this->baseUrl = $ambiente === 'produccion'
-            ? config('dian.factus.url_produccion', 'https://api.factus.com.co')
-            : config('dian.factus.url_sandbox', 'https://api-sandbox.factus.com.co');
+        return \App\Models\ConfiguracionPlataforma::get('dian_factus_ambiente', config('dian.factus.ambiente', 'sandbox'));
+    }
 
-        $this->apiToken = config('dian.factus.api_token') ?: config('dian.proveedor_api_key');
+    private function getBaseUrl(): string
+    {
+        return $this->getAmbiente() === 'produccion'
+            ? \App\Models\ConfiguracionPlataforma::get('dian_factus_url_prod', config('dian.factus.url_produccion', 'https://api.factus.com.co'))
+            : \App\Models\ConfiguracionPlataforma::get('dian_factus_url_sand', config('dian.factus.url_sandbox', 'https://api-sandbox.factus.com.co'));
+    }
+
+    private function getApiToken(): ?string
+    {
+        return \App\Models\ConfiguracionPlataforma::get('dian_factus_token', config('dian.factus.api_token') ?: config('dian.proveedor_api_key'));
     }
 
     public function estaConfigurado(?Empresa $empresa = null): bool
     {
-        if (filled($this->apiToken)) {
+        if (filled($this->getApiToken())) {
             return true;
         }
 
-        return filled(config('dian.factus.client_id'))
-            && filled(config('dian.factus.client_secret'))
-            && filled(config('dian.factus.username'))
-            && filled(config('dian.factus.password'));
+        $clientId     = \App\Models\ConfiguracionPlataforma::get('dian_factus_client_id', config('dian.factus.client_id'));
+        $clientSecret = \App\Models\ConfiguracionPlataforma::get('dian_factus_client_secret', config('dian.factus.client_secret'));
+        $username     = \App\Models\ConfiguracionPlataforma::get('dian_factus_username', config('dian.factus.username'));
+        $password     = \App\Models\ConfiguracionPlataforma::get('dian_factus_password', config('dian.factus.password'));
+
+        return filled($clientId) && filled($clientSecret) && filled($username) && filled($password);
     }
 
     /**
@@ -42,17 +48,23 @@ class FactusProvider implements DianProviderInterface
      */
     public function obtenerToken(): string
     {
-        if (filled($this->apiToken)) {
-            return $this->apiToken;
+        $token = $this->getApiToken();
+        if (filled($token)) {
+            return $token;
         }
 
         return Cache::remember('factus_access_token', 3600, function () {
-            $response = Http::asForm()->post("{$this->baseUrl}/oauth/token", [
+            $clientId     = \App\Models\ConfiguracionPlataforma::get('dian_factus_client_id', config('dian.factus.client_id'));
+            $clientSecret = \App\Models\ConfiguracionPlataforma::get('dian_factus_client_secret', config('dian.factus.client_secret'));
+            $username     = \App\Models\ConfiguracionPlataforma::get('dian_factus_username', config('dian.factus.username'));
+            $password     = \App\Models\ConfiguracionPlataforma::get('dian_factus_password', config('dian.factus.password'));
+
+            $response = Http::asForm()->post("{$this->getBaseUrl()}/oauth/token", [
                 'grant_type'    => 'password',
-                'client_id'     => config('dian.factus.client_id'),
-                'client_secret' => config('dian.factus.client_secret'),
-                'username'      => config('dian.factus.username'),
-                'password'      => config('dian.factus.password'),
+                'client_id'     => $clientId,
+                'client_secret' => $clientSecret,
+                'username'      => $username,
+                'password'      => $password,
             ]);
 
             if (! $response->successful()) {

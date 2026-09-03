@@ -188,7 +188,7 @@
             {{ $empresa->razon_social }} · NIT {{ $empresa->nit_formateado }}
         </div>
         <div class="footer-right">
-            Generado el {{ now()->format('d/m/Y H:i') }} · FacturaCO
+            Generado el {{ now()->format('d/m/Y H:i') }} · FacCol
         </div>
     </div>
 

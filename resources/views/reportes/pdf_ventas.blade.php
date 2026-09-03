@@ -102,7 +102,7 @@
         </tfoot>
     </table>
 
-    <div class="footer">{{ $empresa->razon_social }} · FacturaCO · {{ now()->format('d/m/Y H:i') }}</div>
+    <div class="footer">{{ $empresa->razon_social }} · FacCol · {{ now()->format('d/m/Y H:i') }}</div>
 </div>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaCO — Registro</title>
+    <title>FacCol — Registro</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -16,8 +16,8 @@
             <div class="inline-flex items-center gap-3 mb-4">
                 <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center
                             font-display font-black text-black text-xl">FC</div>
-                <div class="font-display font-black text-2xl text-white">
-                    Factura<span class="text-amber-500">CO</span>
+                <div class="font-display font-black text-2xl text-white tracking-tight">
+                    Fac<span class="text-amber-500">Col</span>
                 </div>
             </div>
             <h1 class="font-display font-bold text-2xl mb-1">Crear Cuenta</h1>

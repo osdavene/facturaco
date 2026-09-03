@@ -272,7 +272,7 @@
             {{ $empresa->razon_social }} · NIT {{ $empresa->nit_formateado }}
         </div>
         <div class="footer-right">
-            FacturaCO · Documento informativo · {{ now()->format('d/m/Y H:i') }}
+            FacCol · Documento informativo · {{ now()->format('d/m/Y H:i') }}
         </div>
     </div>
 

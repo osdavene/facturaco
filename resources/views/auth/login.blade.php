@@ -185,7 +185,7 @@
 
             <div class="mt-8 pt-8 border-t border-[#1e2d47] text-center">
                 <p class="text-xs text-slate-600">
-                    FacturaCO · Sistema de Gestión Empresarial
+                    FacCol · Sistema de Gestión Empresarial
                 </p>
             </div>
         </div>

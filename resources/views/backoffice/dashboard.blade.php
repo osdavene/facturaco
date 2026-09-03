@@ -5,7 +5,7 @@
 
 <div class="mb-8">
     <h1 class="font-display font-black text-2xl text-white">Panel de Plataforma</h1>
-    <p class="text-slate-500 text-sm mt-1">Administración general de FacturaCO</p>
+    <p class="text-slate-500 text-sm mt-1">Administración general de FacCol</p>
 </div>
 
 {{-- Stats --}}

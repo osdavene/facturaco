@@ -90,7 +90,7 @@ class GenerarBackupAction
         }
 
         $payload = json_encode([
-            'sistema' => 'FacturaCO',
+            'sistema' => 'FacCol',
             'empresa' => $empresa->razon_social ?? 'N/A',
             'fecha' => now()->format('Y-m-d H:i:s'),
             'generado_por' => auth()->user()->name,
@@ -164,7 +164,7 @@ class GenerarBackupAction
             $zip->addFile($archivo, basename($archivo));
         }
 
-        $readme = "BACKUP FACTURACO\n";
+        $readme = "BACKUP FACCOL\n";
         $readme .= "Empresa: " . ($empresa->razon_social ?? 'N/A') . "\n";
         $readme .= "Fecha: " . now()->format('d/m/Y H:i:s') . "\n";
         $readme .= "Generado por: " . auth()->user()->name . "\n";

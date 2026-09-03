@@ -162,7 +162,7 @@
     <div class="footer">
         {{ $empresa->razon_social }} · NIT {{ $empresa->nit_formateado }}
         @if($empresa->pie_factura) · {{ $empresa->pie_factura }} @endif
-        · Generado el {{ now()->format('d/m/Y H:i') }} · FacturaCO
+        · Generado el {{ now()->format('d/m/Y H:i') }} · FacCol
     </div>
 
 </div>

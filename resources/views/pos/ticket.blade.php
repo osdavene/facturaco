@@ -315,7 +315,7 @@
         @endif
         <div>Conserve este comprobante</div>
         <div style="margin-top:4px; font-size:9px; color:#999;">
-            Generado por FacturaCO · {{ now()->format('d/m/Y H:i:s') }}
+            Generado por FacCol · {{ now()->format('d/m/Y H:i:s') }}
         </div>
     </div>
 

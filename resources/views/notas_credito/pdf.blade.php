@@ -119,7 +119,7 @@
 @endif
 
 <div class="footer">
-    Nota de Crédito generada por FacturaCO · {{ $empresa->razon_social }} · {{ now()->format('d/m/Y H:i') }}
+    Nota de Crédito generada por FacCol · {{ $empresa->razon_social }} · {{ now()->format('d/m/Y H:i') }}
 </div>
 
 </body>

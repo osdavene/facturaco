@@ -267,7 +267,7 @@
     </div>
 
     <div class="text-center mt-4 text-[10px] text-gray-400">
-        Generado por FacturaCO · {{ now()->format('d/m/Y H:i') }}
+        Generado por FacCol · {{ now()->format('d/m/Y H:i') }}
     </div>
 </div>
 

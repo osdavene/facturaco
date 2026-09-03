@@ -19,7 +19,7 @@ class BackupSqlService
     public function generar(string $generadoPor): string
     {
         $sql  = "-- ================================================\n";
-        $sql .= "-- BACKUP COMPLETO — FacturaCO (BackOffice)\n";
+        $sql .= "-- BACKUP COMPLETO — FacCol (BackOffice)\n";
         $sql .= "-- Fecha:        " . now()->format('d/m/Y H:i:s') . "\n";
         $sql .= "-- Generado por: {$generadoPor}\n";
         $sql .= "-- Base de datos: PostgreSQL\n";
