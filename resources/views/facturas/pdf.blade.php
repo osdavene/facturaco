@@ -12,7 +12,7 @@
     .header-left  { display:table-cell; width:55%; vertical-align:middle; }
     .header-right { display:table-cell; width:45%; text-align:right; vertical-align:top; }
 
-    .logo-box img { max-height:60px; max-width:160px; object-fit:contain; margin-bottom:6px; }
+    .logo-box img { max-height:85px; max-width:240px; object-fit:contain; margin-bottom:8px; }
     .logo-texto   { font-size:22px; font-weight:bold; color:#f59e0b; margin-bottom:4px; }
     .empresa-nombre { font-size:13px; font-weight:bold; color:#1a1a1a; }
     .empresa-sub    { font-size:9px; color:#666; margin-top:1px; }
@@ -99,7 +99,7 @@
         <div class="header-left">
             <div class="logo-box">
                 @if($empresa->logo_base64)
-                    <img src="{{ $empresa->logo_base64 }}" style="max-height:60px; max-width:160px; object-fit:contain; margin-bottom:6px;">
+                    <img src="{{ $empresa->logo_base64 }}" style="max-height:85px; max-width:240px; object-fit:contain; margin-bottom:8px;">
                 @else
                     <div class="logo-texto">
                         {{ $empresa->nombre_comercial ?: $empresa->razon_social }}
