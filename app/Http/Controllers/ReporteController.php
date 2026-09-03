@@ -116,4 +116,199 @@ class ReporteController extends Controller
     {
         return $this->excelAction->carteraExcel();
     }
+
+    public function fiscal(Request $request)
+    {
+        $empresa = \App\Models\Empresa::obtener();
+        $filtros = [
+            'fecha_desde' => $request->fecha_desde ?? now()->startOfMonth()->format('Y-m-d'),
+            'fecha_hasta' => $request->fecha_hasta ?? now()->format('Y-m-d'),
+        ];
+        $datos = $this->reportes->fiscal($filtros);
+
+        return view('reportes.fiscal', array_merge([
+            'empresa' => $empresa,
+        ], $filtros, $datos));
+    }
+
+    public function fiscalExcel(Request $request)
+    {
+        $filtros = [
+            'fecha_desde' => $request->fecha_desde ?? now()->startOfMonth()->format('Y-m-d'),
+            'fecha_hasta' => $request->fecha_hasta ?? now()->format('Y-m-d'),
+        ];
+        $datos = $this->reportes->fiscal($filtros);
+
+        $filename = "Reporte_Fiscal_DIAN_{$filtros['fecha_desde']}_al_{$filtros['fecha_hasta']}.csv";
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($datos, $filtros) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+
+            fputcsv($file, ['INFORME FISCAL Y TRIBUTARIO (DIAN) — PERIODO: ' . $filtros['fecha_desde'] . ' al ' . $filtros['fecha_hasta']], ';');
+            fputcsv($file, [], ';');
+
+            fputcsv($file, ['CONCEPTO TRIBUTARIO', 'BASE GRAVABLE (COP)', 'IMPUESTO GENERADO (COP)'], ';');
+            fputcsv($file, ['Ventas Gravadas Tarifa General (19%)', number_format($datos['totales']['base_19'], 2, ',', ''), number_format($datos['totales']['iva_19'], 2, ',', '')], ';');
+            fputcsv($file, ['Ventas Gravadas Tarifa Especial (5%)', number_format($datos['totales']['base_5'], 2, ',', ''), number_format($datos['totales']['iva_5'], 2, ',', '')], ';');
+            fputcsv($file, ['Ventas Exentas / Excluidas (0%)', number_format($datos['totales']['base_0'], 2, ',', ''), '0,00'], ';');
+            fputcsv($file, ['TOTAL IVA GENERADO', '', number_format($datos['totales']['total_iva_generado'], 2, ',', '')], ';');
+            fputcsv($file, [], ';');
+
+            fputcsv($file, ['RETENCIONES EN LA FUENTE PRACTICADAS'], ';');
+            fputcsv($file, ['ReteFuente Ventas (Pasivo)', '', number_format($datos['totales']['total_retefuente'], 2, ',', '')], ';');
+            fputcsv($file, ['ReteICA Ventas', '', number_format($datos['totales']['total_reteica'], 2, ',', '')], ';');
+            fputcsv($file, ['ReteIVA Ventas', '', number_format($datos['totales']['total_reteiva'], 2, ',', '')], ';');
+            fputcsv($file, [], ';');
+
+            fputcsv($file, ['Factura N°', 'Fecha', 'Cliente', 'NIT / CC', 'Subtotal', 'IVA', 'ReteFuente', 'ReteICA', 'Total Factura'], ';');
+            foreach ($datos['facturas'] as $f) {
+                fputcsv($file, [
+                    $f->numero,
+                    $f->fecha_emision ? $f->fecha_emision->format('Y-m-d') : '',
+                    $f->cliente_nombre,
+                    $f->cliente_documento,
+                    number_format($f->subtotal, 2, ',', ''),
+                    number_format($f->iva, 2, ',', ''),
+                    number_format($f->retefuente, 2, ',', ''),
+                    number_format($f->reteica, 2, ',', ''),
+                    number_format($f->total, 2, ',', ''),
+                ], ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function compras(Request $request)
+    {
+        $empresa = \App\Models\Empresa::obtener();
+        $filtros = [
+            'fecha_desde' => $request->fecha_desde ?? now()->startOfMonth()->format('Y-m-d'),
+            'fecha_hasta' => $request->fecha_hasta ?? now()->format('Y-m-d'),
+            'estado'      => $request->estado ?? '',
+        ];
+        $datos = $this->reportes->compras($filtros);
+
+        return view('reportes.compras', array_merge([
+            'empresa' => $empresa,
+        ], $filtros, $datos));
+    }
+
+    public function comprasExcel(Request $request)
+    {
+        $filtros = [
+            'fecha_desde' => $request->fecha_desde ?? now()->startOfMonth()->format('Y-m-d'),
+            'fecha_hasta' => $request->fecha_hasta ?? now()->format('Y-m-d'),
+            'estado'      => $request->estado ?? '',
+        ];
+        $datos = $this->reportes->compras($filtros);
+
+        $filename = "Reporte_Compras_{$filtros['fecha_desde']}_al_{$filtros['fecha_hasta']}.csv";
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($datos) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+
+            fputcsv($file, ['N° Orden / Factura', 'Fecha Emisión', 'Proveedor', 'NIT / Documento', 'Estado', 'Subtotal', 'IVA Compras', 'Total'], ';');
+
+            foreach ($datos['ordenes'] as $o) {
+                fputcsv($file, [
+                    $o->numero,
+                    $o->fecha_emision ? $o->fecha_emision->format('Y-m-d') : '',
+                    $o->proveedor_nombre,
+                    $o->proveedor_documento,
+                    ucfirst($o->estado),
+                    number_format($o->subtotal, 2, ',', ''),
+                    number_format($o->iva, 2, ',', ''),
+                    number_format($o->total, 2, ',', ''),
+                ], ';');
+            }
+
+            fputcsv($file, [
+                'TOTALES', '', '', '', '',
+                number_format($datos['totales']['subtotal'], 2, ',', ''),
+                number_format($datos['totales']['iva'], 2, ',', ''),
+                number_format($datos['totales']['total'], 2, ',', ''),
+            ], ';');
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function rentabilidad(Request $request)
+    {
+        $empresa = \App\Models\Empresa::obtener();
+        $filtros = [
+            'fecha_desde' => $request->fecha_desde ?? now()->startOfMonth()->format('Y-m-d'),
+            'fecha_hasta' => $request->fecha_hasta ?? now()->format('Y-m-d'),
+        ];
+        $datos = $this->reportes->rentabilidad($filtros);
+
+        return view('reportes.rentabilidad', array_merge([
+            'empresa' => $empresa,
+        ], $filtros, $datos));
+    }
+
+    public function rentabilidadExcel(Request $request)
+    {
+        $filtros = [
+            'fecha_desde' => $request->fecha_desde ?? now()->startOfMonth()->format('Y-m-d'),
+            'fecha_hasta' => $request->fecha_hasta ?? now()->format('Y-m-d'),
+        ];
+        $datos = $this->reportes->rentabilidad($filtros);
+
+        $filename = "Reporte_Rentabilidad_{$filtros['fecha_desde']}_al_{$filtros['fecha_hasta']}.csv";
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($datos) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+
+            fputcsv($file, ['Producto', 'Código', 'Categoría', 'Cant. Vendida', 'Ingreso por Ventas', 'Costo Total', 'Utilidad Bruta (COP)', 'Margen (%)'], ';');
+
+            foreach ($datos['filas'] as $r) {
+                fputcsv($file, [
+                    $r['producto'],
+                    $r['codigo'],
+                    $r['categoria'],
+                    $r['cantidad'],
+                    number_format($r['ingreso'], 2, ',', ''),
+                    number_format($r['costo'], 2, ',', ''),
+                    number_format($r['utilidad'], 2, ',', ''),
+                    number_format($r['margen_pct'], 1, ',', '') . '%',
+                ], ';');
+            }
+
+            fputcsv($file, [
+                'TOTALES', '', '', '',
+                number_format($datos['totales']['total_ingreso'], 2, ',', ''),
+                number_format($datos['totales']['total_costo'], 2, ',', ''),
+                number_format($datos['totales']['total_utilidad'], 2, ',', ''),
+                number_format($datos['totales']['margen_global'], 1, ',', '') . '%',
+            ], ';');
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

@@ -137,5 +137,137 @@ class ReporteService
             ]
         ];
     }
+
+    public function fiscal(array $filtros): array
+    {
+        $facturas = Factura::with('items')
+            ->whereBetween('fecha_emision', [$filtros['fecha_desde'], $filtros['fecha_hasta']])
+            ->where('estado', '!=', 'anulada')
+            ->orderBy('fecha_emision')
+            ->get();
+
+        $base19 = 0; $iva19 = 0;
+        $base5  = 0; $iva5  = 0;
+        $base0  = 0; $iva0  = 0;
+
+        foreach ($facturas as $f) {
+            foreach ($f->items as $item) {
+                $pct = (float) $item->iva_pct;
+                $sub = (float) $item->subtotal;
+                $iv  = (float) $item->iva;
+
+                if ($pct >= 18) {
+                    $base19 += $sub;
+                    $iva19  += $iv;
+                } elseif ($pct > 0) {
+                    $base5 += $sub;
+                    $iva5  += $iv;
+                } else {
+                    $base0 += $sub;
+                    $iva0  += $iv;
+                }
+            }
+        }
+
+        $totales = [
+            'total_ventas_brutas' => $facturas->sum('subtotal'),
+            'total_descuentos'    => $facturas->sum('descuento'),
+            'base_19'             => $base19,
+            'iva_19'              => $iva19,
+            'base_5'              => $base5,
+            'iva_5'               => $iva5,
+            'base_0'              => $base0,
+            'iva_0'               => $iva0,
+            'total_iva_generado'  => $facturas->sum('iva'),
+            'total_retefuente'    => $facturas->sum('retefuente'),
+            'total_reteica'       => $facturas->sum('reteica'),
+            'total_reteiva'       => $facturas->sum('reteiva'),
+            'total_neto_facturado'=> $facturas->sum('total'),
+            'num_facturas'        => $facturas->count(),
+        ];
+
+        return compact('facturas', 'totales');
+    }
+
+    public function compras(array $filtros): array
+    {
+        $query = \App\Models\OrdenCompra::with('proveedor')
+            ->whereBetween('fecha_emision', [$filtros['fecha_desde'], $filtros['fecha_hasta']])
+            ->when(!empty($filtros['estado']), fn($q) => $q->where('estado', $filtros['estado']))
+            ->where('estado', '!=', 'anulada')
+            ->orderByDesc('fecha_emision');
+
+        $ordenes = $query->get();
+
+        $totales = [
+            'subtotal'    => $ordenes->sum('subtotal'),
+            'iva'         => $ordenes->sum('iva'),
+            'descuento'   => $ordenes->sum('descuento'),
+            'total'       => $ordenes->sum('total'),
+            'count'       => $ordenes->count(),
+        ];
+
+        return compact('ordenes', 'totales');
+    }
+
+    public function rentabilidad(array $filtros): array
+    {
+        $items = DB::table('factura_items')
+            ->join('facturas', 'facturas.id', '=', 'factura_items.factura_id')
+            ->leftJoin('productos', 'productos.id', '=', 'factura_items.producto_id')
+            ->leftJoin('categorias', 'categorias.id', '=', 'productos.categoria_id')
+            ->whereBetween('facturas.fecha_emision', [$filtros['fecha_desde'], $filtros['fecha_hasta']])
+            ->where('facturas.estado', '!=', 'anulada')
+            ->select(
+                'factura_items.descripcion',
+                'productos.codigo as producto_codigo',
+                'categorias.nombre as categoria_nombre',
+                DB::raw('SUM(factura_items.cantidad) as total_cantidad'),
+                DB::raw('SUM(factura_items.subtotal) as total_ingreso'),
+                DB::raw('SUM(factura_items.cantidad * COALESCE(productos.precio_compra, 0)) as total_costo')
+            )
+            ->groupBy('factura_items.descripcion', 'productos.codigo', 'categorias.nombre')
+            ->orderByDesc('total_ingreso')
+            ->get();
+
+        $filas = [];
+        $totalIngreso = 0;
+        $totalCosto = 0;
+
+        foreach ($items as $it) {
+            $ing = (float) $it->total_ingreso;
+            $cos = (float) $it->total_costo;
+            $utilidad = $ing - $cos;
+            $margen = $ing > 0 ? round(($utilidad / $ing) * 100, 1) : 0;
+
+            $totalIngreso += $ing;
+            $totalCosto += $cos;
+
+            $filas[] = [
+                'producto'   => $it->descripcion,
+                'codigo'     => $it->producto_codigo ?? '—',
+                'categoria'  => $it->categoria_nombre ?? 'General',
+                'cantidad'   => (float) $it->total_cantidad,
+                'ingreso'    => $ing,
+                'costo'      => $cos,
+                'utilidad'   => $utilidad,
+                'margen_pct' => $margen,
+            ];
+        }
+
+        $totalUtilidad = $totalIngreso - $totalCosto;
+        $margenGlobal = $totalIngreso > 0 ? round(($totalUtilidad / $totalIngreso) * 100, 1) : 0;
+
+        $totales = [
+            'total_ingreso'  => $totalIngreso,
+            'total_costo'    => $totalCosto,
+            'total_utilidad' => $totalUtilidad,
+            'margen_global'  => $margenGlobal,
+            'num_productos'  => count($filas),
+        ];
+
+        return compact('filas', 'totales');
+    }
 }
+
 

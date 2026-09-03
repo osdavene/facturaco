@@ -9,24 +9,42 @@
         <h1 class="font-display font-bold text-2xl">Reportes</h1>
         <p class="text-slate-500 text-sm mt-1">Análisis y estadísticas del negocio</p>
     </div>
-    <div class="flex gap-3">
+    <div class="flex items-center gap-2 flex-wrap">
         <a href="{{ route('reportes.ventas') }}"
-           class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+           class="inline-flex items-center gap-1.5 bg-[#1a2235] border border-[#1e2d47]
                   hover:border-amber-500 text-slate-300 hover:text-amber-500
-                  px-4 py-2.5 rounded-xl transition-colors text-sm">
-            <i class="fas fa-chart-line"></i> Ventas
+                  px-3.5 py-2 rounded-xl transition-colors text-xs font-semibold">
+            <i class="fas fa-chart-line text-blue-400"></i> Ventas
+        </a>
+        <a href="{{ route('reportes.fiscal') }}"
+           class="inline-flex items-center gap-1.5 bg-[#1a2235] border border-[#1e2d47]
+                  hover:border-amber-500 text-slate-300 hover:text-amber-500
+                  px-3.5 py-2 rounded-xl transition-colors text-xs font-semibold">
+            <i class="fas fa-landmark text-emerald-400"></i> Fiscal DIAN
+        </a>
+        <a href="{{ route('reportes.compras') }}"
+           class="inline-flex items-center gap-1.5 bg-[#1a2235] border border-[#1e2d47]
+                  hover:border-amber-500 text-slate-300 hover:text-amber-500
+                  px-3.5 py-2 rounded-xl transition-colors text-xs font-semibold">
+            <i class="fas fa-shopping-bag text-purple-400"></i> Compras
+        </a>
+        <a href="{{ route('reportes.rentabilidad') }}"
+           class="inline-flex items-center gap-1.5 bg-[#1a2235] border border-[#1e2d47]
+                  hover:border-amber-500 text-slate-300 hover:text-amber-500
+                  px-3.5 py-2 rounded-xl transition-colors text-xs font-semibold">
+            <i class="fas fa-percentage text-amber-400"></i> Rentabilidad
         </a>
         <a href="{{ route('reportes.inventario') }}"
-           class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+           class="inline-flex items-center gap-1.5 bg-[#1a2235] border border-[#1e2d47]
                   hover:border-amber-500 text-slate-300 hover:text-amber-500
-                  px-4 py-2.5 rounded-xl transition-colors text-sm">
-            <i class="fas fa-boxes"></i> Inventario
+                  px-3.5 py-2 rounded-xl transition-colors text-xs font-semibold">
+            <i class="fas fa-boxes text-orange-400"></i> Inventario
         </a>
         <a href="{{ route('reportes.cartera') }}"
-           class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+           class="inline-flex items-center gap-1.5 bg-[#1a2235] border border-[#1e2d47]
                   hover:border-amber-500 text-slate-300 hover:text-amber-500
-                  px-4 py-2.5 rounded-xl transition-colors text-sm">
-            <i class="fas fa-hand-holding-usd"></i> Cartera
+                  px-3.5 py-2 rounded-xl transition-colors text-xs font-semibold">
+            <i class="fas fa-hand-holding-usd text-teal-400"></i> Cartera
         </a>
     </div>
 </div>
