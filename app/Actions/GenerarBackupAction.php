@@ -238,6 +238,29 @@ class GenerarBackupAction
             $zip->addFile($archivo, basename($archivo));
         }
 
+        // Empaquetar imágenes físicas de productos y logo de la empresa
+        if (in_array('productos', $tablasSeleccionadas)) {
+            $productosConImagen = DB::table('productos')
+                ->whereIn('empresa_id', $ids)
+                ->whereNotNull('imagen')
+                ->where('imagen', '!=', '')
+                ->get();
+
+            foreach ($productosConImagen as $p) {
+                $rutaFisica = storage_path('app/public/' . $p->imagen);
+                if (file_exists($rutaFisica)) {
+                    $zip->addFile($rutaFisica, 'imagenes/' . $p->imagen);
+                }
+            }
+        }
+
+        if ($empresa && $empresa->logo) {
+            $rutaLogo = storage_path('app/public/' . $empresa->logo);
+            if (file_exists($rutaLogo)) {
+                $zip->addFile($rutaLogo, 'imagenes/' . $empresa->logo);
+            }
+        }
+
         $readme  = "COPIA DE SEGURIDAD FACCOL\n";
         $readme .= "Empresa: " . ($empresa->razon_social ?? 'N/A') . " (NIT: " . ($empresa->nit ?? '') . ")\n";
         $readme .= "Fecha: " . now()->format('d/m/Y H:i:s') . "\n";
@@ -246,6 +269,7 @@ class GenerarBackupAction
         if ($request->filled('fecha_desde') || $request->filled('fecha_hasta')) {
             $readme .= "Rango de fechas: " . ($request->fecha_desde ?? 'Inicio') . ' al ' . ($request->fecha_hasta ?? 'Hoy') . "\n";
         }
+        $readme .= "Archivos multimedia: Las fotos de productos y logo se encuentran en la carpeta 'imagenes/'.\n";
         $zip->addFromString('LEEME.txt', $readme);
         $zip->close();
 
