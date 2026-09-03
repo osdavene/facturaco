@@ -85,18 +85,29 @@ class Factura extends Model
         return max(0, $this->total - $this->total_pagado);
     }
 
-    public static function siguienteConsecutivo(string $prefijo = ''): array
+    public static function siguienteConsecutivo(string $prefijo = '', ?int $empresaId = null): array
     {
+        $empresa = $empresaId ? \App\Models\Empresa::find($empresaId) : \App\Models\Empresa::obtener();
         if (empty($prefijo)) {
-            $prefijo = \App\Models\Empresa::obtener()->prefijo_factura ?? 'FE';
+            $prefijo = $empresa?->prefijo_factura ?? 'FE';
         }
 
-        $ultimo = static::where('prefijo', $prefijo)
-            ->withTrashed()
-            ->max('consecutivo') ?? 0;
+        $empresaId = $empresa?->id;
 
-        $consecutivo = $ultimo + 1;
-        $numero      = $prefijo . '-' . date('Y') . '-' . str_pad($consecutivo, 4, '0', STR_PAD_LEFT);
+        $ultimo = static::where('prefijo', $prefijo)
+            ->when($empresaId, fn($q) => $q->where('empresa_id', $empresaId))
+            ->withTrashed()
+            ->max('consecutivo');
+
+        $desde = (int) ($empresa?->consecutivo_desde ?? 1);
+
+        if ($ultimo === null || $ultimo < $desde) {
+            $consecutivo = $desde > 0 ? $desde : 1;
+        } else {
+            $consecutivo = $ultimo + 1;
+        }
+
+        $numero = !empty($prefijo) ? $prefijo . '-' . $consecutivo : (string) $consecutivo;
 
         return compact('consecutivo', 'numero');
     }
