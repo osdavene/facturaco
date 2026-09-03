@@ -521,7 +521,7 @@ class BackofficeController extends Controller
     public function correoGuardar(Request $request)
     {
         $data = $request->validate([
-            'mail_mailer'       => 'required|string|in:smtp,log,resend',
+            'mail_mailer'       => 'nullable|string|in:smtp,log,resend',
             'mail_host'         => 'required|string|max:255',
             'mail_port'         => 'required|integer',
             'mail_encryption'   => 'nullable|string|in:tls,ssl,null',
@@ -530,6 +530,10 @@ class BackofficeController extends Controller
             'mail_from_address' => 'required|email|max:255',
             'mail_from_name'    => 'required|string|max:255',
         ]);
+
+        // Auto-corregir errores tipográficos (.corn -> .com, srntp -> smtp)
+        $data['mail_host'] = str_replace(['.corn', 'srntp'], ['.com', 'smtp'], trim($data['mail_host']));
+        $data['mail_username'] = str_replace(['.corn', 'srntp'], ['.com', 'smtp'], trim($data['mail_username'] ?? ''));
 
         foreach ($data as $key => $val) {
             if ($key === 'mail_password' && (empty($val) || $val === null)) {
@@ -546,6 +550,40 @@ class BackofficeController extends Controller
         $request->validate([
             'email_destino' => 'required|email',
         ]);
+
+        $host = \App\Models\ConfiguracionPlataforma::get('mail_host', config('mail.mailers.smtp.host'));
+        $user = \App\Models\ConfiguracionPlataforma::get('mail_username', config('mail.mailers.smtp.username'));
+        $pass = \App\Models\ConfiguracionPlataforma::get('mail_password', config('mail.mailers.smtp.password'));
+        $from = \App\Models\ConfiguracionPlataforma::get('mail_from_address', config('mail.from.address', 'onboarding@resend.dev'));
+        $name = \App\Models\ConfiguracionPlataforma::get('mail_from_name', config('mail.from.name', 'FacCol'));
+
+        // Si es Resend (API Key o usuario resend), usar directamente la API HTTPS de Resend (Puerto 443 - 100% inmune a bloqueos)
+        if (str_contains(strtolower((string)$host), 'resend') || strtolower((string)$user) === 'resend' || str_starts_with((string)$pass, 're_')) {
+            $apiKey = trim((string)$pass);
+            if (empty($apiKey)) {
+                return back()->with('error', 'Debes ingresar tu API Key de Resend (empieza por re_...) en el campo Contraseña.');
+            }
+
+            try {
+                $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                    ->acceptJson()
+                    ->post('https://api.resend.com/emails', [
+                        'from'    => "{$name} <{$from}>",
+                        'to'      => [$request->email_destino],
+                        'subject' => '✅ Prueba Exitosa de Correo — FacCol (Resend API)',
+                        'html'    => "<h2>¡Hola!</h2><p>Este es un correo de prueba enviado exitosamente desde tu plataforma <strong>FacCol</strong> mediante la <strong>API HTTPS de Resend</strong>.</p><p>Fecha y hora: " . now()->format('d/m/Y H:i:s') . "</p>",
+                    ]);
+
+                if ($response->successful()) {
+                    return back()->with('success', "¡Correo de prueba enviado con éxito a {$request->email_destino} vía Resend HTTPS API!");
+                }
+
+                $errorMsg = $response->json('message') ?? ($response->json('error') ?? $response->body());
+                return back()->with('error', "Error de Resend API: {$errorMsg}");
+            } catch (\Throwable $e) {
+                return back()->with('error', 'Error al conectar con Resend API: ' . $e->getMessage());
+            }
+        }
 
         try {
             \App\Services\MailConfigService::aplicarConfiguracion();
