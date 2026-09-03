@@ -18,7 +18,17 @@
                 Configura tu cuenta de correo SMTP (Gmail o empresarial) para enviar facturas, cotizaciones y avisos automáticos de vencimiento de planes.
             </p>
         </div>
+        <div>
+            <button type="button" @click="guiaModal = true"
+                    class="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2">
+                <i class="fas fa-circle-question text-sm"></i>
+                <span>Guía de Ayuda Paso a Paso</span>
+            </button>
+        </div>
     </div>
+
+    {{-- Componente Modal Guía --}}
+    <x-modal-guia-correo />
 
     {{-- Alertas --}}
     @if(session('success'))
@@ -225,6 +235,7 @@
 <script>
 function correoConfigManager() {
     return {
+        guiaModal: false,
         form: {
             host: '{{ $mailHost }}',
             port: '{{ $mailPort }}',

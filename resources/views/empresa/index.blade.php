@@ -544,17 +544,28 @@
             </div>
 
             {{-- SECCIÓN: Configuración de Correo --}}
-            <div class="card p-6">
-                <h2 class="font-display font-bold text-base mb-1 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
-                                text-black text-xs font-black">
-                        <i class="fas fa-envelope text-xs"></i>
-                    </span>
-                    Configuración de Correo
-                </h2>
+            <div class="card p-6" x-data="{ guiaModal: false }">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
+                    <h2 class="font-display font-bold text-base flex items-center gap-2">
+                        <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center
+                                    text-black text-xs font-black">
+                            <i class="fas fa-envelope text-xs"></i>
+                        </span>
+                        Configuración de Correo SMTP
+                    </h2>
+                    <button type="button" @click="guiaModal = true"
+                            class="px-3.5 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5 w-fit">
+                        <i class="fas fa-circle-question text-sm"></i>
+                        <span>Guía de Ayuda Paso a Paso</span>
+                    </button>
+                </div>
+
+                {{-- Modal Guía Reutilizable --}}
+                <x-modal-guia-correo />
+
                 <p class="text-xs text-slate-500 mb-5">
-                    Configura el servidor SMTP para enviar facturas por email directamente desde el sistema.
-                    Cada empresa puede tener su propio correo de envío.
+                    Configura el servidor SMTP para enviar facturas electrónicas, cotizaciones y recibos por email directamente desde el sistema.
+                    Tu empresa tendrá su propio remitente personalizado.
                 </p>
 
                 {{-- Estado actual --}}
@@ -569,45 +580,40 @@
                 <div class="bg-amber-500/10 border border-amber-500/30 text-amber-400
                             rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Correo no configurado. Sin esto no podrás enviar facturas por email.
+                    Correo no configurado. Sin esto no podrás enviar facturas por email con tu propio dominio.
                 </div>
                 @endif
 
                 {{-- Selector de proveedor --}}
                 <div class="bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-4 mb-4">
                     <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                        Preconfigurar proveedor
+                        Preconfigurar proveedor con 1 Clic
                     </div>
                     <div class="flex flex-wrap gap-2 mb-3">
-                        <button type="button" onclick="precargarProveedor('resend')"
-                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
-                                    text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fas fa-bolt mr-1 text-amber-400"></i> Resend
-                        </button>
                         <button type="button" onclick="precargarProveedor('gmail')"
-                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
-                                    text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fab fa-google mr-1 text-red-400"></i> Gmail
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-rose-500/60
+                                    text-slate-400 hover:text-rose-400 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fab fa-google mr-1 text-red-400"></i> Gmail / Workspace
                         </button>
                         <button type="button" onclick="precargarProveedor('outlook')"
-                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
-                                    text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fab fa-microsoft mr-1 text-blue-300"></i> Outlook / Hotmail
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-blue-500/60
+                                    text-slate-400 hover:text-blue-400 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fab fa-microsoft mr-1 text-blue-300"></i> Outlook / Office 365
                         </button>
-                        <button type="button" onclick="precargarProveedor('yahoo')"
+                        <button type="button" onclick="precargarProveedor('zoho')"
                                 class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
                                     text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fab fa-yahoo mr-1 text-purple-400"></i> Yahoo
+                            <i class="fas fa-briefcase mr-1 text-amber-400"></i> Zoho Mail
                         </button>
-                        <button type="button" onclick="precargarProveedor('mailgun')"
-                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
-                                    text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fas fa-envelope mr-1 text-slate-400"></i> Mailgun
+                        <button type="button" onclick="precargarProveedor('cpanel')"
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-purple-500/60
+                                    text-slate-400 hover:text-purple-400 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fas fa-server mr-1 text-purple-400"></i> Hostinger / cPanel
                         </button>
-                        <button type="button" onclick="precargarProveedor('sendgrid')"
-                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-amber-500/60
-                                    text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fas fa-paper-plane mr-1 text-blue-400"></i> SendGrid
+                        <button type="button" onclick="precargarProveedor('resend')"
+                                class="proveedor-btn text-xs bg-[#141c2e] border border-[#1e2d47] hover:border-emerald-500/60
+                                    text-slate-400 hover:text-emerald-400 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fas fa-bolt mr-1 text-emerald-400"></i> Resend
                         </button>
                     </div>
 
@@ -926,6 +932,24 @@ function precargarSendgrid() {
     document.getElementById('mail_password').focus();
 }
 
+function precargarZoho() {
+    document.getElementById('mail_host').value       = 'smtppro.zoho.com';
+    document.getElementById('mail_port').value       = '465';
+    document.getElementById('mail_encryption').value = 'ssl';
+    document.getElementById('mail_username').value   = '';
+    document.getElementById('mail_username').placeholder = 'contacto@tuempresa.com';
+    document.getElementById('mail_username').focus();
+}
+
+function precargarCpanel() {
+    document.getElementById('mail_host').value       = 'mail.tudominio.com';
+    document.getElementById('mail_port').value       = '465';
+    document.getElementById('mail_encryption').value = 'ssl';
+    document.getElementById('mail_username').value   = '';
+    document.getElementById('mail_username').placeholder = 'facturacion@tudominio.com';
+    document.getElementById('mail_username').focus();
+}
+
 function precargarProveedor(tipo) {
     switch (tipo) {
         case 'resend':
@@ -936,6 +960,12 @@ function precargarProveedor(tipo) {
             break;
         case 'outlook':
             precargarOutlook();
+            break;
+        case 'zoho':
+            precargarZoho();
+            break;
+        case 'cpanel':
+            precargarCpanel();
             break;
         case 'yahoo':
             precargarYahoo();
