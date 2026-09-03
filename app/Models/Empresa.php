@@ -47,6 +47,21 @@ class Empresa extends Model
         return $this->belongsTo(Plan::class, 'plan_id');
     }
 
+    public function facturas(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Factura::class, 'empresa_id');
+    }
+
+    public function clientes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Cliente::class, 'empresa_id');
+    }
+
+    public function productos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Producto::class, 'empresa_id');
+    }
+
     public function usuarios()
     {
         return $this->belongsToMany(User::class, 'empresa_user')
