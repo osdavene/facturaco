@@ -57,14 +57,17 @@ class FacturaController extends Controller
 
     // ── CREATE ────────────────────────────────────────────────
 
-    public function create()
+    public function create(Request $request)
     {
         $empresa     = Empresa::obtener();
         $consecutivo = Factura::siguienteConsecutivo($empresa->prefijo_factura);
         $clientes    = Cliente::where('activo', true)->orderBy('razon_social')->get();
         $productos   = Producto::where('activo', true)->orderBy('nombre')->get();
+        $clientePreseleccionado = $request->filled('cliente_id')
+            ? Cliente::find($request->cliente_id)
+            : null;
 
-        return view('facturas.create', compact('consecutivo', 'clientes', 'productos', 'empresa'));
+        return view('facturas.create', compact('consecutivo', 'clientes', 'productos', 'empresa', 'clientePreseleccionado'));
     }
 
     // ── STORE ─────────────────────────────────────────────────

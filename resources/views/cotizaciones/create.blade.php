@@ -509,6 +509,12 @@ document.addEventListener('click', e => {
     if (!e.target.closest('#buscar-producto') && !e.target.closest('#resultados-producto'))
         document.getElementById('resultados-producto').classList.add('hidden');
 });
+
+@if(isset($clientePreseleccionado) && $clientePreseleccionado)
+document.addEventListener('DOMContentLoaded', () => {
+    seleccionarCliente(@json($clientePreseleccionado));
+});
+@endif
 </script>
 @endpush
 @endsection

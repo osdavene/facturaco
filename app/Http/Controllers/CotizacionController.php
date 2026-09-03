@@ -43,12 +43,15 @@ class CotizacionController extends Controller
         return view('cotizaciones.index', compact('cotizaciones', 'totales'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $consecutivo = Cotizacion::siguienteConsecutivo();
         $empresa     = Empresa::obtener();
+        $clientePreseleccionado = $request->filled('cliente_id')
+            ? Cliente::find($request->cliente_id)
+            : null;
 
-        return view('cotizaciones.create', compact('consecutivo', 'empresa'));
+        return view('cotizaciones.create', compact('consecutivo', 'empresa', 'clientePreseleccionado'));
     }
 
     public function store(StoreCotizacionRequest $request)

@@ -18,11 +18,23 @@
                 <p class="text-slate-500 text-sm">{{ $cliente->tipo_documento }}: {{ $cliente->documento_formateado }}</p>
             </div>
         </div>
-        <a href="{{ route('clientes.edit', $cliente) }}"
-           class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600
-                  text-black font-semibold px-5 py-2.5 rounded-xl transition-colors">
-            <i class="fas fa-pen"></i> Editar
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('facturas.create', ['cliente_id' => $cliente->id]) }}"
+               class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600
+                      text-black font-bold px-4 py-2.5 rounded-xl transition-all shadow-lg shadow-amber-500/20">
+                <i class="fas fa-plus"></i> Nueva Factura
+            </a>
+            <a href="{{ route('cotizaciones.create', ['cliente_id' => $cliente->id]) }}"
+               class="inline-flex items-center gap-2 bg-[#141c2e] border border-[#1e2d47] hover:border-blue-500/50
+                      text-blue-400 font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                <i class="fas fa-file-invoice"></i> Cotizar
+            </a>
+            <a href="{{ route('clientes.edit', $cliente) }}"
+               class="inline-flex items-center gap-2 bg-[#141c2e] border border-[#1e2d47] hover:border-slate-600
+                      text-slate-300 font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                <i class="fas fa-pen"></i> Editar
+            </a>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
