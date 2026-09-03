@@ -30,7 +30,8 @@
                 <i class="fas fa-file-pdf"></i> PDF
             </a>
 
-            {{-- XML UBL (siempre disponible) --}}
+            {{-- XML UBL (descarga directa o menú si hay certificado de firma) --}}
+            @if(!empty($tieneCertificadoFirma))
             <div class="relative" id="xml-dropdown-wrap">
                 <button onclick="document.getElementById('xml-dropdown').classList.toggle('hidden')"
                         class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
@@ -44,17 +45,23 @@
                     <a href="{{ route('facturas.dian.xml', $factura) }}"
                        class="flex items-center gap-2 px-4 py-3 text-sm text-slate-300
                               hover:bg-[#141c2e] hover:text-white transition-colors">
-                        <i class="fas fa-file-code text-slate-500 w-4"></i> Sin firma
+                        <i class="fas fa-file-code text-slate-500 w-4"></i> XML Estándar
                     </a>
-                    @if($dianConfigurado)
                     <a href="{{ route('facturas.dian.xml-firmado', $factura) }}"
                        class="flex items-center gap-2 px-4 py-3 text-sm text-slate-300
                               hover:bg-[#141c2e] hover:text-sky-400 transition-colors border-t border-[#1e2d47]">
                         <i class="fas fa-file-signature text-sky-500/60 w-4"></i> Con firma XAdES
                     </a>
-                    @endif
                 </div>
             </div>
+            @else
+            <a href="{{ route('facturas.dian.xml', $factura) }}"
+               class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                      hover:border-sky-500/50 text-slate-400 hover:text-sky-400
+                      px-4 py-2.5 rounded-xl transition-colors text-sm">
+                <i class="fas fa-code"></i> XML
+            </a>
+            @endif
             @push('scripts')
             <script>
                 document.addEventListener('click', function(e) {

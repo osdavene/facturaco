@@ -42,6 +42,11 @@ class DianService
         return $this->getProvider()->estaConfigurado($empresa);
     }
 
+    public function tieneCertificadoFirma(): bool
+    {
+        return $this->soapProvider->estaConfigurado();
+    }
+
     public function enviar(Factura $factura): array
     {
         $provider = $this->getProvider();

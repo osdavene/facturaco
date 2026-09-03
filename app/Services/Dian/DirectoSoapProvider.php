@@ -20,7 +20,9 @@ class DirectoSoapProvider implements DianProviderInterface
 
     public function estaConfigurado(?Empresa $empresa = null): bool
     {
-        return filled(config('dian.certificado_path'))
+        $path = config('dian.certificado_path');
+        return filled($path)
+            && file_exists($path)
             && filled(config('dian.certificado_password'));
     }
 
