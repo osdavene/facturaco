@@ -79,7 +79,7 @@ class ReporteService
     {
         $query = Factura::with('cliente')
             ->whereBetween('fecha_emision', [$filtros['fecha_desde'], $filtros['fecha_hasta']])
-            ->when(isset($filtros['estado']), fn($q) => $q->where('estado', $filtros['estado']))
+            ->when(!empty($filtros['estado']), fn($q) => $q->where('estado', $filtros['estado']))
             ->where('estado', '!=', 'anulada')
             ->orderByDesc('fecha_emision');
 
@@ -91,21 +91,19 @@ class ReporteService
                 'subtotal' => $facturas->sum('subtotal'),
                 'iva' => $facturas->sum('iva'),
                 'retefuente' => $facturas->sum('retefuente'),
-            'reteica' => $facturas->sum('reteica'),
+                'reteica' => $facturas->sum('reteica'),
                 'total' => $facturas->sum('total'),
                 'count' => $facturas->count(),
             ]
         ];
-
-        return $datos;
     }
 
     public function inventario(array $filtros): array
     {
         $query = Producto::with(['categoria', 'unidadMedida'])
-            ->when($filtros['filtro'] === 'bajo_stock', fn($q) => $q->whereColumn('stock_actual', '<=', 'stock_minimo')->where('es_servicio', false))
-            ->when($filtros['filtro'] === 'sin_stock', fn($q) => $q->where('stock_actual', 0)->where('es_servicio', false))
-            ->when(isset($filtros['categoria_id']), fn($q) => $q->where('categoria_id', $filtros['categoria_id']))
+            ->when(($filtros['filtro'] ?? null) === 'bajo_stock', fn($q) => $q->whereColumn('stock_actual', '<=', 'stock_minimo')->where('es_servicio', false))
+            ->when(($filtros['filtro'] ?? null) === 'sin_stock', fn($q) => $q->where('stock_actual', 0)->where('es_servicio', false))
+            ->when(!empty($filtros['categoria_id']), fn($q) => $q->where('categoria_id', $filtros['categoria_id']))
             ->where('activo', true)
             ->orderBy('nombre');
 
