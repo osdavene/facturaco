@@ -98,8 +98,8 @@
     <div class="header">
         <div class="header-left">
             <div class="logo-box">
-                @if($empresa->logo)
-                    <img src="{{ public_path('storage/'.$empresa->logo) }}" alt="Logo">
+                @if($empresa->logo_base64)
+                    <img src="{{ $empresa->logo_base64 }}" style="max-height:60px; max-width:160px; object-fit:contain; margin-bottom:6px;">
                 @else
                     <div class="logo-texto">
                         {{ $empresa->nombre_comercial ?: $empresa->razon_social }}

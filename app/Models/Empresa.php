@@ -170,6 +170,39 @@ class Empresa extends Model
         return !empty($this->wompi_events_key);
     }
 
+    public function getLogoBase64Attribute(): ?string
+    {
+        if (empty($this->logo)) {
+            return null;
+        }
+
+        try {
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->logo)) {
+                $content = \Illuminate\Support\Facades\Storage::disk('public')->get($this->logo);
+                $mime    = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($this->logo) ?: 'image/png';
+                return 'data:' . $mime . ';base64,' . base64_encode($content);
+            }
+
+            $fullPath = storage_path('app/public/' . $this->logo);
+            if (file_exists($fullPath)) {
+                $content = file_get_contents($fullPath);
+                $mime    = mime_content_type($fullPath) ?: 'image/png';
+                return 'data:' . $mime . ';base64,' . base64_encode($content);
+            }
+
+            $publicPath = public_path('storage/' . $this->logo);
+            if (file_exists($publicPath)) {
+                $content = file_get_contents($publicPath);
+                $mime    = mime_content_type($publicPath) ?: 'image/png';
+                return 'data:' . $mime . ';base64,' . base64_encode($content);
+            }
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return null;
+    }
+
     // ── Helpers estáticos ─────────────────────────────────────────
 
     /**
