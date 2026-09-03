@@ -410,27 +410,20 @@
             <div class="card p-6">
                 <h3 class="font-display font-bold text-base mb-4 flex items-center gap-2">
                     <i class="fas fa-image text-amber-500 text-sm"></i>
-                    Logo de la Empresa
-                </h3>
-
-                {{-- Preview actual --}}
+                          {{-- Preview actual --}}
                 <div class="flex flex-col items-center mb-4">
                     @if($empresa->logo)
                     <div class="relative mb-3">
                         <img src="{{ Storage::url($empresa->logo) }}"
                              alt="Logo"
                              class="w-32 h-32 object-contain rounded-xl bg-white p-2">
-                        <form method="POST" action="{{ route('empresa.logo.delete') }}"
-                              class="absolute -top-2 -right-2"
-                              onsubmit="return confirm('¿Eliminar el logo?')">
-                            @csrf @method('DELETE')
-                            <button type="submit"
-                                    class="w-6 h-6 bg-red-500 text-white rounded-full
-                                           flex items-center justify-center text-xs
-                                           hover:bg-red-600 transition-colors">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </form>
+                        <button type="submit"
+                                form="form-delete-logo"
+                                class="w-6 h-6 bg-red-500 text-white rounded-full
+                                       flex items-center justify-center text-xs
+                                       hover:bg-red-600 transition-colors absolute -top-2 -right-2">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                     @else
                     <div class="w-32 h-32 bg-[#1a2235] border-2 border-dashed border-[#1e2d47]
@@ -463,7 +456,9 @@
                     <div>
                         <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Resolución</div>
                         <div class="text-sm font-semibold" style="color:#e2e8f0">
-                            {{ number_format($empresa->resolucion_numero, 0, ',', '.') }}
+                            {{ is_numeric($empresa->resolucion_numero) ? number_format((float)$empresa->resolucion_numero, 0, ',', '.') : $empresa->resolucion_numero }}
+                        </div>
+                    </div>
                         </div>
                     </div>
                     @if($empresa->resolucion_vencimiento)
@@ -881,6 +876,12 @@
 
         </div>
     </div>
+</form>
+
+{{-- Formulario independiente para eliminar logo sin colisión de rutas --}}
+<form id="form-delete-logo" method="POST" action="{{ route('empresa.logo.delete') }}" class="hidden" onsubmit="return confirm('¿Deseas eliminar el logo de la empresa?')">
+    @csrf
+    @method('DELETE')
 </form>
 
 @push('scripts')
