@@ -45,7 +45,7 @@
                 style="color:#e2e8f0">
             <option value="">Todas las categorías</option>
             @foreach($categorias as $cat)
-            <option value="{{ $cat->id }}" {{ $categoria==$cat->id ? 'selected':'' }}>
+            <option value="{{ $cat->id }}" {{ ($categoria_id ?? '') == $cat->id ? 'selected':'' }}>
                 {{ $cat->nombre }}
             </option>
             @endforeach

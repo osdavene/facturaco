@@ -66,7 +66,7 @@ echo "=== Nginx configurado en puerto ${APP_PORT} ==="
 
 # ── .env ───────────────────────────────────────────────────────────────────
 cat > .env << EOF
-APP_NAME="${APP_NAME:-FacturaCO}"
+APP_NAME="${APP_NAME:-FacCol}"
 APP_ENV=production
 APP_KEY="${APP_KEY}"
 APP_DEBUG=false
@@ -81,16 +81,16 @@ BCRYPT_ROUNDS=12
 DB_CONNECTION=pgsql
 DATABASE_URL="${DATABASE_URL}"
 
-CACHE_DRIVER=array
-CACHE_STORE=array
-SESSION_DRIVER=database
+CACHE_DRIVER=file
+CACHE_STORE=file
+SESSION_DRIVER=file
 SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
 SESSION_PATH=/
 SESSION_DOMAIN=null
 SESSION_HTTP_ONLY=true
 SESSION_SAME_SITE=lax
-QUEUE_CONNECTION=database
+QUEUE_CONNECTION=sync
 BROADCAST_CONNECTION=log
 FILESYSTEM_DISK=local
 
@@ -105,8 +105,8 @@ MAIL_PORT=2525
 MAIL_USERNAME=null
 MAIL_PASSWORD=null
 MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="facturacion@mundovirtual.co"
-MAIL_FROM_NAME="FacturaCO"
+MAIL_FROM_ADDRESS="facturacion@faccol.co"
+MAIL_FROM_NAME="FacCol"
 
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
@@ -114,7 +114,7 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 AWS_USE_PATH_STYLE_ENDPOINT=false
 
-VITE_APP_NAME="FacturaCO"
+VITE_APP_NAME="FacCol"
 EOF
 
 echo "=== .env generado ==="

@@ -83,8 +83,8 @@ MAIL_PORT=2525
 MAIL_USERNAME=null
 MAIL_PASSWORD=null
 MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="facturacion@mundovirtual.co"
-MAIL_FROM_NAME="FacturaCO"
+MAIL_FROM_ADDRESS="facturacion@faccol.co"
+MAIL_FROM_NAME="FacCol"
 
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
@@ -92,7 +92,7 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 AWS_USE_PATH_STYLE_ENDPOINT=false
 
-VITE_APP_NAME="FacturaCO"
+VITE_APP_NAME="FacCol"
 EOF
 
 echo "=== .env generado ==="
