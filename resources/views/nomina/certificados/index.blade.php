@@ -55,6 +55,14 @@
                     </select>
                 </div>
 
+                <div>
+                    <label class="form-label">¿Incluir Manual de Funciones?</label>
+                    <select name="incluir_funciones" class="form-input text-sm">
+                        <option value="0" selected>No, solo datos del cargo</option>
+                        <option value="1">Sí, detallar funciones y responsabilidades desempeñadas</option>
+                    </select>
+                </div>
+
                 <div class="sm:col-span-2">
                     <label class="form-label">Párrafo Adicional / Observaciones (Opcional)</label>
                     <textarea name="observaciones" rows="2"

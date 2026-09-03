@@ -25,28 +25,31 @@ class CertificadoLaboralController extends Controller
     public function generar(Request $request)
     {
         $request->validate([
-            'empleado_id'    => 'required|exists:empleados,id',
-            'destinatario'   => 'nullable|string|max:150',
-            'incluir_salario'=> 'nullable|boolean',
-            'observaciones'  => 'nullable|string|max:500',
+            'empleado_id'       => 'required|exists:empleados,id',
+            'destinatario'      => 'nullable|string|max:150',
+            'incluir_salario'   => 'nullable|boolean',
+            'incluir_funciones' => 'nullable|boolean',
+            'observaciones'     => 'nullable|string|max:500',
         ]);
 
-        $empleado       = Empleado::findOrFail($request->empleado_id);
-        $empresa        = Empresa::obtener();
-        $destinatario   = $request->destinatario ?: 'A QUIEN PUEDA INTERESAR';
-        $incluirSalario = $request->boolean('incluir_salario', true);
-        $observaciones  = $request->observaciones;
-        $fecha          = now();
+        $empleado         = Empleado::findOrFail($request->empleado_id);
+        $empresa          = Empresa::obtener();
+        $destinatario     = $request->destinatario ?: 'A QUIEN PUEDA INTERESAR';
+        $incluirSalario   = $request->boolean('incluir_salario', true);
+        $incluirFunciones = $request->boolean('incluir_funciones', false);
+        $observaciones    = $request->observaciones;
+        $fecha            = now();
 
-        return view('nomina.certificados.imprimir', compact('empleado', 'empresa', 'destinatario', 'incluirSalario', 'observaciones', 'fecha'));
+        return view('nomina.certificados.imprimir', compact('empleado', 'empresa', 'destinatario', 'incluirSalario', 'incluirFunciones', 'observaciones', 'fecha'));
     }
 
     public function enviarCorreo(Request $request, MailService $mailer)
     {
         $request->validate([
-            'empleado_id'    => 'required|exists:empleados,id',
-            'destinatario'   => 'nullable|string|max:150',
-            'incluir_salario'=> 'nullable|boolean',
+            'empleado_id'       => 'required|exists:empleados,id',
+            'destinatario'      => 'nullable|string|max:150',
+            'incluir_salario'   => 'nullable|boolean',
+            'incluir_funciones' => 'nullable|boolean',
         ]);
 
         $empleado = Empleado::findOrFail($request->empleado_id);
@@ -54,15 +57,16 @@ class CertificadoLaboralController extends Controller
             return back()->with('error', "El empleado {$empleado->nombre_completo} no tiene correo electrónico.");
         }
 
-        $empresa        = Empresa::obtener();
-        $destinatario   = $request->destinatario ?: 'A QUIEN PUEDA INTERESAR';
-        $incluirSalario = $request->boolean('incluir_salario', true);
-        $observaciones  = $request->observaciones;
-        $fecha          = now();
+        $empresa          = Empresa::obtener();
+        $destinatario     = $request->destinatario ?: 'A QUIEN PUEDA INTERESAR';
+        $incluirSalario   = $request->boolean('incluir_salario', true);
+        $incluirFunciones = $request->boolean('incluir_funciones', false);
+        $observaciones    = $request->observaciones;
+        $fecha            = now();
 
         // Generar PDF
         $pdf = app(PdfService::class);
-        $pdfContent = $pdf->output('nomina.certificados.imprimir', compact('empleado', 'empresa', 'destinatario', 'incluirSalario', 'observaciones', 'fecha'));
+        $pdfContent = $pdf->output('nomina.certificados.imprimir', compact('empleado', 'empresa', 'destinatario', 'incluirSalario', 'incluirFunciones', 'observaciones', 'fecha'));
 
         // Usar MailService o Http
         try {

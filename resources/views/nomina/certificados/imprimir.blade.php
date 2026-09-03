@@ -69,6 +69,17 @@
         </p>
         @endif
 
+        @if(!empty($incluirFunciones) && !empty($empleado->funciones))
+        <div class="space-y-1">
+            <p class="text-justify font-bold">
+                Entre las principales funciones y responsabilidades desempeñadas en el cargo se destacan:
+            </p>
+            <div class="pl-6 text-justify text-sm whitespace-pre-line leading-relaxed italic text-gray-700">
+                {{ $empleado->funciones }}
+            </div>
+        </div>
+        @endif
+
         @if($observaciones)
         <p class="text-justify indent-8">
             {{ $observaciones }}
