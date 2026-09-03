@@ -27,7 +27,7 @@ class MailService
     {
         if (! $this->estaConfigurado($empresa)) {
             throw new \RuntimeException(
-                "La empresa [{$empresa->razon_social}] no tiene configuración de correo SMTP."
+                "No hay un servidor de correo SMTP configurado ni en la empresa ni en la plataforma."
             );
         }
 
@@ -36,20 +36,39 @@ class MailService
         // Purgar instancia cacheada para que el worker no reutilice un transport stale
         app('mail.manager')->purge($key);
 
-        Config::set("mail.mailers.{$key}", [
-            'transport'  => 'smtp',
-            'host'       => $empresa->mail_host,
-            'port'       => (int) ($empresa->mail_port ?? 587),
-            'encryption' => $empresa->mail_encryption ?: 'tls',
-            'username'   => $empresa->mail_username,
-            'password'   => $empresa->mail_password,
-            'timeout'    => 30,
-        ]);
+        if ($this->tieneSmtpPropio($empresa)) {
+            Config::set("mail.mailers.{$key}", [
+                'transport'  => 'smtp',
+                'host'       => $empresa->mail_host,
+                'port'       => (int) ($empresa->mail_port ?? 587),
+                'encryption' => $empresa->mail_encryption ?: 'tls',
+                'username'   => $empresa->mail_username,
+                'password'   => $empresa->mail_password,
+                'timeout'    => 30,
+            ]);
+        } else {
+            // Fallback al SMTP maestro configurado en Backoffice
+            $host = \App\Models\ConfiguracionPlataforma::get('mail_host', config('mail.mailers.smtp.host'));
+            $port = \App\Models\ConfiguracionPlataforma::get('mail_port', config('mail.mailers.smtp.port', 587));
+            $enc  = \App\Models\ConfiguracionPlataforma::get('mail_encryption', config('mail.mailers.smtp.encryption', 'tls'));
+            $user = \App\Models\ConfiguracionPlataforma::get('mail_username', config('mail.mailers.smtp.username'));
+            $pass = \App\Models\ConfiguracionPlataforma::get('mail_password', config('mail.mailers.smtp.password'));
+
+            Config::set("mail.mailers.{$key}", [
+                'transport'  => 'smtp',
+                'host'       => $host,
+                'port'       => (int) $port,
+                'encryption' => $enc === 'null' || empty($enc) ? null : $enc,
+                'username'   => $user,
+                'password'   => $pass,
+                'timeout'    => 30,
+            ]);
+        }
 
         return Mail::mailer($key);
     }
 
-    public function estaConfigurado(Empresa $empresa): bool
+    public function tieneSmtpPropio(Empresa $empresa): bool
     {
         $fromAddress = $empresa->mail_from_address ?: $empresa->email;
 
@@ -57,5 +76,18 @@ class MailService
             && ! empty($empresa->mail_username)
             && ! empty($empresa->mail_password)
             && ! empty($fromAddress);
+    }
+
+    public function estaConfigurado(Empresa $empresa): bool
+    {
+        if ($this->tieneSmtpPropio($empresa)) {
+            return true;
+        }
+
+        // Verificar si Backoffice tiene SMTP configurado
+        $masterHost = \App\Models\ConfiguracionPlataforma::get('mail_host', config('mail.mailers.smtp.host'));
+        $masterUser = \App\Models\ConfiguracionPlataforma::get('mail_username', config('mail.mailers.smtp.username'));
+
+        return ! empty($masterHost) && ! empty($masterUser);
     }
 }
