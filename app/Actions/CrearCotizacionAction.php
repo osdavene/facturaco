@@ -21,12 +21,12 @@ class CrearCotizacionAction
             $cotizacion = Cotizacion::create([
                 'numero'            => $consecutivo['numero'],
                 'consecutivo'       => $consecutivo['consecutivo'],
-                'cliente_id'        => $data['cliente_id'],
+                'cliente_id'        => $data['cliente_id'] ?? null,
                 'cliente_nombre'    => strtoupper($data['cliente_nombre']),
-                'cliente_documento' => $data['cliente_documento'],
-                'cliente_email'     => $data['cliente_email'],
-                'cliente_telefono'  => $data['cliente_telefono'],
-                'cliente_direccion' => $data['cliente_direccion'],
+                'cliente_documento' => $data['cliente_documento'] ?? null,
+                'cliente_email'     => $data['cliente_email'] ?? null,
+                'cliente_telefono'  => $data['cliente_telefono'] ?? null,
+                'cliente_direccion' => $data['cliente_direccion'] ?? null,
                 'fecha_emision'     => $data['fecha_emision'],
                 'fecha_vencimiento' => $data['fecha_vencimiento'],
                 'subtotal'          => $calc['subtotal'],
@@ -36,8 +36,8 @@ class CrearCotizacionAction
                 'estado'            => $data['estado'] ?? 'borrador',
                 'forma_pago'        => $data['forma_pago'] ?? 'contado',
                 'plazo_pago'        => $data['plazo_pago'] ?? 0,
-                'observaciones'     => $data['observaciones'],
-                'terminos'          => $data['terminos'],
+                'observaciones'     => $data['observaciones'] ?? null,
+                'terminos'          => $data['terminos'] ?? null,
                 'user_id'           => $userId,
             ]);
 

@@ -30,13 +30,28 @@ class StoreCotizacionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'cliente_id'              => 'nullable|integer|exists:clientes,id',
             'cliente_nombre'          => 'required|string|max:255',
+            'cliente_documento'       => 'nullable|string|max:50',
+            'cliente_email'           => 'nullable|email|max:150',
+            'cliente_telefono'        => 'nullable|string|max:50',
+            'cliente_direccion'       => 'nullable|string|max:255',
             'fecha_emision'           => 'required|date',
             'fecha_vencimiento'       => 'required|date|after_or_equal:fecha_emision',
+            'forma_pago'              => 'nullable|string|max:50',
+            'plazo_pago'              => 'nullable|integer|min:0',
+            'observaciones'           => 'nullable|string|max:2000',
+            'terminos'                => 'nullable|string|max:2000',
+            'estado'                  => 'nullable|string|in:borrador,enviada,aceptada,rechazada',
             'items'                   => 'required|array|min:1',
-            'items.*.descripcion'     => 'required|string',
+            'items.*.producto_id'     => 'nullable|integer',
+            'items.*.codigo'          => 'nullable|string|max:50',
+            'items.*.descripcion'     => 'required|string|max:255',
+            'items.*.unidad'          => 'nullable|string|max:20',
             'items.*.cantidad'        => 'required|numeric|min:0.001',
             'items.*.precio_unitario' => 'required|numeric|min:0',
+            'items.*.descuento_pct'   => 'nullable|numeric|min:0|max:100',
+            'items.*.iva_pct'         => 'nullable|numeric|min:0',
         ];
     }
 
