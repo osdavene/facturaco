@@ -44,6 +44,14 @@ class NominaEmpleadoController extends Controller
             ->with('success', 'Empleado registrado correctamente.');
     }
 
+    public function show(Empleado $empleado)
+    {
+        $empleado->load('liquidaciones.nomina');
+        $empresa = \App\Models\Empresa::obtener();
+
+        return view('nomina.empleados.show', compact('empleado', 'empresa'));
+    }
+
     public function edit(Empleado $empleado)
     {
         return view('nomina.empleados.form', compact('empleado'));
@@ -55,7 +63,7 @@ class NominaEmpleadoController extends Controller
 
         $empleado->update($data);
 
-        return redirect()->route('nomina.empleados.index')
+        return redirect()->route('nomina.empleados.show', $empleado)
             ->with('success', 'Empleado actualizado correctamente.');
     }
 
@@ -83,32 +91,36 @@ class NominaEmpleadoController extends Controller
     private function validar(Request $request, ?Empleado $empleado = null): array
     {
         return $request->validate([
-            'nombres'            => 'required|string|max:100',
-            'apellidos'          => 'required|string|max:100',
-            'tipo_documento'     => 'required|in:CC,CE,PA,PPT,TI',
-            'numero_documento'   => 'required|string|max:30',
-            'fecha_nacimiento'   => 'nullable|date|before:today',
-            'sexo'               => 'nullable|in:M,F,O',
-            'email'              => 'nullable|email|max:150',
-            'telefono'           => 'nullable|string|max:20',
-            'direccion'          => 'nullable|string|max:200',
-            'cargo'              => 'required|string|max:100',
-            'departamento'       => 'nullable|string|max:80',
-            'fecha_ingreso'      => 'required|date',
-            'fecha_retiro'       => 'nullable|date|after:fecha_ingreso',
-            'tipo_contrato'      => 'required|in:indefinido,fijo,obra_labor,prestacion_servicios',
-            'tipo_salario'       => 'required|in:ordinario,integral',
-            'salario_base'       => 'required|numeric|min:1',
-            'periodicidad_pago'  => 'required|in:mensual,quincenal',
-            'nivel_riesgo_arl'   => 'required|integer|between:1,5',
-            'eps'                => 'nullable|string|max:100',
-            'afp'                => 'nullable|string|max:100',
-            'caja_compensacion'  => 'nullable|string|max:100',
-            'banco'              => 'nullable|string|max:80',
-            'tipo_cuenta'        => 'nullable|in:ahorros,corriente',
-            'numero_cuenta'      => 'nullable|string|max:30',
-            'activo'             => 'boolean',
-            'observaciones'      => 'nullable|string|max:500',
+            'nombres'                => 'required|string|max:100',
+            'apellidos'              => 'required|string|max:100',
+            'tipo_documento'         => 'required|in:CC,CE,PA,PPT,TI',
+            'numero_documento'       => 'required|string|max:30',
+            'fecha_nacimiento'       => 'nullable|date|before:today',
+            'sexo'                   => 'nullable|in:M,F,O',
+            'email'                  => 'nullable|email|max:150',
+            'telefono'               => 'nullable|string|max:20',
+            'direccion'              => 'nullable|string|max:200',
+            'cargo'                  => 'required|string|max:100',
+            'departamento'           => 'nullable|string|max:80',
+            'funciones'              => 'nullable|string|max:4000',
+            'horario'                => 'nullable|string|max:150',
+            'jefe_inmediato'         => 'nullable|string|max:150',
+            'habilidades_requisitos' => 'nullable|string|max:2000',
+            'fecha_ingreso'          => 'required|date',
+            'fecha_retiro'           => 'nullable|date|after:fecha_ingreso',
+            'tipo_contrato'          => 'required|in:indefinido,fijo,obra_labor,prestacion_servicios',
+            'tipo_salario'           => 'required|in:ordinario,integral',
+            'salario_base'           => 'required|numeric|min:1',
+            'periodicidad_pago'      => 'required|in:mensual,quincenal',
+            'nivel_riesgo_arl'       => 'required|integer|between:1,5',
+            'eps'                    => 'nullable|string|max:100',
+            'afp'                    => 'nullable|string|max:100',
+            'caja_compensacion'      => 'nullable|string|max:100',
+            'banco'                  => 'nullable|string|max:80',
+            'tipo_cuenta'            => 'nullable|in:ahorros,corriente',
+            'numero_cuenta'          => 'nullable|string|max:30',
+            'activo'                 => 'boolean',
+            'observaciones'          => 'nullable|string|max:500',
         ]);
     }
 }

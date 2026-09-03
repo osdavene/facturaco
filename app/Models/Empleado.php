@@ -20,6 +20,7 @@ class Empleado extends Model
         'fecha_nacimiento', 'sexo',
         'email', 'telefono', 'direccion',
         'cargo', 'departamento',
+        'funciones', 'horario', 'jefe_inmediato', 'habilidades_requisitos',
         'fecha_ingreso', 'fecha_retiro',
         'tipo_contrato', 'tipo_salario',
         'salario_base', 'periodicidad_pago',

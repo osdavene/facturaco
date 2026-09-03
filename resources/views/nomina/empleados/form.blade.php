@@ -120,15 +120,29 @@
                            class="form-input">
                 </div>
                 <div>
+                    <label class="form-label">Horario y Jornada Laboral</label>
+                    <input type="text" name="horario"
+                           value="{{ old('horario', $empleado->horario ?? '') }}"
+                           placeholder="ej. Lunes a Viernes 8:00 AM - 5:00 PM"
+                           class="form-input">
+                </div>
+                <div>
+                    <label class="form-label">Jefe Inmediato / Reporta a</label>
+                    <input type="text" name="jefe_inmediato"
+                           value="{{ old('jefe_inmediato', $empleado->jefe_inmediato ?? '') }}"
+                           placeholder="ej. Gerente de Operaciones / Director RRHH"
+                           class="form-input">
+                </div>
+                <div>
                     <label class="form-label">Fecha de Ingreso *</label>
                     <input type="date" name="fecha_ingreso"
-                           value="{{ old('fecha_ingreso', isset($empleado) ? $empleado->fecha_ingreso->format('Y-m-d') : '') }}"
+                           value="{{ old('fecha_ingreso', isset($empleado) ? ($empleado->fecha_ingreso ? $empleado->fecha_ingreso->format('Y-m-d') : '') : '') }}"
                            class="form-input" required>
                 </div>
                 <div>
                     <label class="form-label">Fecha de Retiro</label>
                     <input type="date" name="fecha_retiro"
-                           value="{{ old('fecha_retiro', isset($empleado) ? $empleado->fecha_retiro?->format('Y-m-d') : '') }}"
+                           value="{{ old('fecha_retiro', isset($empleado) ? ($empleado->fecha_retiro ? $empleado->fecha_retiro->format('Y-m-d') : '') : '') }}"
                            class="form-input">
                 </div>
                 <div>
@@ -156,7 +170,6 @@
                                min="1" step="1"
                                class="form-input pl-7" required>
                     </div>
-                    <p class="text-[10px] text-slate-600 mt-1">SMMLV 2025: $1.423.500</p>
                 </div>
                 <div>
                     <label class="form-label">Periodicidad de Pago *</label>
@@ -172,6 +185,25 @@
                         <option value="{{ $n }}" {{ old('nivel_riesgo_arl', $empleado->nivel_riesgo_arl ?? 1) == $n ? 'selected':'' }}>{{ $lbl }}</option>
                         @endforeach
                     </select>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-[#1e2d47] space-y-4">
+                <div>
+                    <label class="form-label font-bold text-amber-400">
+                        <i class="fas fa-tasks mr-1"></i> Manual de Funciones y Responsabilidades del Puesto
+                    </label>
+                    <textarea name="funciones" rows="4"
+                              placeholder="Describe las funciones principales, responsabilidades del día a día, entregables y objetivos del cargo..."
+                              class="form-input text-xs">{{ old('funciones', $empleado->funciones ?? '') }}</textarea>
+                    <p class="text-[11px] text-slate-500 mt-1">Estas funciones quedarán impresas en la Ficha Técnica del Empleado y en su perfil de Talento Humano.</p>
+                </div>
+
+                <div>
+                    <label class="form-label">Habilidades y Requisitos del Cargo (Opcional)</label>
+                    <textarea name="habilidades_requisitos" rows="2"
+                              placeholder="Nivel educativo, experiencia requerida, manejo de software, competencias..."
+                              class="form-input text-xs">{{ old('habilidades_requisitos', $empleado->habilidades_requisitos ?? '') }}</textarea>
                 </div>
             </div>
         </div>

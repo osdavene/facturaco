@@ -88,11 +88,14 @@
             @foreach($empleados as $emp)
             <tr class="table-row">
                 <td class="px-5 py-4">
-                    <div class="font-semibold text-slate-200">{{ $emp->nombre_completo }}</div>
+                    <a href="{{ route('nomina.empleados.show', $emp) }}"
+                       class="font-semibold text-slate-200 hover:text-amber-400 transition-colors block">
+                        {{ $emp->nombre_completo }}
+                    </a>
                     <div class="text-xs text-slate-500">{{ $emp->tipo_documento }}: {{ $emp->numero_documento }}</div>
                 </td>
                 <td class="px-4 py-4 hidden md:table-cell">
-                    <div class="text-slate-300">{{ $emp->cargo }}</div>
+                    <div class="text-slate-300 font-medium">{{ $emp->cargo }}</div>
                     @if($emp->departamento)
                     <div class="text-xs text-slate-500">{{ $emp->departamento }}</div>
                     @endif
@@ -108,7 +111,7 @@
                     <div class="text-[10px] text-slate-600 capitalize">{{ $emp->periodicidad_pago }}</div>
                 </td>
                 <td class="px-4 py-4 hidden sm:table-cell">
-                    <div class="text-slate-400 text-xs">{{ $emp->fecha_ingreso->format('d/m/Y') }}</div>
+                    <div class="text-slate-400 text-xs">{{ $emp->fecha_ingreso ? $emp->fecha_ingreso->format('d/m/Y') : '—' }}</div>
                     <div class="text-[10px] text-slate-600">{{ $emp->antiguedad }}</div>
                 </td>
                 <td class="px-4 py-4 text-center">
@@ -120,6 +123,10 @@
                 </td>
                 <td class="px-5 py-4 text-right">
                     <div class="flex items-center justify-end gap-2">
+                        <a href="{{ route('nomina.empleados.show', $emp) }}" title="Ver Ficha y Manual de Funciones"
+                           class="btn-icon hover:text-blue-400 hover:border-blue-500/50">
+                            <i class="fas fa-id-card text-xs"></i>
+                        </a>
                         <a href="{{ route('nomina.empleados.edit', $emp) }}" title="Editar"
                            class="btn-icon hover:text-amber-400 hover:border-amber-500/50">
                             <i class="fas fa-edit text-xs"></i>

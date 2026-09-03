@@ -33,6 +33,7 @@ Route::prefix('nomina')->name('nomina.')->middleware('modulo:nomina')->group(fun
     // Solo lectura
     Route::middleware('can:ver nomina')->group(function () {
         Route::get('/empleados',                       [NominaEmpleadoController::class, 'index']) ->name('empleados.index');
+        Route::get('/empleados/{empleado}',            [NominaEmpleadoController::class, 'show'])  ->name('empleados.show')->whereNumber('empleado');
         Route::get('/',                                [NominaController::class, 'index'])         ->name('index');
         Route::get('/liquidacion-definitiva',          [\App\Http\Controllers\LiquidacionDefinitivaController::class, 'index'])   ->name('liquidacion-definitiva.index');
         Route::post('/liquidacion-definitiva/imprimir',[\App\Http\Controllers\LiquidacionDefinitivaController::class, 'imprimir'])->name('liquidacion-definitiva.imprimir');
