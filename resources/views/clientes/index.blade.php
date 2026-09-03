@@ -104,8 +104,9 @@
             </thead>
             <tbody>
                 @forelse($clientes as $cliente)
-                <tr class="table-row">
-                    <td class="px-4 py-4">
+                <tr class="table-row cursor-pointer hover:bg-[#141d2e] transition-colors group"
+                    onclick="if(!event.target.closest('input, a, button, .bulk-item')) window.location.href='{{ route('clientes.show', $cliente) }}'">
+                    <td class="px-4 py-4" onclick="event.stopPropagation()">
                         <input type="checkbox" class="bulk-item w-4 h-4 rounded border-[#2d3f5c]
                                bg-[#1a2235] accent-amber-500 cursor-pointer" value="{{ $cliente->id }}">
                     </td>
@@ -119,7 +120,7 @@
                                 {{ strtoupper(substr($cliente->nombre_completo, 0, 2)) }}
                             </div>
                             <div>
-                                <div class="text-sm font-semibold">{{ $cliente->nombre_completo }}</div>
+                                <div class="text-sm font-semibold group-hover:underline text-slate-200">{{ $cliente->nombre_completo }}</div>
                                 <div class="text-xs text-slate-500">
                                     {{ $cliente->tipo_persona == 'juridica' ? 'Jurídica' : 'Natural' }}
                                 </div>

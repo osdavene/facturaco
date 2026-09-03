@@ -132,11 +132,11 @@
                 <div class="grid grid-cols-2 gap-4 text-sm">
                     <div>
                         <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Creado</div>
-                        <div class="text-slate-300">{{ $proveedor->created_at->format('d/m/Y H:i') }}</div>
+                        <div class="text-slate-300">{{ $proveedor->created_at?->format('d/m/Y H:i') ?? '—' }}</div>
                     </div>
                     <div>
                         <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Actualizado</div>
-                        <div class="text-slate-300">{{ $proveedor->updated_at->format('d/m/Y H:i') }}</div>
+                        <div class="text-slate-300">{{ $proveedor->updated_at?->format('d/m/Y H:i') ?? '—' }}</div>
                     </div>
                 </div>
             </div>
