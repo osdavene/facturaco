@@ -15,3 +15,9 @@ Schedule::command('alertas:enviar')
          ->dailyAt('08:00')
          ->name('enviar-alertas-diarias')
          ->withoutOverlapping();
+
+// Enviar avisos de vencimiento de planes mensuales a clientes a las 8:30am
+Schedule::command('suscripciones:notificar-vencimientos')
+         ->dailyAt('08:30')
+         ->name('notificar-vencimientos-planes')
+         ->withoutOverlapping();

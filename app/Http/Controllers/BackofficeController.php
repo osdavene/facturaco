@@ -487,4 +487,107 @@ class BackofficeController extends Controller
 
         return redirect()->route('backoffice.planes')->with('success', "Plan '{$nombre}' eliminado.");
     }
+
+    // ── Configuración de Correo SMTP & Notificaciones ──────────────────────
+
+    public function correoIndex()
+    {
+        $mailMailer     = \App\Models\ConfiguracionPlataforma::get('mail_mailer', config('mail.default', 'smtp'));
+        $mailHost       = \App\Models\ConfiguracionPlataforma::get('mail_host', config('mail.mailers.smtp.host', 'smtp.gmail.com'));
+        $mailPort       = \App\Models\ConfiguracionPlataforma::get('mail_port', config('mail.mailers.smtp.port', 587));
+        $mailEncryption = \App\Models\ConfiguracionPlataforma::get('mail_encryption', config('mail.mailers.smtp.encryption', 'tls'));
+        $mailUsername   = \App\Models\ConfiguracionPlataforma::get('mail_username', config('mail.mailers.smtp.username', ''));
+        $mailFromAddress = \App\Models\ConfiguracionPlataforma::get('mail_from_address', config('mail.from.address', ''));
+        $mailFromName   = \App\Models\ConfiguracionPlataforma::get('mail_from_name', config('mail.from.name', 'FacturaCO Notificaciones'));
+
+        $empresasPorVencer = Empresa::whereNotNull('plan_vencimiento')
+            ->whereNotNull('plan_id')
+            ->with(['plan', 'usuarios'])
+            ->orderBy('plan_vencimiento')
+            ->get()
+            ->map(function ($emp) {
+                $venc = \Carbon\Carbon::parse($emp->plan_vencimiento)->startOfDay();
+                $emp->dias_restantes = (int) \Carbon\Carbon::today()->diffInDays($venc, false);
+                return $emp;
+            });
+
+        return view('backoffice.correo.index', compact(
+            'mailMailer', 'mailHost', 'mailPort', 'mailEncryption',
+            'mailUsername', 'mailFromAddress', 'mailFromName',
+            'empresasPorVencer'
+        ));
+    }
+
+    public function correoGuardar(Request $request)
+    {
+        $data = $request->validate([
+            'mail_mailer'       => 'required|string|in:smtp,log,resend',
+            'mail_host'         => 'required|string|max:255',
+            'mail_port'         => 'required|integer',
+            'mail_encryption'   => 'nullable|string|in:tls,ssl,null',
+            'mail_username'     => 'nullable|string|max:255',
+            'mail_password'     => 'nullable|string|max:255',
+            'mail_from_address' => 'required|email|max:255',
+            'mail_from_name'    => 'required|string|max:255',
+        ]);
+
+        foreach ($data as $key => $val) {
+            if ($key === 'mail_password' && (empty($val) || $val === null)) {
+                continue; // Conservar clave existente si se deja vacía
+            }
+            \App\Models\ConfiguracionPlataforma::set($key, $val, 'correo');
+        }
+
+        return redirect()->route('backoffice.correo')->with('success', 'Configuración de correo guardada exitosamente.');
+    }
+
+    public function correoProbar(Request $request)
+    {
+        $request->validate([
+            'email_destino' => 'required|email',
+        ]);
+
+        try {
+            \App\Services\MailConfigService::aplicarConfiguracion();
+
+            \Illuminate\Support\Facades\Mail::raw(
+                "¡Hola! Este es un correo de prueba enviado desde tu plataforma FacturaCO.\n\nTu servidor de correo SMTP está funcionando correctamente.\nFecha y hora: " . now()->format('d/m/Y H:i:s'),
+                function ($message) use ($request) {
+                    $message->to($request->email_destino)
+                            ->subject('✅ Prueba Exitosa de Correo — FacturaCO');
+                }
+            );
+
+            return back()->with('success', "¡Correo de prueba enviado con éxito a {$request->email_destino}!");
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Error al enviar correo: ' . $e->getMessage());
+        }
+    }
+
+    public function notificarEmpresaVencimiento(Empresa $empresa)
+    {
+        try {
+            \App\Services\MailConfigService::aplicarConfiguracion();
+
+            $vencimiento = \Carbon\Carbon::parse($empresa->plan_vencimiento ?? now())->startOfDay();
+            $diasRestantes = (int) \Carbon\Carbon::today()->diffInDays($vencimiento, false);
+
+            $destinatarios = collect([$empresa->email])
+                ->merge($empresa->usuarios->pluck('email'))
+                ->filter(fn($e) => filter_var($e, FILTER_VALIDATE_EMAIL))
+                ->unique()
+                ->values()
+                ->toArray();
+
+            if (empty($destinatarios)) {
+                return back()->with('error', "La empresa '{$empresa->razon_social}' no tiene correos electrónicos configurados.");
+            }
+
+            \Illuminate\Support\Facades\Mail::to($destinatarios)->send(new \App\Mail\PlanVencimientoMail($empresa, $diasRestantes));
+
+            return back()->with('success', "Aviso de vencimiento enviado a {$empresa->razon_social} (" . implode(', ', $destinatarios) . ").");
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Error enviando notificación: ' . $e->getMessage());
+        }
+    }
 }

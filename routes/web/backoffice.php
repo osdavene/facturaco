@@ -29,4 +29,8 @@ Route::middleware(['auth', 'backoffice'])->prefix('backoffice')->name('backoffic
     Route::post('/planes',                         [BackofficeController::class, 'planesStore'])     ->name('planes.store');
     Route::put('/planes/{plan}',                   [BackofficeController::class, 'planesUpdate'])    ->name('planes.update');
     Route::delete('/planes/{plan}',                [BackofficeController::class, 'planesDestroy'])   ->name('planes.destroy');
+    Route::get('/correo',                          [BackofficeController::class, 'correoIndex'])     ->name('correo');
+    Route::post('/correo',                         [BackofficeController::class, 'correoGuardar'])   ->name('correo.guardar');
+    Route::post('/correo/probar',                  [BackofficeController::class, 'correoProbar'])    ->name('correo.probar');
+    Route::post('/empresas/{empresa}/notificar',   [BackofficeController::class, 'notificarEmpresaVencimiento'])->name('empresas.notificar');
 });

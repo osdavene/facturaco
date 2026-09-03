@@ -167,9 +167,13 @@
                    class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#1a2235] transition-colors">
                     <i class="fas fa-file-invoice-dollar mr-1 text-emerald-400"></i>Integración DIAN
                 </a>
+                <a href="{{ route('backoffice.correo') }}"
+                   class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#1a2235] transition-colors">
+                    <i class="fas fa-envelope-open-text mr-1 text-blue-400"></i>Servidor Correo
+                </a>
                 <a href="{{ route('backoffice.backup') }}"
                    class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#1a2235] transition-colors">
-                    <i class="fas fa-database mr-1 text-blue-400"></i>Backup
+                    <i class="fas fa-database mr-1 text-slate-400"></i>Backup
                 </a>
             </nav>
         </div>
