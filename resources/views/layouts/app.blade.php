@@ -201,12 +201,17 @@
                     <x-nav-item href="{{ route('nomina.index') }}"
                                 icon="fa-file-invoice-dollar"
                                 :active="request()->routeIs('nomina.index') || request()->routeIs('nomina.show') || request()->routeIs('nomina.create')">
-                        Liquidación
+                        Períodos de Nómina
                     </x-nav-item>
                     <x-nav-item href="{{ route('nomina.empleados.index') }}"
                                 icon="fa-id-badge"
                                 :active="request()->routeIs('nomina.empleados.*')">
                         Empleados
+                    </x-nav-item>
+                    <x-nav-item href="{{ route('nomina.liquidacion-definitiva.index') }}"
+                                icon="fa-calculator"
+                                :active="request()->routeIs('nomina.liquidacion-definitiva.*')">
+                        Liquidación Definitiva
                     </x-nav-item>
                 </x-nav-section>
                 @endcan
