@@ -419,6 +419,7 @@ class BackofficeController extends Controller
             'nombre'               => 'required|string|max:100',
             'descripcion'          => 'nullable|string|max:500',
             'precio'               => 'required|numeric|min:0',
+            'duracion_meses'       => 'nullable|integer|min:1',
             'limite_facturas_mes'  => 'nullable|integer|min:1',
             'limite_usuarios'      => 'nullable|integer|min:1',
             'limite_productos'     => 'nullable|integer|min:1',
@@ -432,6 +433,7 @@ class BackofficeController extends Controller
             'orden'                => 'nullable|integer',
         ]);
 
+        $data['duracion_meses']       = $data['duracion_meses'] ?? 1;
         $data['soporta_dian']         = $request->boolean('soporta_dian');
         $data['soporta_pos']          = $request->boolean('soporta_pos');
         $data['soporta_nomina']       = $request->boolean('soporta_nomina');
@@ -450,6 +452,7 @@ class BackofficeController extends Controller
             'nombre'               => 'required|string|max:100',
             'descripcion'          => 'nullable|string|max:500',
             'precio'               => 'required|numeric|min:0',
+            'duracion_meses'       => 'nullable|integer|min:1',
             'limite_facturas_mes'  => 'nullable|integer|min:1',
             'limite_usuarios'      => 'nullable|integer|min:1',
             'limite_productos'     => 'nullable|integer|min:1',
@@ -463,6 +466,7 @@ class BackofficeController extends Controller
             'orden'                => 'nullable|integer',
         ]);
 
+        $data['duracion_meses']       = $data['duracion_meses'] ?? 1;
         $data['soporta_dian']         = $request->boolean('soporta_dian');
         $data['soporta_pos']          = $request->boolean('soporta_pos');
         $data['soporta_nomina']       = $request->boolean('soporta_nomina');

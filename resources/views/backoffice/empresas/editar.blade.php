@@ -85,17 +85,24 @@
             </div>
         </div>
 
-        {{-- Plan y Límites SaaS --}}
-        <div class="card p-6 space-y-5 mt-5">
-            <h2 class="font-display font-bold text-base flex items-center gap-2">
-                <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
-                Plan SaaS y Límites de Facturación DIAN
-            </h2>
+        {{-- Plan y Límites SaaS con cálculo automático de meses completos --}}
+        <div class="card p-6 space-y-5 mt-5" x-data="planVencimientoManager({
+            planId: '{{ old('plan_id', $empresa->plan_id) }}',
+            vencimiento: '{{ old('plan_vencimiento', $empresa->plan_vencimiento?->format('Y-m-d')) }}',
+            planes: {{ json_encode($planes) }}
+        })">
+            <div class="flex items-center justify-between border-b border-[#1e2d47] pb-3">
+                <h2 class="font-display font-bold text-base flex items-center gap-2">
+                    <span class="w-6 h-6 bg-amber-500 rounded-lg flex items-center justify-center text-black text-xs font-black">2</span>
+                    Plan SaaS y Vigencia Automática
+                </h2>
+                <span class="text-xs text-amber-400 font-medium" x-show="vencimientoTexto" x-text="vencimientoTexto"></span>
+            </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Plan Asignado</label>
-                    <select name="plan_id" class="form-input">
+                    <select name="plan_id" x-model="planId" @change="alCambiarPlan()" class="form-input">
                         <option value="">— Sin Plan (Facturas Ilimitadas) —</option>
                         @foreach($planes as $p)
                             <option value="{{ $p->id }}" {{ old('plan_id', $empresa->plan_id) == $p->id ? 'selected' : '' }}>
@@ -106,10 +113,47 @@
                 </div>
 
                 <div>
-                    <label class="form-label">Fecha de Vencimiento</label>
-                    <input type="date" name="plan_vencimiento"
-                           value="{{ old('plan_vencimiento', $empresa->plan_vencimiento?->format('Y-m-d')) }}"
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="form-label mb-0">Fecha de Vencimiento (Automática)</label>
+                        <span class="text-[11px] text-slate-400" x-show="diasRestantesTexto" x-text="diasRestantesTexto"></span>
+                    </div>
+                    <input type="date" name="plan_vencimiento" x-model="vencimiento"
                            class="form-input">
+                </div>
+
+                {{-- Botones de Acceso Rápido para Vigencia --}}
+                <div class="sm:col-span-2 bg-[#1a2235]/60 border border-[#1e2d47] rounded-xl p-3.5 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-300">Fijar Período Automático (Meses Completos):</span>
+                        <span class="text-[11px] text-slate-500">Calcula meses de 30 o 31 días automáticamente</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <button type="button" @click="fijarMesesDesdeHoy(1)"
+                                class="px-3 py-1.5 bg-[#111827] hover:bg-amber-500/10 hover:text-amber-400 border border-[#1e2d47] hover:border-amber-500/30 rounded-lg text-xs font-semibold text-slate-300 transition-colors flex items-center gap-1.5">
+                            <i class="fas fa-calendar-day text-amber-500 text-[10px]"></i>
+                            <span>1 Mes Completo</span>
+                        </button>
+                        <button type="button" @click="fijarMesesDesdeHoy(3)"
+                                class="px-3 py-1.5 bg-[#111827] hover:bg-amber-500/10 hover:text-amber-400 border border-[#1e2d47] hover:border-amber-500/30 rounded-lg text-xs font-semibold text-slate-300 transition-colors flex items-center gap-1.5">
+                            <i class="fas fa-calendar-week text-blue-400 text-[10px]"></i>
+                            <span>3 Meses (Trimestre)</span>
+                        </button>
+                        <button type="button" @click="fijarMesesDesdeHoy(6)"
+                                class="px-3 py-1.5 bg-[#111827] hover:bg-amber-500/10 hover:text-amber-400 border border-[#1e2d47] hover:border-amber-500/30 rounded-lg text-xs font-semibold text-slate-300 transition-colors flex items-center gap-1.5">
+                            <i class="fas fa-calendar text-emerald-400 text-[10px]"></i>
+                            <span>6 Meses (Semestre)</span>
+                        </button>
+                        <button type="button" @click="fijarMesesDesdeHoy(12)"
+                                class="px-3 py-1.5 bg-[#111827] hover:bg-amber-500/10 hover:text-amber-400 border border-[#1e2d47] hover:border-amber-500/30 rounded-lg text-xs font-semibold text-slate-300 transition-colors flex items-center gap-1.5">
+                            <i class="fas fa-calendar-star text-purple-400 text-[10px]"></i>
+                            <span>1 Año (12 Meses)</span>
+                        </button>
+                        <button type="button" @click="extenderUnMes()"
+                                class="px-3 py-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ml-auto">
+                            <i class="fas fa-plus text-[10px]"></i>
+                            <span>Renovar (+1 Mes)</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="sm:col-span-2">
@@ -121,6 +165,68 @@
                 </div>
             </div>
         </div>
+
+        <script>
+        function planVencimientoManager(config) {
+            return {
+                planId: config.planId || '',
+                vencimiento: config.vencimiento || '',
+                planes: config.planes || [],
+                
+                get vencimientoTexto() {
+                    if (!this.vencimiento) return '';
+                    const partes = this.vencimiento.split('-');
+                    if (partes.length !== 3) return '';
+                    const d = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+                    return 'Vence: ' + d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+                },
+
+                get diasRestantesTexto() {
+                    if (!this.vencimiento) return '';
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    const partes = this.vencimiento.split('-');
+                    const target = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+                    const diff = Math.ceil((target - hoy) / (1000 * 60 * 60 * 24));
+                    if (diff < 0) return 'Vencido hace ' + Math.abs(diff) + ' días';
+                    if (diff === 0) return 'Vence hoy';
+                    return 'Faltan ' + diff + ' días';
+                },
+
+                alCambiarPlan() {
+                    if (this.planId && !this.vencimiento) {
+                        this.fijarMesesDesdeHoy(1);
+                    }
+                },
+
+                fijarMesesDesdeHoy(meses) {
+                    const hoy = new Date();
+                    const target = new Date(hoy.getFullYear(), hoy.getMonth() + meses, hoy.getDate());
+                    this.vencimiento = this.formatearFecha(target);
+                },
+
+                extenderUnMes() {
+                    let base = new Date();
+                    if (this.vencimiento) {
+                        const partes = this.vencimiento.split('-');
+                        base = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+                        if (base < new Date()) {
+                            base = new Date(); // Si ya estaba vencido, extender desde hoy
+                        }
+                    }
+                    const target = new Date(base.getFullYear(), base.getMonth() + 1, base.getDate());
+                    this.vencimiento = this.formatearFecha(target);
+                },
+
+                formatearFecha(d) {
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+            };
+        }
+        </script>
 
         <div class="flex justify-end mt-4">
             <button type="submit"

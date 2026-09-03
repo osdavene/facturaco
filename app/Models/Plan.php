@@ -15,6 +15,7 @@ class Plan extends Model
         'slug',
         'descripcion',
         'precio',
+        'duracion_meses',
         'limite_facturas_mes',
         'limite_usuarios',
         'limite_productos',
@@ -30,6 +31,7 @@ class Plan extends Model
 
     protected $casts = [
         'precio'               => 'decimal:2',
+        'duracion_meses'       => 'integer',
         'limite_facturas_mes'  => 'integer',
         'limite_usuarios'      => 'integer',
         'limite_productos'     => 'integer',

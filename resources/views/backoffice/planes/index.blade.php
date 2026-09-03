@@ -64,11 +64,13 @@
                     {{ $plan->descripcion ?: 'Sin descripción' }}
                 </p>
 
-                {{-- Precio --}}
+                {{-- Precio y Duración --}}
                 <div class="my-4 pb-4 border-b border-[#1e2d47]">
-                    <div class="flex items-baseline gap-1">
+                    <div class="flex items-baseline gap-1.5 flex-wrap">
                         <span class="font-display font-black text-3xl text-white">{{ $plan->precio_formateado }}</span>
-                        <span class="text-xs text-slate-500">COP / mes</span>
+                        <span class="text-xs text-slate-400">
+                            COP / {{ $plan->duracion_meses == 1 ? '1 mes completo' : ($plan->duracion_meses == 12 ? '1 año' : $plan->duracion_meses . ' meses') }}
+                        </span>
                     </div>
                 </div>
 
@@ -166,13 +168,22 @@
                     <input type="text" name="descripcion" x-model="form.descripcion" placeholder="Ej. Ideal para pequeñas empresas" class="form-input">
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="form-label">Precio Mensual (COP) *</label>
+                        <label class="form-label">Precio (COP) *</label>
                         <input type="number" name="precio" x-model="form.precio" required min="0" step="1000" placeholder="39000" class="form-input">
                     </div>
                     <div>
-                        <label class="form-label">Límite Facturas / Mes</label>
+                        <label class="form-label">Duración Período *</label>
+                        <select name="duracion_meses" x-model="form.duracion_meses" class="form-input">
+                            <option value="1">1 Mes Completo</option>
+                            <option value="3">3 Meses (Trimestre)</option>
+                            <option value="6">6 Meses (Semestre)</option>
+                            <option value="12">12 Meses (1 Año)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Límite Facturas</label>
                         <input type="number" name="limite_facturas_mes" x-model="form.limite_facturas_mes" min="1" placeholder="Vacio = Ilimitadas" class="form-input">
                     </div>
                 </div>
@@ -245,6 +256,7 @@ function planesManager() {
             nombre: '',
             descripcion: '',
             precio: 39000,
+            duracion_meses: 1,
             limite_facturas_mes: 100,
             limite_usuarios: 2,
             limite_productos: '',
@@ -264,6 +276,7 @@ function planesManager() {
                 nombre: '',
                 descripcion: '',
                 precio: 39000,
+                duracion_meses: 1,
                 limite_facturas_mes: 100,
                 limite_usuarios: 2,
                 limite_productos: '',
@@ -285,6 +298,7 @@ function planesManager() {
                 nombre: plan.nombre,
                 descripcion: plan.descripcion || '',
                 precio: plan.precio,
+                duracion_meses: plan.duracion_meses || 1,
                 limite_facturas_mes: plan.limite_facturas_mes,
                 limite_usuarios: plan.limite_usuarios,
                 limite_productos: plan.limite_productos || '',
