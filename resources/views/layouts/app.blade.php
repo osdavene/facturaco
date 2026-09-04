@@ -153,8 +153,9 @@
             {{-- Botón de Acción Rápida "+ Nuevo" --}}
             <div class="px-3 pt-3 pb-1">
                 <div class="relative" id="dropdown-crear-container">
-                    <button type="button" onclick="toggleCrearDropdown(event)"
-                            class="w-full flex items-center justify-between gap-2 py-2 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-amber-500/10 transition-all group select-none">
+                    <button type="button"
+                            onclick="const dd = document.getElementById('dropdown-crear'); const ch = document.getElementById('chevron-crear'); const isH = dd.classList.toggle('hidden'); if(ch) ch.classList.toggle('rotate-180', !isH); event.stopPropagation();"
+                            class="w-full flex items-center justify-between gap-2 py-2 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-amber-500/10 transition-all group select-none cursor-pointer">
                         <span class="flex items-center gap-2">
                             <i class="fas fa-plus-circle text-sm transition-transform group-hover:rotate-90"></i>
                             <span>Nuevo Registro</span>
@@ -1289,53 +1290,19 @@
             @if(session('info'))
                 window.toast(@json(session('info')), 'info');
             @endif
-        // Control de Acordeones del Menú Lateral
-        window.toggleNavGroup = function(id) {
-            const content = document.getElementById('content-nav-group-' + id) || document.getElementById('content-' + id);
-            const chevron = document.getElementById('chevron-nav-group-' + id) || document.getElementById('chevron-' + id);
-            if (!content) return;
-
-            const isHidden = content.classList.contains('hidden');
-            if (isHidden) {
-                content.classList.remove('hidden');
-                if (chevron) {
-                    chevron.classList.add('rotate-90', 'text-amber-500');
-                }
-            } else {
-                content.classList.add('hidden');
-                if (chevron) {
-                    chevron.classList.remove('rotate-90', 'text-amber-500');
-                }
-            }
-        };
-
-        // Control de Dropdown de Acción Rápida "+ Nuevo"
-        window.toggleCrearDropdown = function(event) {
-            event.stopPropagation();
-            const dd = document.getElementById('dropdown-crear');
-            const ch = document.getElementById('chevron-crear');
-            if (!dd) return;
-
-            const isHidden = dd.classList.contains('hidden');
-            if (isHidden) {
-                dd.classList.remove('hidden');
-                if (ch) ch.classList.add('rotate-180');
-            } else {
-                dd.classList.add('hidden');
-                if (ch) ch.classList.remove('rotate-180');
-            }
-        };
-
-        document.addEventListener('click', function(e) {
-            const container = document.getElementById('dropdown-crear-container');
-            const dd = document.getElementById('dropdown-crear');
-            const ch = document.getElementById('chevron-crear');
-            if (container && !container.contains(e.target) && dd && !dd.classList.contains('hidden')) {
-                dd.classList.add('hidden');
-                if (ch) ch.classList.remove('rotate-180');
-            }
         });
     })();
+
+    // Cierre de dropdown si se hace clic fuera
+    document.addEventListener('click', function(e) {
+        const container = document.getElementById('dropdown-crear-container');
+        const dd = document.getElementById('dropdown-crear');
+        const ch = document.getElementById('chevron-crear');
+        if (container && !container.contains(e.target) && dd && !dd.classList.contains('hidden')) {
+            dd.classList.add('hidden');
+            if (ch) ch.classList.remove('rotate-180');
+        }
+    });
     </script>
 
 </body>

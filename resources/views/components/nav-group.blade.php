@@ -21,9 +21,9 @@
 
 <div class="nav-accordion-group mb-1" data-group-id="{{ $id }}">
     <button type="button"
-            onclick="toggleNavGroup('{{ $id }}')"
+            onclick="const content = this.nextElementSibling; const chevron = this.querySelector('.chevron-icon'); const isHidden = content.classList.toggle('hidden'); if (chevron) { chevron.classList.toggle('rotate-90', !isHidden); chevron.classList.toggle('text-amber-500', !isHidden); }"
             aria-expanded="{{ $active ? 'true' : 'false' }}"
-            class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-medium transition-all group select-none
+            class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-medium transition-all group select-none cursor-pointer
                    {{ $active
                        ? 'bg-[#162034] text-slate-100 border border-[#1e2d47]'
                        : 'text-slate-400 hover:bg-[#151d2e] hover:text-slate-200 border border-transparent' }}">
@@ -44,7 +44,7 @@
         @endif
 
         {{-- Flecha Chevron giratoria --}}
-        <i class="fas fa-chevron-right text-[10px] text-slate-500 transition-transform duration-200 group-hover:text-slate-300 {{ $active ? 'rotate-90 text-amber-500' : '' }}"
+        <i class="fas fa-chevron-right chevron-icon text-[10px] text-slate-500 transition-transform duration-200 group-hover:text-slate-300 {{ $active ? 'rotate-90 text-amber-500' : '' }}"
            id="chevron-{{ $id }}"></i>
     </button>
 
