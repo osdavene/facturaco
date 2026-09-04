@@ -133,11 +133,10 @@
                     $precioFinal = $prod->incluye_iva
                         ? $prod->precio_venta
                         : round($prod->precio_venta * (1 + $prod->iva_pct / 100));
+                    $sinStock = !$prod->es_servicio && $prod->stock_actual <= 0;
                 @endphp
-                <div class="producto-card cursor-pointer group relative
-                            bg-[#111827] border border-[#1e2d47] rounded-xl p-3
-                            hover:border-amber-500/60 hover:bg-[#1a2235] transition-all
-                            active:scale-95"
+                <div class="producto-card group relative rounded-xl p-3 transition-all select-none
+                            {{ $sinStock ? 'bg-[#111827]/60 border border-red-500/20 opacity-40 cursor-not-allowed' : 'cursor-pointer bg-[#111827] border border-[#1e2d47] hover:border-amber-500/60 hover:bg-[#1a2235] active:scale-95' }}"
                      data-id="{{ $prod->id }}"
                      data-nombre="{{ $prod->nombre }}"
                      data-codigo="{{ $prod->codigo }}"
@@ -146,15 +145,15 @@
                      data-precio-con-iva="{{ $precioFinal }}"
                      data-iva-pct="{{ $prod->iva_pct }}"
                      data-incluye-iva="{{ $prod->incluye_iva ? '1' : '0' }}"
-                     data-stock="{{ $prod->es_servicio ? 9999 : $prod->stock_actual }}"
+                     data-stock="{{ $prod->es_servicio ? 999999 : $prod->stock_actual }}"
                      data-es-servicio="{{ $prod->es_servicio ? '1' : '0' }}"
                      data-categoria="{{ $prod->categoria_id }}"
                      onclick="agregarAlCarrito(this)">
 
-                    {{-- Badge stock bajo --}}
-                    @if(!$prod->es_servicio && $prod->stock_actual <= 0)
-                    <span class="absolute top-2 right-2 text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded-full">
-                        Sin stock
+                    {{-- Badge stock bajo / sin stock --}}
+                    @if($sinStock)
+                    <span class="absolute top-2 right-2 text-[9px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 px-2 py-0.5 rounded-full z-10 flex items-center gap-1">
+                        <i class="fas fa-ban text-[8px]"></i> Sin stock
                     </span>
                     @endif
 
@@ -175,7 +174,7 @@
                         ${{ number_format($precioFinal, 0, ',', '.') }}
                     </div>
                     @if(!$prod->es_servicio)
-                    <div class="text-[10px] text-slate-600 mt-0.5">
+                    <div class="text-[10px] {{ $prod->stock_actual <= 0 ? 'text-red-400 font-semibold' : 'text-slate-500' }} mt-0.5">
                         Stock: {{ number_format($prod->stock_actual, 0) }}
                     </div>
                     @endif
@@ -676,8 +675,10 @@ function agregarAlCarrito(card) {
     }
 
     const stock = parseFloat(card.dataset.stock);
-    if (stock <= 0 && card.dataset.esServicio !== '1') {
-        mostrarToast('Sin stock disponible', 'error');
+    const esServicio = card.dataset.esServicio === '1';
+
+    if (!esServicio && stock <= 0) {
+        mostrarToast('Producto agotado (sin existencias)', 'error');
         return;
     }
 
@@ -690,11 +691,16 @@ function agregarAlCarrito(card) {
         ivaPct:     parseFloat(card.dataset.ivaPct),
         incluyeIva: card.dataset.incluyeIva === '1',
         stock:      stock,
+        esServicio: esServicio,
     };
 
-    // Si ya está en carrito, editar cantidad directamente
+    // Si ya está en carrito, editar cantidad directamente respetando existencias
     const existente = carrito.find(i => i.id === productoModalActual.id);
     if (existente) {
+        if (!esServicio && (existente.cantidad + 1) > stock) {
+            mostrarToast(`Stock máximo alcanzado (${stock} disp.)`, 'error');
+            return;
+        }
         existente.cantidad += 1;
         renderizarCarrito();
         mostrarToast(`${productoModalActual.nombre} (+1)`, 'ok');
@@ -703,16 +709,21 @@ function agregarAlCarrito(card) {
 
     // Mostrar modal de cantidad para la primera vez
     document.getElementById('modal-producto-nombre').textContent = productoModalActual.nombre;
-    document.getElementById('modal-producto-precio').textContent = fmt(productoModalActual.precioIva) + ' c/u';
-    document.getElementById('modal-cantidad-input').value = 1;
+    document.getElementById('modal-producto-precio').textContent = fmt(productoModalActual.precioIva) + ' c/u' + (!esServicio ? ` · Stock: ${stock}` : '');
+    const cantInput = document.getElementById('modal-cantidad-input');
+    cantInput.value = 1;
+    cantInput.max = esServicio ? '' : stock;
     document.getElementById('modal-cantidad').classList.remove('hidden');
-    document.getElementById('modal-cantidad-input').focus();
-    document.getElementById('modal-cantidad-input').select();
+    cantInput.focus();
+    cantInput.select();
 }
 
 function ajustarCantidadModal(delta) {
     const inp = document.getElementById('modal-cantidad-input');
-    inp.value = Math.max(1, parseFloat(inp.value) + delta);
+    const valActual = parseFloat(inp.value) || 1;
+    const maxStock = (productoModalActual && !productoModalActual.esServicio) ? productoModalActual.stock : 999999;
+    const nuevo = Math.min(maxStock, Math.max(1, valActual + delta));
+    inp.value = nuevo;
 }
 
 function cerrarModalCantidad() {
@@ -726,6 +737,11 @@ function confirmarCantidad() {
     if (isNaN(cantidad) || cantidad <= 0) { mostrarToast('Cantidad inválida', 'error'); return; }
 
     const p = productoModalActual;
+    if (!p.esServicio && cantidad > p.stock) {
+        mostrarToast(`Stock insuficiente. Solo hay ${p.stock} disponibles.`, 'error');
+        return;
+    }
+
     // precio_unitario siempre sin IVA para que DocumentoService calcule bien
     const precioSinIva = p.incluyeIva
         ? p.precio / (1 + p.ivaPct / 100)
@@ -740,6 +756,8 @@ function confirmarCantidad() {
         precio_display:   p.precioIva,
         iva_pct:          p.ivaPct,
         descuento_pct:    0,
+        stock:            p.stock,
+        es_servicio:      p.esServicio,
     });
     cerrarModalCantidad();
     renderizarCarrito();
@@ -762,11 +780,16 @@ function eliminarItem(idx) {
 }
 
 function cambiarCantidad(idx, delta) {
-    const nueva = carrito[idx].cantidad + delta;
+    const item = carrito[idx];
+    const nueva = item.cantidad + delta;
     if (nueva <= 0) {
         carrito.splice(idx, 1);
     } else {
-        carrito[idx].cantidad = nueva;
+        if (delta > 0 && !item.es_servicio && nueva > item.stock) {
+            mostrarToast(`Stock máximo alcanzado (${item.stock} disp.)`, 'error');
+            return;
+        }
+        item.cantidad = nueva;
     }
     renderizarCarrito();
 }
@@ -874,8 +897,18 @@ let timerCliente;
 document.getElementById('buscar-cliente').addEventListener('input', function () {
     clearTimeout(timerCliente);
     const q = this.value.trim();
-    if (q.length < 2) { ocultarSugerenciasCliente(); return; }
-    timerCliente = setTimeout(() => buscarCliente(q), 300);
+    if (q.length < 1) {
+        ocultarSugerenciasCliente();
+        return;
+    }
+    timerCliente = setTimeout(() => buscarCliente(q), 150);
+});
+
+document.getElementById('buscar-cliente').addEventListener('focus', function () {
+    const q = this.value.trim();
+    if (q.length >= 1) {
+        buscarCliente(q);
+    }
 });
 
 async function buscarCliente(q) {
@@ -884,9 +917,9 @@ async function buscarCliente(q) {
     const cont = document.getElementById('cliente-sugerencias');
     if (!data.length) { ocultarSugerenciasCliente(); return; }
     cont.innerHTML = data.map(c => `
-        <div onclick="seleccionarCliente(${c.id}, '${c.razon_social.replace(/'/g,"\\'")}', '${(c.numero_documento||'').replace(/'/g,"\\'")}', '${(c.tipo_documento||'').replace(/'/g,"\\'")}' )"
-             class="px-3 py-2.5 hover:bg-[#141c2e] cursor-pointer border-b border-[#1e2d47] last:border-0">
-            <div class="text-xs font-semibold text-slate-200">${c.razon_social || c.nombres}</div>
+        <div onclick="seleccionarCliente(${c.id}, '${c.razon_social ? c.razon_social.replace(/'/g,"\\'") : (c.nombres||'').replace(/'/g,"\\'")}', '${(c.numero_documento||'').replace(/'/g,"\\'")}', '${(c.tipo_documento||'').replace(/'/g,"\\'")}' )"
+             class="px-3 py-2.5 hover:bg-[#141c2e] cursor-pointer border-b border-[#1e2d47] last:border-0 transition-colors">
+            <div class="text-xs font-semibold text-slate-200">${c.razon_social || ((c.nombres||'') + ' ' + (c.apellidos||''))}</div>
             <div class="text-[10px] text-slate-500">${c.tipo_documento}: ${c.numero_documento}</div>
         </div>`).join('');
     cont.classList.remove('hidden');
@@ -932,6 +965,14 @@ async function cobrar() {
         return;
     }
     if (carrito.length === 0) return;
+
+    // Validar stock antes de enviar petición
+    for (const item of carrito) {
+        if (!item.es_servicio && item.cantidad > item.stock) {
+            mostrarToast(`Stock insuficiente para "${item.nombre}" (${item.stock} disp.)`, 'error');
+            return;
+        }
+    }
     const formaPago = document.querySelector('input[name="forma_pago"]:checked').value;
     const efectivo  = parseFloat(document.getElementById('monto-efectivo').value) || 0;
 

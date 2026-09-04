@@ -30,14 +30,21 @@ Route::get('/api/municipios', function (Request $req) {
 })->name('api.municipios');
 
 Route::get('/api/clientes/buscar', function (Request $req) {
-    $clientes = Cliente::where('activo', true)
-        ->where(function ($q) use ($req) {
-            $q->where('nombres',           'ilike', '%'.$req->q.'%')
-              ->orWhere('apellidos',        'ilike', '%'.$req->q.'%')
-              ->orWhere('razon_social',     'ilike', '%'.$req->q.'%')
-              ->orWhere('numero_documento', 'ilike', '%'.$req->q.'%');
-        })
-        ->limit(10)
+    $q = trim($req->q ?? '');
+    $query = Cliente::where('activo', true);
+    if ($q !== '') {
+        $query->where(function ($sub) use ($q) {
+            $sub->where('nombres',           'ilike', '%'.$q.'%')
+              ->orWhere('apellidos',        'ilike', '%'.$q.'%')
+              ->orWhere('razon_social',     'ilike', '%'.$q.'%')
+              ->orWhere('numero_documento', 'ilike', '%'.$q.'%')
+              ->orWhere('email',            'ilike', '%'.$q.'%')
+              ->orWhere('telefono',         'ilike', '%'.$q.'%')
+              ->orWhere('celular',          'ilike', '%'.$q.'%');
+        });
+    }
+    $clientes = $query->orderBy('razon_social')
+        ->limit(20)
         ->get(['id','nombres','apellidos','razon_social','numero_documento',
                'tipo_documento','retefuente_pct','reteiva_pct','reteica_pct',
                'plazo_pago','email','direccion','lista_precio']);

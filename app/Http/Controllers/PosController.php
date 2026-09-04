@@ -113,6 +113,20 @@ class PosController extends Controller
                 $prefijo     = $empresa->prefijo_factura ?? 'FE';
                 $consecutivo = Factura::siguienteConsecutivo($prefijo, $empresa->id);
                 $calc        = $this->documentos->calcularItems($request->items);
+
+                // Validar stock de todos los productos físicos antes de procesar la venta
+                foreach ($calc['items'] as $item) {
+                    if (!empty($item['producto_id'])) {
+                        $producto = Producto::find($item['producto_id']);
+                        if ($producto && !$producto->es_servicio) {
+                            if ($producto->stock_actual < $item['cantidad']) {
+                                $disp = (float)$producto->stock_actual;
+                                throw new \Exception("Stock insuficiente para \"{$producto->nombre}\". Disponible: " . number_format($disp, 0) . ", Solicitado: " . number_format($item['cantidad'], 0));
+                            }
+                        }
+                    }
+                }
+
                 $ret         = $this->documentos->calcularRetenciones(
                     $calc['subtotal'],
                     $calc['iva'],
