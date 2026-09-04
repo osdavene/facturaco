@@ -6,12 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }} — @yield('title', 'Dashboard')</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="bg-[#0b0f1a] text-slate-200 font-sans">
+<body class="bg-[#0b0f1a] text-slate-200 font-sans antialiased">
 
     {{-- Barra de progreso de navegación --}}
     <div id="page-progress"
@@ -30,7 +32,7 @@
              SIDEBAR
         ═══════════════════════════════════════ --}}
         <aside id="sidebar"
-               class="fixed top-0 left-0 h-full w-64 bg-[#111827] border-r border-[#1e2d47]
+               class="fixed top-0 left-0 h-full w-[268px] bg-[#111827] border-r border-[#1e2d47]
                       flex flex-col z-[100]
                       -translate-x-full lg:translate-x-0 transition-transform duration-300">
 
@@ -305,12 +307,12 @@
                 </x-nav-group>
                 @endcanany
 
-                {{-- 3. TALENTO HUMANO Y NÓMINA --}}
+                {{-- 3. PERSONAL Y NÓMINA --}}
                 @php
                     $nominaActivo = request()->routeIs('nomina.*');
                 @endphp
                 @can('ver nomina')
-                <x-nav-group label="Talento Humano & Nómina" icon="fa-users-gear" color="violet" :active="$nominaActivo" id="nomina">
+                <x-nav-group label="Personal & Nómina" icon="fa-users-gear" color="violet" :active="$nominaActivo" id="nomina">
                     <x-nav-subitem href="{{ route('nomina.empleados.index') }}" icon="fa-id-badge" :active="request()->routeIs('nomina.empleados.*')">
                         Empleados & Ficha Técnica
                     </x-nav-subitem>
@@ -361,12 +363,12 @@
                 </x-nav-group>
                 @endcan
 
-                {{-- 5. REPORTES Y FISCAL DIAN --}}
+                {{-- 5. REPORTES Y DIAN --}}
                 @php
                     $reportesActivo = request()->routeIs('reportes.*') || request()->routeIs('impuestos.*');
                 @endphp
                 @canany(['ver reportes','ver configuracion'])
-                <x-nav-group label="Reportes & Fiscal DIAN" icon="fa-chart-pie" color="pink" :active="$reportesActivo" id="reportes">
+                <x-nav-group label="Reportes & DIAN" icon="fa-chart-pie" color="pink" :active="$reportesActivo" id="reportes">
                     @can('ver reportes')
                     <x-nav-subitem href="{{ route('reportes.index') }}" icon="fa-chart-bar" :active="request()->routeIs('reportes.index')">
                         Centro de Reportes
@@ -456,7 +458,7 @@
         {{-- ═══════════════════════════════════════
              CONTENIDO PRINCIPAL
         ═══════════════════════════════════════ --}}
-        <div class="flex-1 flex flex-col lg:ml-64 min-w-0">
+        <div class="flex-1 flex flex-col lg:ml-[268px] min-w-0">
 
             {{-- Banner cuando el superadmin está impersonando a una empresa --}}
             @if(session('backoffice_impersonando'))

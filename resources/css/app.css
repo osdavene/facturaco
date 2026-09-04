@@ -3,8 +3,19 @@
 @tailwind utilities;
 
 /* ── Fuentes ─────────────────────────────── */
-.font-display { font-family: 'Syne', sans-serif; }
-.font-sans    { font-family: 'DM Sans', sans-serif; }
+.font-display {
+    font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.02em;
+}
+.font-sans {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+}
+body {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
 
 /* ══ FIX CRÍTICO: Color texto inputs tema oscuro ══
    Sin esto los números/texto se ven invisibles (negro sobre oscuro)

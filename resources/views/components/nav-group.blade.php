@@ -34,7 +34,7 @@
         </div>
 
         {{-- Texto del grupo --}}
-        <span class="flex-1 text-left truncate text-xs sm:text-[13px] font-semibold tracking-tight">{{ $label }}</span>
+        <span class="flex-1 text-left truncate text-[13px] font-medium tracking-normal text-slate-200 group-hover:text-white transition-colors">{{ $label }}</span>
 
         {{-- Badge opcional --}}
         @if($badge)
