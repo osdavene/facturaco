@@ -595,17 +595,33 @@
 
                     {{-- Theme Toggle --}}
                     @php $esOscuro = ($temaActual ?? 'dark') === 'dark'; @endphp
-                    <form method="POST" action="{{ route('tema.cambiar') }}">
-                        @csrf
-                        <input type="hidden" name="tema" value="{{ $esOscuro ? 'light' : 'dark' }}">
-                        <button type="submit"
-                                title="{{ $esOscuro ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro' }}"
-                                class="w-9 h-9 bg-[#1a2235] border border-[#1e2d47] rounded-lg
-                                    flex items-center justify-center transition-colors
-                                    text-slate-400 hover:text-amber-500 hover:border-amber-500/50">
-                            <i class="fas {{ $esOscuro ? 'fa-sun' : 'fa-moon' }} text-sm"></i>
-                        </button>
-                    </form>
+                    <div class="relative" x-data="{ cambiando: false }">
+                        <form method="POST" action="{{ route('tema.cambiar') }}" @submit="cambiando = true">
+                            @csrf
+                            <input type="hidden" name="tema" value="{{ $esOscuro ? 'light' : 'dark' }}">
+                            <button type="submit"
+                                    data-no-loading
+                                    :disabled="cambiando"
+                                    title="{{ $esOscuro ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro' }}"
+                                    class="w-9 h-9 bg-[#1a2235] border border-[#1e2d47] rounded-lg
+                                        flex items-center justify-center transition-all duration-200
+                                        text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-500/10 shadow-sm relative group">
+                                <i :class="cambiando ? 'fas fa-spinner fa-spin text-amber-500 text-sm' : 'fas {{ $esOscuro ? 'fa-sun' : 'fa-moon' }} text-sm group-hover:scale-110 transition-transform'"></i>
+                            </button>
+                        </form>
+
+                        {{-- Micro-aviso flotante inferior --}}
+                        <div x-show="cambiando" x-cloak
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="absolute top-full mt-2 right-0 sm:left-1/2 sm:-translate-x-1/2 z-50 pointer-events-none whitespace-nowrap">
+                            <div class="bg-[#141c2e]/95 text-amber-400 border border-amber-500/30 shadow-2xl text-[11px] font-medium px-3 py-1.5 rounded-xl flex items-center gap-2 backdrop-blur-md">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+                                <span>Aplicando {{ $esOscuro ? 'modo claro' : 'modo oscuro' }}…</span>
+                            </div>
+                        </div>
+                    </div>
 
                     {{-- Notificaciones --}}
                     @php
@@ -1174,10 +1190,19 @@
 
             btn.disabled = true;
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = `<svg class="animate-spin inline-block w-4 h-4 mr-1.5 -mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>Guardando…`;
+            const isSmallOrIcon = (btn.offsetWidth > 0 && btn.offsetWidth < 75) || (!btn.textContent.trim() && btn.querySelector('i, svg'));
+
+            if (isSmallOrIcon) {
+                btn.innerHTML = `<svg class="animate-spin inline-block w-4 h-4 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>`;
+            } else {
+                btn.innerHTML = `<svg class="animate-spin inline-block w-4 h-4 mr-1.5 -mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>Guardando…`;
+            }
 
             // Restaurar si el usuario regresa (bfcache)
             window.addEventListener('pageshow', function onPageShow(ev) {
