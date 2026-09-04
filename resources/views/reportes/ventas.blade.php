@@ -4,12 +4,17 @@
 
 @section('content')
 
+@php
+    $desde = $fecha_desde ?? $fechaDesde ?? now()->startOfMonth()->format('Y-m-d');
+    $hasta = $fecha_hasta ?? $fechaHasta ?? now()->format('Y-m-d');
+@endphp
+
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
         <h1 class="font-display font-bold text-2xl">Reporte de Ventas</h1>
         <p class="text-slate-500 text-sm mt-1">
-            Del {{ \Carbon\Carbon::parse($fechaDesde)->format('d/m/Y') }}
-            al {{ \Carbon\Carbon::parse($fechaHasta)->format('d/m/Y') }}
+            Del {{ \Carbon\Carbon::parse($desde)->format('d/m/Y') }}
+            al {{ \Carbon\Carbon::parse($hasta)->format('d/m/Y') }}
         </p>
     </div>
     <div class="flex gap-2 flex-wrap">
@@ -38,13 +43,13 @@
     <div class="flex flex-col sm:flex-row gap-3">
         <div>
             <label class="block text-xs text-slate-500 mb-1">Desde</label>
-            <input type="date" name="fecha_desde" value="{{ $fechaDesde }}"
+            <input type="date" name="fecha_desde" value="{{ $desde }}"
                    class="form-input"
                    style="color:#e2e8f0">
         </div>
         <div>
             <label class="block text-xs text-slate-500 mb-1">Hasta</label>
-            <input type="date" name="fecha_hasta" value="{{ $fechaHasta }}"
+            <input type="date" name="fecha_hasta" value="{{ $hasta }}"
                    class="form-input"
                    style="color:#e2e8f0">
         </div>

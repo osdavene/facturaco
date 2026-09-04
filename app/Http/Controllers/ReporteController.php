@@ -40,12 +40,14 @@ class ReporteController extends Controller
         $filtros = [
             'fecha_desde' => $request->fecha_desde ?? now()->startOfMonth()->format('Y-m-d'),
             'fecha_hasta' => $request->fecha_hasta ?? now()->format('Y-m-d'),
-            'estado' => $request->estado ?? '',
+            'estado'      => $request->estado ?? '',
         ];
         $datos = $this->reportes->ventas($filtros);
 
         return view('reportes.ventas', array_merge([
-            'empresa' => $empresa,
+            'empresa'    => $empresa,
+            'fechaDesde' => $filtros['fecha_desde'],
+            'fechaHasta' => $filtros['fecha_hasta'],
         ], $filtros, $datos));
     }
 
