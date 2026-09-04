@@ -150,231 +150,268 @@
                 </button>
             </div>
 
-            {{-- Navegación --}}
-            <nav class="flex-1 overflow-y-auto py-4 px-3">
+            {{-- Botón de Acción Rápida "+ Nuevo" --}}
+            <div class="px-3 pt-3 pb-1">
+                <div class="relative" id="dropdown-crear-container">
+                    <button type="button" onclick="toggleCrearDropdown(event)"
+                            class="w-full flex items-center justify-between gap-2 py-2 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-amber-500/10 transition-all group select-none">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-plus-circle text-sm transition-transform group-hover:rotate-90"></i>
+                            <span>Nuevo Registro</span>
+                        </span>
+                        <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" id="chevron-crear"></i>
+                    </button>
 
-                {{-- PRINCIPAL --}}
-                <x-nav-section label="Principal">
-                    <x-nav-item href="{{ route('dashboard') }}"
-                                icon="fa-chart-line"
-                                :active="request()->routeIs('dashboard')">
-                        Dashboard
-                    </x-nav-item>
+                    <div id="dropdown-crear"
+                         class="absolute left-0 right-0 top-full mt-1.5 bg-[#141c2e] border border-[#1e2d47] rounded-xl shadow-2xl p-1.5 hidden z-50 space-y-1 animate-in fade-in zoom-in-95 duration-150">
+                        @can('crear facturas')
+                        <a href="{{ route('facturas.create') }}"
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-300 hover:text-amber-400 hover:bg-[#1a2337] transition-colors">
+                            <i class="fas fa-file-invoice text-amber-500 w-4 text-center"></i>
+                            <span class="font-medium">Nueva Factura de Venta</span>
+                        </a>
+                        <a href="{{ route('pos.index') }}"
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-300 hover:text-emerald-400 hover:bg-[#1a2337] transition-colors">
+                            <i class="fas fa-cash-register text-emerald-500 w-4 text-center"></i>
+                            <span class="font-medium">Abrir Punto de Venta (POS)</span>
+                        </a>
+                        @endcan
+                        @can('crear cotizaciones')
+                        <a href="{{ route('cotizaciones.create') }}"
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-300 hover:text-amber-400 hover:bg-[#1a2337] transition-colors">
+                            <i class="fas fa-file-alt text-amber-400 w-4 text-center"></i>
+                            <span class="font-medium">Nueva Cotización</span>
+                        </a>
+                        @endcan
+                        @can('crear inventario')
+                        <a href="{{ route('inventario.create') }}"
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-300 hover:text-sky-400 hover:bg-[#1a2337] transition-colors">
+                            <i class="fas fa-box text-sky-400 w-4 text-center"></i>
+                            <span class="font-medium">Nuevo Producto / Stock</span>
+                        </a>
+                        @endcan
+                        @can('crear nomina')
+                        <a href="{{ route('nomina.empleados.create') }}"
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-300 hover:text-violet-400 hover:bg-[#1a2337] transition-colors">
+                            <i class="fas fa-user-plus text-violet-400 w-4 text-center"></i>
+                            <span class="font-medium">Nuevo Empleado (RRHH)</span>
+                        </a>
+                        @endcan
+                        @can('crear clientes')
+                        <a href="{{ route('clientes.create') }}"
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-300 hover:text-amber-400 hover:bg-[#1a2337] transition-colors">
+                            <i class="fas fa-user-tag text-amber-400 w-4 text-center"></i>
+                            <span class="font-medium">Nuevo Cliente</span>
+                        </a>
+                        @endcan
+                        @can('ver recibos')
+                        <a href="{{ route('contabilidad.libro-diario.create') }}"
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-300 hover:text-emerald-400 hover:bg-[#1a2337] transition-colors">
+                            <i class="fas fa-book-medical text-emerald-400 w-4 text-center"></i>
+                            <span class="font-medium">Nuevo Asiento Contable</span>
+                        </a>
+                        @endcan
+                    </div>
+                </div>
+            </div>
+
+            {{-- Navegación con Acordeones --}}
+            <nav class="flex-1 overflow-y-auto py-3 px-3 space-y-1">
+
+                {{-- DASHBOARD DIRECTO --}}
+                <a href="{{ route('dashboard') }}"
+                   class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs sm:text-[13px] font-semibold transition-all mb-2
+                          {{ request()->routeIs('dashboard')
+                              ? 'bg-[#162034] text-amber-400 border border-amber-500/30 shadow-sm'
+                              : 'text-slate-400 hover:bg-[#151d2e] hover:text-slate-200 border border-transparent' }}">
+                    <div class="w-7 h-7 rounded-lg border flex items-center justify-center flex-shrink-0 text-amber-400 bg-amber-500/10 border-amber-500/20">
+                        <i class="fas fa-chart-pie text-xs"></i>
+                    </div>
+                    <span class="flex-1">Dashboard</span>
+                </a>
+
+                {{-- 1. VENTAS Y FACTURACIÓN --}}
+                @php
+                    $ventasActivo = request()->routeIs('pos.*') || request()->routeIs('facturas.*') || request()->routeIs('cotizaciones.*') || request()->routeIs('notas_credito.*') || request()->routeIs('remisiones.*') || request()->routeIs('recibos.*') || request()->routeIs('clientes.*');
+                @endphp
+                @canany(['ver facturas','ver cotizaciones','crear facturas','ver clientes'])
+                <x-nav-group label="Ventas & Facturación" icon="fa-cash-register" color="amber" :active="$ventasActivo" id="ventas">
                     @can('crear facturas')
-                    <x-nav-item href="{{ route('pos.index') }}"
-                                icon="fa-cash-register"
-                                :active="request()->routeIs('pos.*')">
-                        Punto de Venta
-                    </x-nav-item>
+                    <x-nav-subitem href="{{ route('pos.index') }}" icon="fa-desktop" :active="request()->routeIs('pos.*')">
+                        Punto de Venta (POS)
+                    </x-nav-subitem>
                     @endcan
                     @can('ver facturas')
-                    <x-nav-item href="{{ route('facturas.index') }}"
-                                icon="fa-file-invoice"
-                                :active="request()->routeIs('facturas.*')">
-                        Facturación
-                    </x-nav-item>
+                    <x-nav-subitem href="{{ route('facturas.index') }}" icon="fa-file-invoice" :active="request()->routeIs('facturas.*')">
+                        Facturas de Venta
+                    </x-nav-subitem>
                     @endcan
                     @can('ver cotizaciones')
-                    <x-nav-item href="{{ route('cotizaciones.index') }}"
-                                icon="fa-file-alt"
-                                :active="request()->routeIs('cotizaciones.*')">
+                    <x-nav-subitem href="{{ route('cotizaciones.index') }}" icon="fa-file-alt" :active="request()->routeIs('cotizaciones.*')">
                         Cotizaciones
-                    </x-nav-item>
+                    </x-nav-subitem>
                     @endcan
                     @can('ver facturas')
-                    <x-nav-item href="{{ route('notas_credito.index') }}"
-                                icon="fas fa-undo-alt"
-                                :active="request()->routeIs('notas_credito.*')">
+                    <x-nav-subitem href="{{ route('notas_credito.index') }}" icon="fa-undo-alt" :active="request()->routeIs('notas_credito.*')">
                         Notas de Crédito
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('remisiones.index') }}"
-                                icon="fa-receipt"
-                                :active="request()->routeIs('remisiones.*')">
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('remisiones.index') }}" icon="fa-receipt" :active="request()->routeIs('remisiones.*')">
                         Remisiones
-                    </x-nav-item>
+                    </x-nav-subitem>
                     @endcan
-                </x-nav-section>
-
-                {{-- RECURSOS HUMANOS --}}
-                @can('ver nomina')
-                <x-nav-section label="Recursos Humanos">
-                    <x-nav-item href="{{ route('nomina.empleados.index') }}"
-                                icon="fa-users"
-                                :active="request()->routeIs('nomina.empleados.*')">
-                        Empleados
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('nomina.certificados.index') }}"
-                                icon="fa-file-signature"
-                                :active="request()->routeIs('nomina.certificados.*')">
-                        Certificados Laborales
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('nomina.liquidacion-definitiva.index') }}"
-                                icon="fa-calculator"
-                                :active="request()->routeIs('nomina.liquidacion-definitiva.*')">
-                        Liquidación Definitiva
-                    </x-nav-item>
-                </x-nav-section>
-
-                {{-- NÓMINA --}}
-                <x-nav-section label="Nómina">
-                    <x-nav-item href="{{ route('nomina.index') }}"
-                                icon="fa-file-invoice-dollar"
-                                :active="request()->routeIs('nomina.index') || request()->routeIs('nomina.show') || request()->routeIs('nomina.create')">
-                        Liquidación de Nómina
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('nomina.reportes.index') }}"
-                                icon="fa-chart-pie"
-                                :active="request()->routeIs('nomina.reportes.*')">
-                        Informes y PILA
-                    </x-nav-item>
-                    @can('gestionar nomina')
-                    <x-nav-item href="{{ route('nomina.configuracion.index') }}"
-                                icon="fa-sliders-h"
-                                :active="request()->routeIs('nomina.configuracion.*')">
-                        Parámetros Laborales
-                    </x-nav-item>
-                    @endcan
-                </x-nav-section>
-                @endcan
-
-                {{-- GESTIÓN --}}
-                @canany(['ver inventario','ver clientes','ver proveedores','ver compras'])
-                <x-nav-section label="Gestión">
-                    @can('ver inventario')
-                    <x-nav-item href="{{ route('inventario.index') }}"
-                                icon="fa-boxes"
-                                :active="request()->routeIs('inventario.*')">
-                        Inventario
-                    </x-nav-item>
+                    @can('ver recibos')
+                    <x-nav-subitem href="{{ route('recibos.index') }}" icon="fa-hand-holding-dollar" :active="request()->routeIs('recibos.*')">
+                        Recibos de Caja (Cobros)
+                    </x-nav-subitem>
                     @endcan
                     @can('ver clientes')
-                    <x-nav-item href="{{ route('clientes.index') }}"
-                                icon="fa-users"
-                                :active="request()->routeIs('clientes.*')">
+                    <x-nav-subitem href="{{ route('clientes.index') }}" icon="fa-users" :active="request()->routeIs('clientes.*')">
                         Clientes
-                    </x-nav-item>
+                    </x-nav-subitem>
                     @endcan
-                    @can('ver proveedores')
-                    <x-nav-item href="{{ route('proveedores.index') }}"
-                                icon="fa-truck"
-                                :active="request()->routeIs('proveedores.*')">
-                        Proveedores
-                    </x-nav-item>
-                    @endcan
-                    @can('ver compras')
-                    <x-nav-item href="{{ route('ordenes.index') }}"
-                                icon="fa-shopping-cart"
-                                :active="request()->routeIs('ordenes.*')">
-                        Órdenes de Compra
-                    </x-nav-item>
-                    @endcan
-                </x-nav-section>
+                </x-nav-group>
                 @endcanany
 
-                {{-- CONTABLE --}}
-                @can('ver recibos')
-                <x-nav-section label="Contable">
-                    <x-nav-item href="{{ route('recibos.index') }}"
-                                icon="fa-hand-holding-usd"
-                                :active="request()->routeIs('recibos.*')">
-                        Recibos de Caja
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('contabilidad.plan-cuentas.index') }}"
-                                icon="fa-list-ol"
-                                :active="request()->routeIs('contabilidad.plan-cuentas.*')">
-                        Plan de Cuentas
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('contabilidad.libro-diario.index') }}"
-                                icon="fa-book"
-                                :active="request()->routeIs('contabilidad.libro-diario.*')">
-                        Libro Diario
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('contabilidad.reportes.balance-prueba') }}"
-                                icon="fa-scale-balanced"
-                                :active="request()->routeIs('contabilidad.reportes.balance-prueba*')">
-                        Balance de Prueba
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('contabilidad.reportes.auxiliar') }}"
-                                icon="fa-table-list"
-                                :active="request()->routeIs('contabilidad.reportes.auxiliar*')">
-                        Libro Auxiliar
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('contabilidad.reportes.balance') }}"
-                                icon="fa-balance-scale"
-                                :active="request()->routeIs('contabilidad.reportes.balance')">
-                        Balance General
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('contabilidad.reportes.pyg') }}"
-                                icon="fa-chart-line"
-                                :active="request()->routeIs('contabilidad.reportes.pyg')">
-                        Estado de Resultados
-                    </x-nav-item>
-                </x-nav-section>
-                @endcan
-
-                {{-- REPORTES --}}
-                @canany(['ver reportes','ver configuracion'])
-                <x-nav-section label="Reportes">
-                    @can('ver reportes')
-                    <x-nav-item href="{{ route('reportes.index') }}"
-                                icon="fa-chart-bar"
-                                :active="request()->routeIs('reportes.*')">
-                        Reportes
-                    </x-nav-item>
-                    @endcan
-                    @can('ver configuracion')
-                    <x-nav-item href="{{ route('impuestos.index') }}"
-                                icon="fa-percent"
-                                :active="request()->routeIs('impuestos.*')">
-                        Impuestos / DIAN
-                    </x-nav-item>
-                    @endcan
-                </x-nav-section>
-                @endcanany
-
-                {{-- CONFIGURACIÓN --}}
-                @can('ver usuarios')
-                <x-nav-section label="Configuración">
-                    <x-nav-item href="{{ route('usuarios.index') }}"
-                                icon="fa-users-cog"
-                                :active="request()->routeIs('usuarios.*')">
-                        Usuarios & Roles
-                    </x-nav-item>
-                    @can('ver configuracion')
-                    <x-nav-item href="{{ route('empresa.index') }}"
-                                icon="fa-building"
-                                :active="request()->routeIs('empresa.*')">
-                        Empresa
-                    </x-nav-item>
+                {{-- 2. INVENTARIO Y COMPRAS --}}
+                @php
+                    $inventarioActivo = request()->routeIs('inventario.*') || request()->routeIs('categorias.*') || request()->routeIs('unidades.*') || request()->routeIs('proveedores.*') || request()->routeIs('ordenes.*');
+                @endphp
+                @canany(['ver inventario','ver proveedores','ver compras'])
+                <x-nav-group label="Inventario & Compras" icon="fa-boxes-stacked" color="sky" :active="$inventarioActivo" id="inventario">
+                    @can('ver inventario')
+                    <x-nav-subitem href="{{ route('inventario.index') }}" icon="fa-box-open" :active="request()->routeIs('inventario.*')">
+                        Productos & Catálogo
+                    </x-nav-subitem>
                     @endcan
                     @can('editar inventario')
-                    <x-nav-item href="{{ route('categorias.index') }}"
-                                icon="fa-tags"
-                                :active="request()->routeIs('categorias.*')">
+                    <x-nav-subitem href="{{ route('categorias.index') }}" icon="fa-tags" :active="request()->routeIs('categorias.*')">
                         Categorías
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('unidades.index') }}"
-                                icon="fa-ruler"
-                                :active="request()->routeIs('unidades.*')">
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('unidades.index') }}" icon="fa-ruler" :active="request()->routeIs('unidades.*')">
                         Unidades de Medida
-                    </x-nav-item>
+                    </x-nav-subitem>
                     @endcan
-                    <x-nav-item href="{{ route('sesiones.index') }}"
-                                icon="fas fa-users"
-                                :active="request()->routeIs('sesiones.*')">
-                        Sesiones
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('auditoria.index') }}"
-                                icon="fas fa-clipboard-list"
-                                :active="request()->routeIs('auditoria.*')">
-                        Auditoría
-                    </x-nav-item>
-                    <x-nav-item href="{{ route('backup.index') }}"
-                                icon="fas fa-hdd"
-                                :active="request()->routeIs('backup.*')">
-                        Backup
-                    </x-nav-item>
-                </x-nav-section>
+                    @can('ver proveedores')
+                    <x-nav-subitem href="{{ route('proveedores.index') }}" icon="fa-truck" :active="request()->routeIs('proveedores.*')">
+                        Proveedores
+                    </x-nav-subitem>
+                    @endcan
+                    @can('ver compras')
+                    <x-nav-subitem href="{{ route('ordenes.index') }}" icon="fa-cart-shopping" :active="request()->routeIs('ordenes.*')">
+                        Órdenes de Compra
+                    </x-nav-subitem>
+                    @endcan
+                </x-nav-group>
+                @endcanany
+
+                {{-- 3. TALENTO HUMANO Y NÓMINA --}}
+                @php
+                    $nominaActivo = request()->routeIs('nomina.*');
+                @endphp
+                @can('ver nomina')
+                <x-nav-group label="Talento Humano & Nómina" icon="fa-users-gear" color="violet" :active="$nominaActivo" id="nomina">
+                    <x-nav-subitem href="{{ route('nomina.empleados.index') }}" icon="fa-id-badge" :active="request()->routeIs('nomina.empleados.*')">
+                        Empleados & Ficha Técnica
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('nomina.index') }}" icon="fa-file-invoice-dollar" :active="request()->routeIs('nomina.index') || request()->routeIs('nomina.show') || request()->routeIs('nomina.create')">
+                        Liquidación de Nómina
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('nomina.certificados.index') }}" icon="fa-file-signature" :active="request()->routeIs('nomina.certificados.*')">
+                        Certificados Laborales
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('nomina.liquidacion-definitiva.index') }}" icon="fa-calculator" :active="request()->routeIs('nomina.liquidacion-definitiva.*')">
+                        Liquidación Definitiva
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('nomina.reportes.index') }}" icon="fa-pie-chart" :active="request()->routeIs('nomina.reportes.*')">
+                        Informes & PILA
+                    </x-nav-subitem>
+                    @can('gestionar nomina')
+                    <x-nav-subitem href="{{ route('nomina.configuracion.index') }}" icon="fa-sliders" :active="request()->routeIs('nomina.configuracion.*')">
+                        Parámetros Laborales
+                    </x-nav-subitem>
+                    @endcan
+                </x-nav-group>
+                @endcan
+
+                {{-- 4. CONTABILIDAD Y FINANZAS --}}
+                @php
+                    $contabilidadActivo = request()->routeIs('contabilidad.*');
+                @endphp
+                @can('ver recibos')
+                <x-nav-group label="Contabilidad & Finanzas" icon="fa-scale-balanced" color="emerald" :active="$contabilidadActivo" id="contabilidad">
+                    <x-nav-subitem href="{{ route('contabilidad.libro-diario.index') }}" icon="fa-book" :active="request()->routeIs('contabilidad.libro-diario.*')">
+                        Libro Diario (Asientos)
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('contabilidad.plan-cuentas.index') }}" icon="fa-list-ol" :active="request()->routeIs('contabilidad.plan-cuentas.*')">
+                        Plan de Cuentas (PUC)
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('contabilidad.reportes.balance-prueba') }}" icon="fa-scale-unbalanced" :active="request()->routeIs('contabilidad.reportes.balance-prueba*')">
+                        Balance de Prueba
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('contabilidad.reportes.auxiliar') }}" icon="fa-table-list" :active="request()->routeIs('contabilidad.reportes.auxiliar*')">
+                        Libro Auxiliar
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('contabilidad.reportes.balance') }}" icon="fa-landmark" :active="request()->routeIs('contabilidad.reportes.balance')">
+                        Balance General
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('contabilidad.reportes.pyg') }}" icon="fa-chart-line" :active="request()->routeIs('contabilidad.reportes.pyg')">
+                        Estado de Resultados (P&G)
+                    </x-nav-subitem>
+                </x-nav-group>
+                @endcan
+
+                {{-- 5. REPORTES Y FISCAL DIAN --}}
+                @php
+                    $reportesActivo = request()->routeIs('reportes.*') || request()->routeIs('impuestos.*');
+                @endphp
+                @canany(['ver reportes','ver configuracion'])
+                <x-nav-group label="Reportes & Fiscal DIAN" icon="fa-chart-pie" color="pink" :active="$reportesActivo" id="reportes">
+                    @can('ver reportes')
+                    <x-nav-subitem href="{{ route('reportes.index') }}" icon="fa-chart-bar" :active="request()->routeIs('reportes.index')">
+                        Centro de Reportes
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('reportes.fiscal') }}" icon="fa-landmark-flag" :active="request()->routeIs('reportes.fiscal')">
+                        Informe Fiscal DIAN (300/350)
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('reportes.compras') }}" icon="fa-cart-flatbed" :active="request()->routeIs('reportes.compras')">
+                        Compras & Proveedores
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('reportes.rentabilidad') }}" icon="fa-money-bill-trend-up" :active="request()->routeIs('reportes.rentabilidad')">
+                        Rentabilidad por Producto
+                    </x-nav-subitem>
+                    @endcan
+                    @can('ver configuracion')
+                    <x-nav-subitem href="{{ route('impuestos.index') }}" icon="fa-percent" :active="request()->routeIs('impuestos.*')">
+                        Impuestos & Resoluciones
+                    </x-nav-subitem>
+                    @endcan
+                </x-nav-group>
+                @endcanany
+
+                {{-- 6. CONFIGURACIÓN Y SEGURIDAD --}}
+                @php
+                    $configActivo = request()->routeIs('empresa.*') || request()->routeIs('usuarios.*') || request()->routeIs('backup.*') || request()->routeIs('auditoria.*') || request()->routeIs('sesiones.*');
+                @endphp
+                @can('ver usuarios')
+                <x-nav-group label="Configuración" icon="fa-gear" color="slate" :active="$configActivo" id="configuracion">
+                    @can('ver configuracion')
+                    <x-nav-subitem href="{{ route('empresa.index') }}" icon="fa-building" :active="request()->routeIs('empresa.*')">
+                        Datos de Empresa & Logo
+                    </x-nav-subitem>
+                    @endcan
+                    <x-nav-subitem href="{{ route('usuarios.index') }}" icon="fa-users-gear" :active="request()->routeIs('usuarios.*')">
+                        Usuarios, Roles & Permisos
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('backup.index') }}" icon="fa-hard-drive" :active="request()->routeIs('backup.*')">
+                        Copias de Seguridad (Backup)
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('auditoria.index') }}" icon="fa-clipboard-list" :active="request()->routeIs('auditoria.*')">
+                        Auditoría de Actividad
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('sesiones.index') }}" icon="fa-shield-halved" :active="request()->routeIs('sesiones.*')">
+                        Sesiones Activas
+                    </x-nav-subitem>
+                </x-nav-group>
                 @endcan
 
             </nav>
@@ -1252,6 +1289,51 @@
             @if(session('info'))
                 window.toast(@json(session('info')), 'info');
             @endif
+        // Control de Acordeones del Menú Lateral
+        window.toggleNavGroup = function(id) {
+            const content = document.getElementById('content-nav-group-' + id) || document.getElementById('content-' + id);
+            const chevron = document.getElementById('chevron-nav-group-' + id) || document.getElementById('chevron-' + id);
+            if (!content) return;
+
+            const isHidden = content.classList.contains('hidden');
+            if (isHidden) {
+                content.classList.remove('hidden');
+                if (chevron) {
+                    chevron.classList.add('rotate-90', 'text-amber-500');
+                }
+            } else {
+                content.classList.add('hidden');
+                if (chevron) {
+                    chevron.classList.remove('rotate-90', 'text-amber-500');
+                }
+            }
+        };
+
+        // Control de Dropdown de Acción Rápida "+ Nuevo"
+        window.toggleCrearDropdown = function(event) {
+            event.stopPropagation();
+            const dd = document.getElementById('dropdown-crear');
+            const ch = document.getElementById('chevron-crear');
+            if (!dd) return;
+
+            const isHidden = dd.classList.contains('hidden');
+            if (isHidden) {
+                dd.classList.remove('hidden');
+                if (ch) ch.classList.add('rotate-180');
+            } else {
+                dd.classList.add('hidden');
+                if (ch) ch.classList.remove('rotate-180');
+            }
+        };
+
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('dropdown-crear-container');
+            const dd = document.getElementById('dropdown-crear');
+            const ch = document.getElementById('chevron-crear');
+            if (container && !container.contains(e.target) && dd && !dd.classList.contains('hidden')) {
+                dd.classList.add('hidden');
+                if (ch) ch.classList.remove('rotate-180');
+            }
         });
     })();
     </script>
