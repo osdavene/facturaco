@@ -29,7 +29,10 @@ class InventarioService
 
         $producto->update(['stock_actual' => $stockNuevo]);
 
+        $empresaId = $producto->empresa_id ?? session('empresa_activa_id') ?? \App\Models\Empresa::obtener()?->id ?? 1;
+
         MovimientoInventario::create([
+            'empresa_id'     => $empresaId,
             'producto_id'    => $producto->id,
             'tipo'           => 'salida',
             'cantidad'       => $cantidad,
@@ -66,7 +69,10 @@ class InventarioService
 
         $producto->update($updates);
 
+        $empresaId = $producto->empresa_id ?? session('empresa_activa_id') ?? \App\Models\Empresa::obtener()?->id ?? 1;
+
         MovimientoInventario::create([
+            'empresa_id'     => $empresaId,
             'producto_id'    => $producto->id,
             'tipo'           => 'entrada',
             'cantidad'       => $cantidad,

@@ -20,7 +20,7 @@ trait PertenecerEmpresa
         // ── Auto-asignar empresa_id al crear ──────────────────────
         static::creating(function (Model $model) {
             if (empty($model->empresa_id)) {
-                $model->empresa_id = session('empresa_activa_id');
+                $model->empresa_id = session('empresa_activa_id') ?? \App\Models\Empresa::obtener()?->id ?? 1;
             }
         });
 
