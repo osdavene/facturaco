@@ -29,50 +29,73 @@
     </div>
 </div>
 
-{{-- MÉTRICAS SECUNDARIAS --}}
+{{-- MÉTRICAS SECUNDARIAS INTERACTIVAS --}}
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-    <div class="kpi-card kpi-red px-4 py-3 flex items-center gap-3">
-        <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center text-red-400 flex-shrink-0">
+    <a href="{{ route('facturas.index', ['estado' => 'emitida']) }}"
+       title="Ver facturas pendientes de cobro (Cartera)"
+       class="kpi-card kpi-red px-4 py-3 flex items-center gap-3 cursor-pointer group">
+        <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center text-red-400 flex-shrink-0 group-hover:scale-110 transition-transform">
             <i class="fas fa-hand-holding-usd text-xs"></i>
         </div>
         <div>
-            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Cartera</div>
-            <div class="font-bold text-sm text-red-400">${{ number_format($cartera/1000000, 1) }}M</div>
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Cartera</span>
+                <i class="fas fa-arrow-up-right-from-square text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="font-bold text-sm text-red-400 group-hover:underline">${{ number_format($cartera/1000000, 1) }}M</div>
         </div>
-    </div>
-    <div class="kpi-card kpi-amber px-4 py-3 flex items-center gap-3">
-        <div class="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500 flex-shrink-0">
+    </a>
+
+    <a href="{{ route('reportes.ventas') }}"
+       title="Ver reporte de ventas y ticket promedio"
+       class="kpi-card kpi-amber px-4 py-3 flex items-center gap-3 cursor-pointer group">
+        <div class="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500 flex-shrink-0 group-hover:scale-110 transition-transform">
             <i class="fas fa-receipt text-xs"></i>
         </div>
         <div>
-            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Ticket Promedio</div>
-            <div class="font-bold text-sm text-amber-500">
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Ticket Promedio</span>
+                <i class="fas fa-arrow-up-right-from-square text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="font-bold text-sm text-amber-500 group-hover:underline">
                 ${{ $ticketPromedio > 0 ? number_format($ticketPromedio/1000, 0).'k' : '—' }}
             </div>
         </div>
-    </div>
-    <div class="kpi-card kpi-blue px-4 py-3 flex items-center gap-3">
-        <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 flex-shrink-0">
+    </a>
+
+    <a href="{{ route('facturas.index', ['estado' => 'vencida']) }}"
+       title="Ver facturas vencidas"
+       class="kpi-card kpi-blue px-4 py-3 flex items-center gap-3 cursor-pointer group">
+        <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 flex-shrink-0 group-hover:scale-110 transition-transform">
             <i class="fas fa-exclamation-triangle text-xs"></i>
         </div>
         <div>
-            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Vencidas</div>
-            <div class="font-bold text-sm {{ $facturasVencidas > 0 ? 'text-red-400' : 'text-slate-400' }}">
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Vencidas</span>
+                <i class="fas fa-arrow-up-right-from-square text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="font-bold text-sm {{ $facturasVencidas > 0 ? 'text-red-400 group-hover:underline' : 'text-slate-400' }}">
                 {{ $facturasVencidas }} factura{{ $facturasVencidas != 1 ? 's' : '' }}
             </div>
         </div>
-    </div>
-    <div class="kpi-card kpi-emerald px-4 py-3 flex items-center gap-3">
-        <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500 flex-shrink-0">
+    </a>
+
+    <a href="{{ route('inventario.index', ['stock' => 'bajo']) }}"
+       title="Ver productos con bajo inventario"
+       class="kpi-card kpi-emerald px-4 py-3 flex items-center gap-3 cursor-pointer group">
+        <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500 flex-shrink-0 group-hover:scale-110 transition-transform">
             <i class="fas fa-boxes text-xs"></i>
         </div>
         <div>
-            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Stock Bajo</div>
-            <div class="font-bold text-sm {{ $productosStockBajo > 0 ? 'text-amber-400' : 'text-slate-400' }}">
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Stock Bajo</span>
+                <i class="fas fa-arrow-up-right-from-square text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="font-bold text-sm {{ $productosStockBajo > 0 ? 'text-amber-400 group-hover:underline' : 'text-slate-400' }}">
                 {{ $productosStockBajo }} producto{{ $productosStockBajo != 1 ? 's' : '' }}
             </div>
         </div>
-    </div>
+    </a>
 </div>
 
 {{-- ALERTAS --}}
@@ -81,25 +104,25 @@
     @if($facturasVencidas > 0)
     <a href="{{ route('facturas.index', ['estado'=>'vencida']) }}"
        class="flex items-center gap-3 bg-red-500/10 border border-red-500/30
-              rounded-xl px-4 py-3 hover:bg-red-500/15 transition-colors">
-        <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center text-red-400 flex-shrink-0">
+              rounded-xl px-4 py-3 hover:bg-red-500/15 transition-colors group">
+        <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center text-red-400 flex-shrink-0 group-hover:scale-110 transition-transform">
             <i class="fas fa-exclamation-triangle text-sm"></i>
         </div>
         <div>
-            <div class="text-sm font-semibold text-red-400">{{ $facturasVencidas }} facturas vencidas</div>
+            <div class="text-sm font-semibold text-red-400 group-hover:underline">{{ $facturasVencidas }} facturas vencidas</div>
             <div class="text-xs text-red-400/70">Requieren atención</div>
         </div>
     </a>
     @endif
     @if($productosStockBajo > 0)
-    <a href="{{ route('reportes.inventario', ['filtro'=>'bajo_stock']) }}"
+    <a href="{{ route('inventario.index', ['stock'=>'bajo']) }}"
        class="flex items-center gap-3 bg-amber-500/10 border border-amber-500/30
-              rounded-xl px-4 py-3 hover:bg-amber-500/15 transition-colors">
-        <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-500 flex-shrink-0">
+              rounded-xl px-4 py-3 hover:bg-amber-500/15 transition-colors group">
+        <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-500 flex-shrink-0 group-hover:scale-110 transition-transform">
             <i class="fas fa-box-open text-sm"></i>
         </div>
         <div>
-            <div class="text-sm font-semibold text-amber-500">{{ $productosStockBajo }} con stock bajo</div>
+            <div class="text-sm font-semibold text-amber-500 group-hover:underline">{{ $productosStockBajo }} con stock bajo</div>
             <div class="text-xs text-amber-500/70">Reponer inventario</div>
         </div>
     </a>
@@ -107,12 +130,12 @@
     @if($cotizacionesPend > 0)
     <a href="{{ route('cotizaciones.index', ['estado'=>'enviada']) }}"
        class="flex items-center gap-3 bg-blue-500/10 border border-blue-500/30
-              rounded-xl px-4 py-3 hover:bg-blue-500/15 transition-colors">
-        <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 flex-shrink-0">
+              rounded-xl px-4 py-3 hover:bg-blue-500/15 transition-colors group">
+        <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 flex-shrink-0 group-hover:scale-110 transition-transform">
             <i class="fas fa-file-alt text-sm"></i>
         </div>
         <div>
-            <div class="text-sm font-semibold text-blue-400">{{ $cotizacionesPend }} cotizaciones</div>
+            <div class="text-sm font-semibold text-blue-400 group-hover:underline">{{ $cotizacionesPend }} cotizaciones</div>
             <div class="text-xs text-blue-400/70">Pendientes de respuesta</div>
         </div>
     </a>
@@ -120,12 +143,12 @@
     @if($ordenesPend > 0)
     <a href="{{ route('ordenes.index', ['estado'=>'aprobada']) }}"
        class="flex items-center gap-3 bg-purple-500/10 border border-purple-500/30
-              rounded-xl px-4 py-3 hover:bg-purple-500/15 transition-colors">
-        <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 flex-shrink-0">
+              rounded-xl px-4 py-3 hover:bg-purple-500/15 transition-colors group">
+        <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 flex-shrink-0 group-hover:scale-110 transition-transform">
             <i class="fas fa-truck text-sm"></i>
         </div>
         <div>
-            <div class="text-sm font-semibold text-purple-400">{{ $ordenesPend }} órdenes por recibir</div>
+            <div class="text-sm font-semibold text-purple-400 group-hover:underline">{{ $ordenesPend }} órdenes por recibir</div>
             <div class="text-xs text-purple-400/70">Mercancía en camino</div>
         </div>
     </a>
@@ -146,61 +169,81 @@ function deltaBadge(float $delta): string {
 }
 @endphp
 
-{{-- KPIs PRINCIPALES --}}
+{{-- KPIs PRINCIPALES INTERACTIVOS --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
     {{-- Ventas Hoy --}}
-    <div class="kpi-card kpi-emerald p-5">
+    <a href="{{ route('facturas.index', ['fecha_desde' => now()->toDateString(), 'fecha_hasta' => now()->toDateString()]) }}"
+       title="Ver facturas generadas hoy"
+       class="kpi-card kpi-emerald p-5 block cursor-pointer group">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Ventas Hoy</div>
-            <div class="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Ventas Hoy</span>
+                <i class="fas fa-arrow-up-right-from-square text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
                 <i class="fas fa-sun text-sm"></i>
             </div>
         </div>
-        <div class="font-display font-bold text-2xl text-emerald-500">
+        <div class="font-display font-bold text-2xl text-emerald-500 group-hover:underline">
             ${{ number_format($ventasHoy, 0, ',', '.') }}
         </div>
         <div class="mt-1.5">{!! deltaBadge($deltaHoy) !!}</div>
-    </div>
+    </a>
 
     {{-- Ventas del Mes --}}
-    <div class="kpi-card kpi-blue p-5">
+    <a href="{{ route('reportes.ventas', ['periodo' => 'este_mes']) }}"
+       title="Ver reporte detallado de ventas del mes"
+       class="kpi-card kpi-blue p-5 block cursor-pointer group">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Ventas del Mes</div>
-            <div class="w-9 h-9 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400">
+            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Ventas del Mes</span>
+                <i class="fas fa-arrow-up-right-from-square text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="w-9 h-9 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                 <i class="fas fa-chart-line text-sm"></i>
             </div>
         </div>
-        <div class="font-display font-bold text-2xl text-blue-400">
+        <div class="font-display font-bold text-2xl text-blue-400 group-hover:underline">
             ${{ number_format($ventasMes, 0, ',', '.') }}
         </div>
         <div class="mt-1.5">{!! deltaBadge($deltaMes) !!}</div>
-    </div>
+    </a>
 
     {{-- Ventas del Año --}}
-    <div class="kpi-card kpi-amber p-5">
+    <a href="{{ route('reportes.ventas', ['periodo' => 'este_ano']) }}"
+       title="Ver reporte anual de ventas"
+       class="kpi-card kpi-amber p-5 block cursor-pointer group">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Ventas del Año</div>
-            <div class="w-9 h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
+            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Ventas del Año</span>
+                <i class="fas fa-arrow-up-right-from-square text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="w-9 h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
                 <i class="fas fa-chart-bar text-sm"></i>
             </div>
         </div>
-        <div class="font-display font-bold text-2xl text-amber-500">
+        <div class="font-display font-bold text-2xl text-amber-500 group-hover:underline">
             ${{ number_format($ventasAno, 0, ',', '.') }}
         </div>
         <div class="mt-1.5">{!! deltaBadge($deltaAno) !!}</div>
-    </div>
+    </a>
 
     {{-- Facturas del Mes --}}
-    <div class="kpi-card kpi-violet p-5">
+    <a href="{{ route('facturas.index') }}"
+       title="Ir al listado general de facturación"
+       class="kpi-card kpi-violet p-5 block cursor-pointer group">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Facturas del Mes</div>
-            <div class="w-9 h-9 bg-violet-500/10 rounded-xl flex items-center justify-center text-violet-400">
+            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1">
+                <span>Facturas del Mes</span>
+                <i class="fas fa-arrow-up-right-from-square text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="w-9 h-9 bg-violet-500/10 rounded-xl flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
                 <i class="fas fa-file-invoice text-sm"></i>
             </div>
         </div>
         <div class="flex items-end gap-2">
-            <div class="font-display font-bold text-2xl text-violet-400">{{ $facturasMes }}</div>
+            <div class="font-display font-bold text-2xl text-violet-400 group-hover:underline">{{ $facturasMes }}</div>
             @if($ticketPromedio > 0)
             <div class="text-xs text-slate-500 mb-1 pb-0.5">
                 ~${{ number_format($ticketPromedio/1000, 0) }}k/ticket
@@ -208,7 +251,7 @@ function deltaBadge(float $delta): string {
             @endif
         </div>
         <div class="mt-1.5">{!! deltaBadge($deltaTicket) !!}</div>
-    </div>
+    </a>
 
 </div>
 
