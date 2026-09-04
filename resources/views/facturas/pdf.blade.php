@@ -329,6 +329,25 @@
     </div>
     @endif
 
+    {{-- ═══ BLOQUE PAGO EN LÍNEA ═══ --}}
+    @if(!in_array($factura->estado, ['pagada', 'anulada']))
+    <div style="background:#fffbeb; border:1px dashed #f59e0b; border-radius:6px; padding:8px 12px; margin-top:10px; display:table; width:100%;">
+        <div style="display:table-cell; width:75%; vertical-align:middle;">
+            <div style="font-size:9.5px; font-weight:bold; color:#b45309; text-transform:uppercase;">
+                Pague esta factura en línea (PSE, Nequi, Tarjetas)
+            </div>
+            <div style="font-size:8px; color:#78350f; margin-top:2px;">
+                Escanee el código QR o ingrese a: <span style="color:#2563eb; font-weight:bold;">{{ $factura->url_pago }}</span>
+            </div>
+        </div>
+        @if(isset($qrPagoBase64))
+        <div style="display:table-cell; width:25%; text-align:right; vertical-align:middle;">
+            <img src="data:image/png;base64,{{ $qrPagoBase64 }}" width="60" height="60" alt="QR Pago Online">
+        </div>
+        @endif
+    </div>
+    @endif
+
     {{-- ═══ OBSERVACIONES ═══ --}}
     @if($factura->observaciones)
     <div class="obs-box">

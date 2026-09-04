@@ -126,23 +126,34 @@
             </a>
             @endif
 
-            {{-- Pagar con Wompi --}}
-            @if($empresa->wompi_configurado && in_array($factura->estado, ['emitida', 'vencida']) && $factura->saldo_pendiente > 0)
-            @php
-                $wompiRef    = 'FCO-' . $factura->empresa_id . '-' . $factura->numero;
-                $wompiAmount = intval($factura->saldo_pendiente * 100);
-                $wompiUrl    = 'https://checkout.wompi.co/p/'
-                    . '?public-key='      . urlencode($empresa->wompi_public_key)
-                    . '&currency='        . urlencode($empresa->wompi_currency ?? 'COP')
-                    . '&amount-in-cents=' . $wompiAmount
-                    . '&reference='       . urlencode($wompiRef)
-                    . '&redirect-url='    . urlencode(route('wompi.retorno', $factura));
-            @endphp
-            <a href="{{ $wompiUrl }}" target="_blank"
+            {{-- Compartir por WhatsApp --}}
+            <a href="{{ route('facturas.whatsapp', $factura) }}" target="_blank"
+               title="Enviar resumen y link de pago por WhatsApp"
+               class="inline-flex items-center gap-2 bg-emerald-600/20 border border-emerald-500/40
+                      hover:bg-emerald-600/30 text-emerald-400
+                      px-4 py-2.5 rounded-xl transition-colors text-sm font-semibold">
+                <i class="fab fa-whatsapp text-base"></i>
+                <span class="hidden sm:inline">WhatsApp</span>
+            </a>
+
+            {{-- Copiar Link de Pago --}}
+            <button type="button"
+                    onclick="navigator.clipboard.writeText('{{ $factura->url_pago }}'); if (window.toast) { window.toast('¡Link de pago copiado al portapapeles!', 'success'); } else { alert('¡Link copiado!'); }"
+                    title="Copiar link de pago para el cliente"
+                    class="inline-flex items-center gap-2 bg-[#1a2235] border border-[#1e2d47]
+                           hover:border-amber-500/50 text-slate-400 hover:text-amber-400
+                           px-4 py-2.5 rounded-xl transition-colors text-sm">
+                <i class="fas fa-link"></i>
+                <span class="hidden sm:inline">Link Pago</span>
+            </button>
+
+            {{-- Pagar con Wompi / Pago en línea --}}
+            @if(in_array($factura->estado, ['emitida', 'vencida']) && $factura->saldo_pendiente > 0)
+            <a href="{{ $factura->url_pago }}" target="_blank"
                class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600
-                      text-white font-bold px-4 py-2.5 rounded-xl transition-colors text-sm">
-                <i class="fas fa-credit-card"></i> Pagar en línea
-                <span class="bg-white/20 text-xs px-1.5 py-0.5 rounded-lg font-mono">
+                      text-black font-bold px-4 py-2.5 rounded-xl transition-colors text-sm shadow-lg shadow-emerald-500/20">
+                <i class="fas fa-credit-card"></i> Portal de Pago
+                <span class="bg-black/20 text-xs px-1.5 py-0.5 rounded-lg font-mono">
                     ${{ number_format($factura->saldo_pendiente, 0, ',', '.') }}
                 </span>
             </a>

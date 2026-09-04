@@ -235,13 +235,16 @@
 
                 {{-- 1. VENTAS Y FACTURACIÓN --}}
                 @php
-                    $ventasActivo = request()->routeIs('pos.*') || request()->routeIs('facturas.*') || request()->routeIs('cotizaciones.*') || request()->routeIs('notas_credito.*') || request()->routeIs('remisiones.*') || request()->routeIs('recibos.*') || request()->routeIs('clientes.*');
+                    $ventasActivo = request()->routeIs('pos.*') || request()->routeIs('cajas.*') || request()->routeIs('facturas.*') || request()->routeIs('cotizaciones.*') || request()->routeIs('notas_credito.*') || request()->routeIs('remisiones.*') || request()->routeIs('recibos.*') || request()->routeIs('clientes.*');
                 @endphp
                 @canany(['ver facturas','ver cotizaciones','crear facturas','ver clientes'])
                 <x-nav-group label="Ventas & Facturación" icon="fa-cash-register" color="amber" :active="$ventasActivo" id="ventas">
                     @can('crear facturas')
                     <x-nav-subitem href="{{ route('pos.index') }}" icon="fa-desktop" :active="request()->routeIs('pos.*')">
                         Punto de Venta (POS)
+                    </x-nav-subitem>
+                    <x-nav-subitem href="{{ route('cajas.index') }}" icon="fa-vault" :active="request()->routeIs('cajas.*')">
+                        Control de Caja & Turnos
                     </x-nav-subitem>
                     @endcan
                     @can('ver facturas')

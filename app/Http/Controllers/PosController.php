@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Caja;
+use App\Models\CajaTurno;
 use App\Models\Categoria;
 use App\Models\Cliente;
 use App\Models\Empresa;
@@ -10,6 +12,7 @@ use App\Models\FacturaItem;
 use App\Models\Producto;
 use App\Services\DocumentoService;
 use App\Services\InventarioService;
+use App\Services\PdfService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +22,7 @@ class PosController extends Controller
     public function __construct(
         private DocumentoService  $documentos,
         private InventarioService $inventario,
+        private PdfService        $pdf,
     ) {}
 
     // ── INTERFAZ POS ─────────────────────────────────────────
@@ -39,7 +43,17 @@ class PosController extends Controller
                         ])
                         ->get();
 
-        return view('pos.index', compact('empresa', 'categorias', 'productos'));
+        // Obtener turno activo del usuario autenticado
+        $turnoActivo = CajaTurno::where('estado', 'abierto')
+            ->where('user_id', Auth::id())
+            ->latest('id')
+            ->first();
+
+        if ($turnoActivo) {
+            $turnoActivo->recalcularTotales();
+        }
+
+        return view('pos.index', compact('empresa', 'categorias', 'productos', 'turnoActivo'));
     }
 
     // ── GUARDAR VENTA ─────────────────────────────────────────
@@ -57,7 +71,13 @@ class PosController extends Controller
         $userId  = Auth::id();
         $empresa = Empresa::obtener();
 
-        $facturaId = DB::transaction(function () use ($request, $userId, $empresa) {
+        // Buscar o vincular turno activo
+        $turnoActivo = CajaTurno::where('estado', 'abierto')
+            ->where('user_id', $userId)
+            ->latest('id')
+            ->first();
+
+        $facturaId = DB::transaction(function () use ($request, $userId, $empresa, $turnoActivo) {
 
             // Cliente: usar seleccionado o Consumidor Final
             if ($request->filled('cliente_id')) {
@@ -119,6 +139,7 @@ class PosController extends Controller
                 'plazo_pago'        => 0,
                 'observaciones'     => 'Venta POS',
                 'user_id'           => $userId,
+                'caja_turno_id'     => $turnoActivo?->id,
             ]);
 
             foreach ($calc['items'] as $item) {
@@ -153,6 +174,10 @@ class PosController extends Controller
                 }
             }
 
+            if ($turnoActivo) {
+                $turnoActivo->recalcularTotales();
+            }
+
             try {
                 (new \App\Services\ContabilidadService())->asientoFactura($factura);
             } catch (\Throwable) {}
@@ -167,7 +192,7 @@ class PosController extends Controller
         ]);
     }
 
-    // ── TICKET 80MM ───────────────────────────────────────────
+    // ── TICKET 80MM / 58MM ────────────────────────────────────
 
     public function ticket(Factura $factura)
     {
@@ -175,7 +200,22 @@ class PosController extends Controller
         $empresa  = Empresa::obtener();
         $efectivo = (float) request('efectivo', 0);
         $vuelto   = max(0, $efectivo - $factura->total);
+        $ancho    = request('ancho', '80');
 
-        return view('pos.ticket', compact('factura', 'empresa', 'efectivo', 'vuelto'));
+        $qrBase64 = null;
+        if ($factura->cufe) {
+            $qrContent = "NumFac: {$factura->numero}\nFecFac: {$factura->fecha_emision->format('Y-m-d')}\nNitFac: {$empresa->nit}\nDocAdq: {$factura->cliente_documento}\nValFac: " . number_format($factura->subtotal, 2, '.', '') . "\nValIva: " . number_format($factura->iva, 2, '.', '') . "\nValTotal: " . number_format($factura->total, 2, '.', '') . "\nCUFE: {$factura->cufe}";
+            $qrBase64 = $this->pdf->qrBase64([$qrContent], 110, 2);
+        } else {
+            $qrBase64 = $this->pdf->qrBase64([
+                'Factura: ' . $factura->numero,
+                'Empresa: ' . ($empresa->nombre_comercial ?: $empresa->razon_social),
+                'NIT: '     . $empresa->nit_formateado,
+                'Total: $'  . number_format($factura->total, 0, ',', '.'),
+                'Fecha: '   . ($factura->fecha_emision ? $factura->fecha_emision->format('d/m/Y') : date('d/m/Y')),
+            ], 100, 2);
+        }
+
+        return view('pos.ticket', compact('factura', 'empresa', 'efectivo', 'vuelto', 'ancho', 'qrBase64'));
     }
 }

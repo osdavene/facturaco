@@ -41,6 +41,25 @@
             <div class="hidden sm:block text-xs text-slate-500">
                 <i class="fas fa-calendar mr-1"></i>{{ now()->locale('es')->isoFormat('D MMM YYYY') }}
             </div>
+
+            {{-- Control de Turno de Caja --}}
+            @if($turnoActivo)
+                <button onclick="abrirModalPosCaja()"
+                        title="Ver arqueo y opciones de caja"
+                        class="flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>Turno #{{ $turnoActivo->id }}</span>
+                    <span class="hidden md:inline font-mono">(${{ number_format($turnoActivo->monto_cierre_esperado, 0, ',', '.') }})</span>
+                </button>
+            @else
+                <button onclick="abrirModalAperturaPos()"
+                        title="Abrir turno de caja con base inicial"
+                        class="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-black font-bold px-3 py-1.5 rounded-lg text-xs transition-all shadow-md shadow-amber-500/20">
+                    <i class="fas fa-key"></i>
+                    <span>Abrir Caja</span>
+                </button>
+            @endif
+
             <div class="text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg max-w-[120px] sm:max-w-none truncate">
                 {{ $empresa->nombre_comercial ?: $empresa->razon_social }}
             </div>
@@ -340,6 +359,192 @@
                 Agregar
             </button>
         </div>
+    </div>
+</div>
+
+{{-- ── MODAL GESTIÓN DE CAJA EN POS ───────────────── --}}
+<div id="modal-pos-caja" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <div class="flex items-center justify-between border-b border-[#1e2d47] pb-3 mb-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fas fa-cash-register text-amber-500"></i>
+                <span>Estado de Caja & Turno</span>
+            </h3>
+            <button onclick="cerrarModalPosCaja()" class="text-slate-400 hover:text-white text-lg">✕</button>
+        </div>
+
+        <div id="caja-info-activa" class="space-y-4">
+            <div class="bg-[#111827] border border-[#1e2d47] rounded-xl p-3.5 space-y-2 text-xs">
+                <div class="flex justify-between text-slate-400">
+                    <span>Base inicial:</span>
+                    <span class="font-bold text-slate-200" id="pos-base-inicial">$0</span>
+                </div>
+                <div class="flex justify-between text-emerald-400">
+                    <span>Ventas en Efectivo:</span>
+                    <span class="font-bold" id="pos-ventas-efectivo">$0</span>
+                </div>
+                <div class="flex justify-between text-blue-400">
+                    <span>Ventas Tarjeta / Nequi / Transf:</span>
+                    <span class="font-bold" id="pos-ventas-otros">$0</span>
+                </div>
+                <div class="flex justify-between text-slate-400">
+                    <span>Entradas / Salidas menores:</span>
+                    <span class="font-bold text-slate-300" id="pos-flujo-menor">$0</span>
+                </div>
+                <div class="border-t border-[#1e2d47] pt-2 flex justify-between font-bold text-sm text-amber-400">
+                    <span>Efectivo Esperado en Caja:</span>
+                    <span id="pos-efectivo-esperado">$0</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="abrirModalMovimientoPos('salida')"
+                        class="bg-[#1a2235] hover:bg-red-500/20 border border-[#1e2d47] hover:border-red-500/40 text-slate-200 hover:text-red-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-1">
+                    <i class="fas fa-arrow-circle-up text-base text-red-400"></i>
+                    <span>Registrar Salida</span>
+                </button>
+                <button onclick="abrirModalMovimientoPos('entrada')"
+                        class="bg-[#1a2235] hover:bg-emerald-500/20 border border-[#1e2d47] hover:border-emerald-500/40 text-slate-200 hover:text-emerald-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-1">
+                    <i class="fas fa-arrow-circle-down text-base text-emerald-400"></i>
+                    <span>Registrar Entrada</span>
+                </button>
+            </div>
+
+            <div class="border-t border-[#1e2d47] pt-4">
+                <button onclick="abrirModalCierrePos()"
+                        class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2">
+                    <i class="fas fa-lock"></i>
+                    <span>Arqueo y Cierre de Turno (Reporte Z)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ── MODAL APERTURA EN POS ───────────────────────── --}}
+<div id="modal-pos-apertura" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+            <i class="fas fa-key text-amber-500"></i>
+            <span>Apertura de Turno en Caja</span>
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">
+            Ingresa la base inicial de dinero en efectivo para comenzar a registrar ventas.
+        </p>
+
+        <form id="form-apertura-pos" onsubmit="guardarAperturaPos(event)">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                        Base Inicial en Efectivo ($)
+                    </label>
+                    <input id="pos-input-apertura" type="number" step="100" min="0" required value="100000"
+                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-3 text-xl font-bold text-amber-400 focus:outline-none focus:border-amber-500">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 mt-6">
+                <button type="button" onclick="document.getElementById('modal-pos-apertura').classList.add('hidden')"
+                        class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" id="btn-submit-apertura"
+                        class="bg-amber-500 hover:bg-amber-600 text-black font-bold px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20">
+                    <i class="fas fa-check"></i>
+                    <span>Abrir Turno</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ── MODAL MOVIMIENTO EN POS ─────────────────────── --}}
+<div id="modal-pos-movimiento" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
+            <i class="fas fa-exchange-alt text-amber-500"></i>
+            <span id="pos-mov-titulo">Registrar Movimiento de Caja</span>
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">
+            Ingresa el monto y motivo de la operación.
+        </p>
+
+        <form id="form-movimiento-pos" onsubmit="guardarMovimientoPos(event)">
+            <input type="hidden" id="pos-mov-tipo" value="salida">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                        Monto ($)
+                    </label>
+                    <input id="pos-mov-monto" type="number" step="100" min="1" required placeholder="Ej: 15000"
+                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-lg font-bold text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                        Motivo / Concepto
+                    </label>
+                    <input id="pos-mov-motivo" type="text" required placeholder="Ej: Pago de domicilio / Retiro cambio"
+                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 mt-6">
+                <button type="button" onclick="document.getElementById('modal-pos-movimiento').classList.add('hidden')"
+                        class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" id="btn-submit-mov"
+                        class="bg-amber-500 hover:bg-amber-600 text-black font-bold px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <i class="fas fa-save"></i>
+                    <span>Guardar Movimiento</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ── MODAL CIERRE EN POS ─────────────────────────── --}}
+<div id="modal-pos-cierre" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
+            <i class="fas fa-lock text-red-500"></i>
+            <span>Arqueo y Cierre de Turno</span>
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">
+            Ingresa el dinero físico total contado en la gaveta.
+        </p>
+
+        <form id="form-cierre-pos" onsubmit="guardarCierrePos(event)">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                        Efectivo Real Contado en Caja ($)
+                    </label>
+                    <input id="pos-cierre-real" type="number" step="100" min="0" required
+                           placeholder="Total contado"
+                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-3 text-xl font-bold text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                        Observaciones (Opcional)
+                    </label>
+                    <textarea id="pos-cierre-obs" rows="2" placeholder="Novedades del turno…"
+                              class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 mt-6">
+                <button type="button" onclick="document.getElementById('modal-pos-cierre').classList.add('hidden')"
+                        class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" id="btn-submit-cierre"
+                        class="bg-red-500 hover:bg-red-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <i class="fas fa-lock"></i>
+                    <span>Cerrar Turno & Imprimir Reporte Z</span>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -796,10 +1001,164 @@ window.addEventListener('resize', () => {
     }
 });
 
+// ── Control de Turnos de Caja en POS ────────────────
+let turnoActivo = @json($turnoActivo);
+
+function fmtCOP(val) {
+    if (val === null || val === undefined) return '$0';
+    return '$' + Math.round(Number(val)).toLocaleString('es-CO');
+}
+
+function abrirModalAperturaPos() {
+    document.getElementById('modal-pos-apertura').classList.remove('hidden');
+    setTimeout(() => document.getElementById('pos-input-apertura')?.focus(), 100);
+}
+
+function abrirModalPosCaja() {
+    if (!turnoActivo) {
+        abrirModalAperturaPos();
+        return;
+    }
+    document.getElementById('pos-base-inicial').textContent     = fmtCOP(turnoActivo.monto_apertura);
+    document.getElementById('pos-ventas-efectivo').textContent   = fmtCOP(turnoActivo.total_ventas_efectivo);
+    const otrosVentas = (Number(turnoActivo.total_ventas_tarjeta) || 0) + (Number(turnoActivo.total_ventas_transferencia) || 0) + (Number(turnoActivo.total_ventas_nequi) || 0);
+    document.getElementById('pos-ventas-otros').textContent      = fmtCOP(otrosVentas);
+    const flujoMenor = (Number(turnoActivo.total_entradas) || 0) - (Number(turnoActivo.total_salidas) || 0);
+    document.getElementById('pos-flujo-menor').textContent       = (flujoMenor >= 0 ? '+' : '-') + fmtCOP(Math.abs(flujoMenor));
+    document.getElementById('pos-efectivo-esperado').textContent = fmtCOP(turnoActivo.monto_cierre_esperado);
+    document.getElementById('modal-pos-caja').classList.remove('hidden');
+}
+
+function cerrarModalPosCaja() {
+    document.getElementById('modal-pos-caja').classList.add('hidden');
+}
+
+function abrirModalMovimientoPos(tipo = 'salida') {
+    cerrarModalPosCaja();
+    document.getElementById('pos-mov-tipo').value = tipo;
+    document.getElementById('pos-mov-titulo').textContent = tipo === 'salida' ? 'Registrar Salida de Efectivo' : 'Registrar Entrada Extra de Efectivo';
+    document.getElementById('pos-mov-monto').value = '';
+    document.getElementById('pos-mov-motivo').value = '';
+    document.getElementById('modal-pos-movimiento').classList.remove('hidden');
+    setTimeout(() => document.getElementById('pos-mov-monto')?.focus(), 100);
+}
+
+function abrirModalCierrePos() {
+    cerrarModalPosCaja();
+    document.getElementById('pos-cierre-real').value = turnoActivo ? turnoActivo.monto_cierre_esperado : '';
+    document.getElementById('pos-cierre-obs').value = '';
+    document.getElementById('modal-pos-cierre').classList.remove('hidden');
+    setTimeout(() => document.getElementById('pos-cierre-real')?.focus(), 100);
+}
+
+async function guardarAperturaPos(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit-apertura');
+    btn.disabled = true;
+    const monto = parseFloat(document.getElementById('pos-input-apertura').value) || 0;
+
+    try {
+        const res = await fetch('{{ route("cajas.abrir") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ monto_apertura: monto })
+        });
+        const data = await res.json();
+        if (data.success) {
+            turnoActivo = data.turno;
+            document.getElementById('modal-pos-apertura').classList.add('hidden');
+            mostrarToast('¡Turno de caja abierto correctamente!', 'ok');
+            setTimeout(() => window.location.reload(), 600);
+        } else {
+            mostrarToast(data.message || 'Error al abrir turno', 'error');
+        }
+    } catch (err) {
+        mostrarToast('Error de conexión', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function guardarMovimientoPos(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit-mov');
+    btn.disabled = true;
+    const tipo = document.getElementById('pos-mov-tipo').value;
+    const monto = parseFloat(document.getElementById('pos-mov-monto').value) || 0;
+    const motivo = document.getElementById('pos-mov-motivo').value;
+
+    try {
+        const res = await fetch('{{ route("cajas.movimiento") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ tipo, monto, motivo })
+        });
+        const data = await res.json();
+        if (data.success) {
+            turnoActivo = data.turno;
+            document.getElementById('modal-pos-movimiento').classList.add('hidden');
+            mostrarToast('Movimiento registrado correctamente', 'ok');
+        } else {
+            mostrarToast(data.message || 'Error al registrar movimiento', 'error');
+        }
+    } catch (err) {
+        mostrarToast('Error de conexión', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function guardarCierrePos(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit-cierre');
+    btn.disabled = true;
+    const montoReal = parseFloat(document.getElementById('pos-cierre-real').value) || 0;
+    const obs = document.getElementById('pos-cierre-obs').value;
+
+    try {
+        const res = await fetch('{{ route("cajas.cerrar") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ monto_cierre_real: montoReal, observaciones: obs })
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('modal-pos-cierre').classList.add('hidden');
+            mostrarToast('¡Turno de caja cerrado exitosamente!', 'ok');
+            if (data.ticket_url) {
+                const win = window.open(data.ticket_url, '_blank', 'width=420,height=700,scrollbars=yes');
+                if (win) win.onload = () => win.print();
+            }
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            mostrarToast(data.message || 'Error al cerrar turno', 'error');
+        }
+    } catch (err) {
+        mostrarToast('Error de conexión', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
 // ── Teclado global ───────────────────────────────────
 document.addEventListener('keydown', e => {
     // Escape cierra modal
-    if (e.key === 'Escape') cerrarModalCantidad();
+    if (e.key === 'Escape') {
+        cerrarModalCantidad();
+        cerrarModalPosCaja();
+        document.getElementById('modal-pos-apertura')?.classList.add('hidden');
+        document.getElementById('modal-pos-movimiento')?.classList.add('hidden');
+        document.getElementById('modal-pos-cierre')?.classList.add('hidden');
+    }
     // F2 foco en búsqueda de producto
     if (e.key === 'F2') { e.preventDefault(); document.getElementById('buscar-producto').focus(); }
     // F4 cobrar

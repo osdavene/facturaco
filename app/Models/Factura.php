@@ -44,6 +44,7 @@ class Factura extends Model
         'total', 'total_pagado',
         'estado', 'observaciones', 'forma_pago', 'plazo_pago',
         'cufe', 'enviada_dian', 'fecha_dian', 'user_id',
+        'caja_turno_id', 'token_pago',
     ];
 
     protected $casts = [
@@ -53,6 +54,21 @@ class Factura extends Model
         'enviada_dian'      => 'boolean',
         'fecha_dian'        => 'datetime',
     ];
+
+    public function cajaTurno()
+    {
+        return $this->belongsTo(CajaTurno::class, 'caja_turno_id');
+    }
+
+    public function getUrlPagoAttribute(): string
+    {
+        if (empty($this->token_pago)) {
+            $this->token_pago = \Illuminate\Support\Str::random(32);
+            $this->saveQuietly();
+        }
+
+        return route('factura.pago_publico', ['token' => $this->token_pago]);
+    }
 
     public function cliente()
     {
@@ -114,6 +130,12 @@ class Factura extends Model
 
     protected static function booted(): void
     {
+        static::creating(function ($factura) {
+            if (empty($factura->token_pago)) {
+                $factura->token_pago = \Illuminate\Support\Str::random(32);
+            }
+        });
+
         static::retrieved(function ($factura) {
             if ($factura->estado === 'emitida' &&
                 $factura->fecha_vencimiento < now()->startOfDay()) {

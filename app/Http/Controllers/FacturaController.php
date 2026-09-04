@@ -187,15 +187,20 @@ class FacturaController extends Controller
                 'Factura: ' . $factura->numero,
                 'NIT: '     . $empresa->nit_formateado,
                 'Cliente: ' . $factura->cliente_nombre,
-                'Fecha: '   . $factura->fecha_emision->format('d/m/Y'),
+                'Fecha: '   . ($factura->fecha_emision ? $factura->fecha_emision->format('d/m/Y') : date('d/m/Y')),
                 'Total: $'  . number_format($factura->total, 0, ',', '.'),
                 'Estado: '  . strtoupper($factura->estado),
             ]);
         }
 
+        $qrPagoBase64 = null;
+        if (!in_array($factura->estado, ['pagada', 'anulada'])) {
+            $qrPagoBase64 = $this->pdf->qrBase64([$factura->url_pago], 100, 2);
+        }
+
         return $this->pdf->stream(
             'facturas.pdf',
-            compact('factura', 'empresa', 'qrBase64'),
+            compact('factura', 'empresa', 'qrBase64', 'qrPagoBase64'),
             'factura-'.$factura->numero.'.pdf',
         );
     }

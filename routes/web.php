@@ -14,6 +14,9 @@ RateLimiter::for('login', function (Request $request) {
 // ── Webhooks (sin CSRF, sin auth) ─────────────────────────────────────────
 Route::post('/webhooks/wompi', [WompiController::class, 'webhook'])->name('wompi.webhook');
 
+// ── Portal Público de Consulta y Pago de Facturas ────────────────────────
+Route::get('/pagar/{token}', [\App\Http\Controllers\PagoPublicoController::class, 'mostrar'])->name('factura.pago_publico');
+
 // ── Página de inicio ──────────────────────────────────────────────────────
 Route::get('/', fn () => redirect()->route('login'));
 

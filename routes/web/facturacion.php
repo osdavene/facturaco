@@ -11,11 +11,19 @@ use App\Http\Controllers\RemisionController;
 use App\Http\Controllers\WompiController;
 use Illuminate\Support\Facades\Route;
 
-// ── POS ───────────────────────────────────────────────────────────────────
+// ── POS & Control de Caja ──────────────────────────────────────────────────
 Route::middleware(['modulo:facturacion', 'can:crear facturas'])->group(function () {
     Route::get('/pos',                    [PosController::class, 'index'])  ->name('pos.index');
     Route::post('/pos',                   [PosController::class, 'store'])  ->name('pos.store');
     Route::get('/pos/ticket/{factura}',   [PosController::class, 'ticket']) ->name('pos.ticket');
+
+    // Control de Turnos y Cajas
+    Route::get('/cajas',                          [\App\Http\Controllers\CajaController::class, 'index'])        ->name('cajas.index');
+    Route::get('/cajas/estado',                   [\App\Http\Controllers\CajaController::class, 'estado'])       ->name('cajas.estado');
+    Route::post('/cajas/abrir',                   [\App\Http\Controllers\CajaController::class, 'abrir'])        ->name('cajas.abrir');
+    Route::post('/cajas/cerrar',                  [\App\Http\Controllers\CajaController::class, 'cerrar'])       ->name('cajas.cerrar');
+    Route::post('/cajas/movimiento',              [\App\Http\Controllers\CajaController::class, 'movimiento'])   ->name('cajas.movimiento');
+    Route::get('/cajas/{turno}/cierre-ticket',    [\App\Http\Controllers\CajaController::class, 'cierreTicket'])->name('cajas.cierre_ticket');
 });
 
 // ── Facturas ──────────────────────────────────────────────────────────────
@@ -31,6 +39,7 @@ Route::middleware('modulo:facturacion')->group(function () {
     Route::get('/facturas/{factura}/pdf',      [FacturaController::class, 'pdf'])          ->name('facturas.pdf')         ->middleware('can:ver facturas');
     Route::get('/facturas/{factura}/enviar',   [FacturaController::class, 'formEnviar'])   ->name('facturas.formEnviar')  ->middleware('can:ver facturas');
     Route::post('/facturas/{factura}/enviar',  [FacturaController::class, 'enviar'])       ->name('facturas.enviar')      ->middleware('can:ver facturas');
+    Route::get('/facturas/{factura}/whatsapp', [\App\Http\Controllers\PagoPublicoController::class, 'whatsapp'])->name('facturas.whatsapp')->middleware('can:ver facturas');
     Route::delete('/facturas',                          [FacturaController::class, 'bulkDelete'])       ->name('facturas.bulk-delete')  ->middleware('can:anular facturas');
     Route::post('/facturas/{factura}/dian/enviar',      [DianController::class, 'enviar'])          ->name('facturas.dian.enviar')  ->middleware('can:crear facturas');
     Route::get('/facturas/{factura}/dian/estado',       [DianController::class, 'consultarEstado']) ->name('facturas.dian.estado')  ->middleware('can:ver facturas');
