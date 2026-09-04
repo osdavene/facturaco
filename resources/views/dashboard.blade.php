@@ -31,7 +31,7 @@
 
 {{-- MÉTRICAS SECUNDARIAS --}}
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-xl px-4 py-3 flex items-center gap-3">
+    <div class="kpi-card kpi-red px-4 py-3 flex items-center gap-3">
         <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center text-red-400 flex-shrink-0">
             <i class="fas fa-hand-holding-usd text-xs"></i>
         </div>
@@ -40,7 +40,7 @@
             <div class="font-bold text-sm text-red-400">${{ number_format($cartera/1000000, 1) }}M</div>
         </div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-xl px-4 py-3 flex items-center gap-3">
+    <div class="kpi-card kpi-amber px-4 py-3 flex items-center gap-3">
         <div class="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500 flex-shrink-0">
             <i class="fas fa-receipt text-xs"></i>
         </div>
@@ -51,7 +51,7 @@
             </div>
         </div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-xl px-4 py-3 flex items-center gap-3">
+    <div class="kpi-card kpi-blue px-4 py-3 flex items-center gap-3">
         <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 flex-shrink-0">
             <i class="fas fa-exclamation-triangle text-xs"></i>
         </div>
@@ -62,7 +62,7 @@
             </div>
         </div>
     </div>
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-xl px-4 py-3 flex items-center gap-3">
+    <div class="kpi-card kpi-emerald px-4 py-3 flex items-center gap-3">
         <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500 flex-shrink-0">
             <i class="fas fa-boxes text-xs"></i>
         </div>
@@ -150,9 +150,9 @@ function deltaBadge(float $delta): string {
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
     {{-- Ventas Hoy --}}
-    <div class="card p-5">
+    <div class="kpi-card kpi-emerald p-5">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas Hoy</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Ventas Hoy</div>
             <div class="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
                 <i class="fas fa-sun text-sm"></i>
             </div>
@@ -164,9 +164,9 @@ function deltaBadge(float $delta): string {
     </div>
 
     {{-- Ventas del Mes --}}
-    <div class="card p-5">
+    <div class="kpi-card kpi-blue p-5">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Mes</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Ventas del Mes</div>
             <div class="w-9 h-9 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400">
                 <i class="fas fa-chart-line text-sm"></i>
             </div>
@@ -178,9 +178,9 @@ function deltaBadge(float $delta): string {
     </div>
 
     {{-- Ventas del Año --}}
-    <div class="card p-5">
+    <div class="kpi-card kpi-amber p-5">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider">Ventas del Año</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Ventas del Año</div>
             <div class="w-9 h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
                 <i class="fas fa-chart-bar text-sm"></i>
             </div>
@@ -192,9 +192,9 @@ function deltaBadge(float $delta): string {
     </div>
 
     {{-- Facturas del Mes --}}
-    <div class="card p-5">
+    <div class="kpi-card kpi-violet p-5">
         <div class="flex items-center justify-between mb-3">
-            <div class="text-xs text-slate-500 uppercase tracking-wider">Facturas del Mes</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Facturas del Mes</div>
             <div class="w-9 h-9 bg-violet-500/10 rounded-xl flex items-center justify-center text-violet-400">
                 <i class="fas fa-file-invoice text-sm"></i>
             </div>

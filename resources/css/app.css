@@ -861,19 +861,96 @@ html:not(.dark) .text-xs.text-slate-500:not(nav *) {
     }
 
     .table-row {
-        @apply border-b border-[#1e2d47]/50
-               hover:bg-[#1a2235]/50 transition-colors;
+        @apply border-b border-[#1e2d47]/50 transition-all duration-150 relative;
+    }
+    .table-row:hover {
+        background-color: rgba(30, 45, 71, 0.45) !important;
+    }
+    .table-row:hover td:first-child {
+        box-shadow: inset 3px 0 0 0 #f59e0b;
+    }
+    html:not(.dark) .table-row:hover {
+        background-color: #f1f5f9 !important;
+    }
+    html:not(.dark) .table-row:hover td:first-child {
+        box-shadow: inset 3px 0 0 0 #f59e0b;
     }
 
-    /* ── Badges ────────────────────────────────────── */
+    /* ── Tarjetas KPI con Micro-Gradientes ─────────── */
+    .kpi-card {
+        position: relative;
+        overflow: hidden;
+        background: #141c2e;
+        border: 1px solid #1e2d47;
+        border-radius: 1rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+        border-color: rgba(245, 158, 11, 0.35);
+    }
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3.5px;
+        background: linear-gradient(90deg, transparent, var(--kpi-color, #f59e0b), transparent);
+        opacity: 0.9;
+    }
+    .kpi-emerald { --kpi-color: #10b981; }
+    .kpi-blue    { --kpi-color: #3b82f6; }
+    .kpi-sky     { --kpi-color: #0ea5e9; }
+    .kpi-amber   { --kpi-color: #f59e0b; }
+    .kpi-violet  { --kpi-color: #8b5cf6; }
+    .kpi-red     { --kpi-color: #ef4444; }
+    .kpi-rose    { --kpi-color: #f43f5e; }
+
+    /* KPI en Modo Claro */
+    html:not(.dark) .kpi-card {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    html:not(.dark) .kpi-card:hover {
+        box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+        border-color: #cbd5e1 !important;
+    }
+
+    /* ── Badges con Efecto Píldora Luminosa ───────── */
     .badge {
-        @apply text-xs px-2.5 py-1 rounded-full font-semibold;
+        @apply text-xs px-2.5 py-1 rounded-full font-semibold inline-flex items-center gap-1.5 border;
     }
 
-    .badge-amber  { @apply badge bg-amber-500/10 text-amber-500; }
-    .badge-green  { @apply badge bg-emerald-500/10 text-emerald-400; }
-    .badge-red    { @apply badge bg-red-500/10 text-red-400; }
-    .badge-blue   { @apply badge bg-blue-500/10 text-blue-400; }
-    .badge-slate  { @apply badge bg-[#1a2235] text-slate-400; }
+    .badge-amber  { @apply badge bg-amber-500/10 text-amber-400 border-amber-500/20; }
+    .badge-green,
+    .badge-emerald{ @apply badge bg-emerald-500/10 text-emerald-400 border-emerald-500/20; }
+    .badge-red    { @apply badge bg-red-500/10 text-red-400 border-red-500/20; }
+    .badge-blue   { @apply badge bg-blue-500/10 text-blue-400 border-blue-500/20; }
+    .badge-violet { @apply badge bg-violet-500/10 text-violet-400 border-violet-500/20; }
+    .badge-slate  { @apply badge bg-[#1a2235] text-slate-400 border-[#1e2d47]; }
+
+    /* ── Portadas y Logos con Sombra y Micro-Zoom ─── */
+    .img-thumb-glow {
+        border-radius: 0.75rem;
+        border: 1px solid #1e2d47;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .img-thumb-glow:hover {
+        transform: scale(1.08);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+        border-color: rgba(245, 158, 11, 0.5);
+    }
+    html:not(.dark) .img-thumb-glow {
+        border-color: #e2e8f0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+    html:not(.dark) .img-thumb-glow:hover {
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+        border-color: #f59e0b;
+    }
 
 }

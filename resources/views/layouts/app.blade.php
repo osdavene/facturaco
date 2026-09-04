@@ -116,10 +116,10 @@
                 @else
                 {{-- Solo una empresa: mostrar estático --}}
                 <div class="flex items-center gap-3 px-2">
-                    <div class="w-9 h-9 bg-amber-500 rounded-xl flex items-center justify-center
-                                font-display font-black text-black text-sm flex-shrink-0 overflow-hidden">
+                    <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center
+                                font-display font-black text-black text-sm flex-shrink-0 overflow-hidden img-thumb-glow shadow-md shadow-amber-500/20">
                         @if($emp->logo)
-                            <img src="{{ Storage::url($emp->logo) }}" class="w-9 h-9 object-contain" alt="Logo">
+                            <img src="{{ Storage::url($emp->logo) }}" class="w-10 h-10 object-contain" alt="Logo">
                         @else
                             FC
                         @endif

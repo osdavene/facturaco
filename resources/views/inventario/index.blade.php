@@ -133,9 +133,9 @@
                     </td>
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl flex-shrink-0 overflow-hidden
+                            <div class="w-10 h-10 rounded-xl flex-shrink-0 overflow-hidden img-thumb-glow
                                         flex items-center justify-center
-                                        {{ $producto->imagen ? '' : ($producto->es_servicio
+                                        {{ $producto->imagen ? 'bg-[#101726]' : ($producto->es_servicio
                                            ? 'bg-gradient-to-br from-purple-500 to-pink-600'
                                            : 'bg-gradient-to-br from-amber-500 to-orange-600') }}">
                                 @if($producto->imagen)
@@ -171,7 +171,10 @@
                                 mín {{ number_format($producto->stock_minimo, 0) }}
                             </div>
                             @if($producto->bajo_stock)
-                            <div class="text-[10px] text-red-400 font-semibold">⚠ Bajo stock</div>
+                            <div class="text-[10px] text-red-400 font-semibold inline-flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                                Bajo stock
+                            </div>
                             @endif
                         @endif
                     </td>
@@ -184,11 +187,11 @@
                     </td>
 
                     <td class="px-3 py-4 hidden lg:table-cell">
-                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full
-                            {{ $producto->activo
-                               ? 'bg-emerald-500/10 text-emerald-500'
-                               : 'bg-red-500/10 text-red-400' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                        <span class="badge {{ $producto->activo ? 'badge-emerald' : 'badge-red' }}">
+                            <span class="relative flex h-1.5 w-1.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-current"></span>
+                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-current"></span>
+                            </span>
                             {{ $producto->activo ? 'Activo' : 'Inactivo' }}
                         </span>
                     </td>

@@ -133,9 +133,11 @@
                         </div>
                     </td>
                     <td class="px-3 py-4">
-                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full
-                            bg-{{ $factura->estado_color }}-500/10 text-{{ $factura->estado_color }}-{{ $factura->estado_color=='slate' ? '400' : '500' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                        <span class="badge badge-{{ $factura->estado_color }}">
+                            <span class="relative flex h-1.5 w-1.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-current"></span>
+                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-current"></span>
+                            </span>
                             {{ ucfirst($factura->estado) }}
                         </span>
                     </td>
