@@ -216,19 +216,69 @@ html:not(.dark) aside#sidebar .text-slate-500 {
     color: #64748b !important;
 }
 
-/* Nav items normales */
-html:not(.dark) aside#sidebar a.text-slate-500 {
-    color: #64748b !important;
+/* Nav items y Acordeones */
+html:not(.dark) aside#sidebar a.text-slate-500,
+html:not(.dark) aside#sidebar a.text-slate-400 {
+    color: #475569 !important;
 }
 html:not(.dark) aside#sidebar a:hover {
-    background-color: #ede8df !important;
-    color: #1a202c !important;
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
 }
 
 /* Nav item activo */
-html:not(.dark) aside#sidebar a.bg-amber-500\/10 {
+html:not(.dark) aside#sidebar a.bg-amber-500\/10,
+html:not(.dark) aside#sidebar a.bg-amber-500\/15 {
     background-color: #fef3c7 !important;
-    color: #92400e !important;
+    color: #b45309 !important;
+    border-color: #fcd34d !important;
+}
+
+/* Acordeones en Modo Claro */
+html:not(.dark) aside#sidebar .nav-accordion-group button {
+    color: #475569 !important;
+}
+html:not(.dark) aside#sidebar .nav-accordion-group button:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+html:not(.dark) aside#sidebar .nav-accordion-group button.bg-\[\#162034\] {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Dropdown de Acción Rápida "+ Nuevo" en Modo Claro */
+html:not(.dark) #dropdown-crear {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+}
+html:not(.dark) #dropdown-crear a {
+    color: #334155 !important;
+}
+html:not(.dark) #dropdown-crear a:hover {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+/* Modal de Escaneo en Modo Claro */
+html:not(.dark) #modal-escaner .bg-\[\#141c2e\] {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+html:not(.dark) #modal-escaner .bg-\[\#0d1526\] {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+html:not(.dark) #modal-escaner .bg-\[\#1a2235\] {
+    background-color: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #334155 !important;
+}
+html:not(.dark) #modal-escaner .text-slate-200,
+html:not(.dark) #modal-escaner .text-slate-300 {
+    color: #0f172a !important;
 }
 
 /* Labels de sección (PRINCIPAL, GESTIÓN...) */
