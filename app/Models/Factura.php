@@ -110,7 +110,8 @@ class Factura extends Model
 
         $empresaId = $empresa?->id;
 
-        $ultimo = static::where('prefijo', $prefijo)
+        $ultimo = static::withoutGlobalScopes()
+            ->where('prefijo', $prefijo)
             ->when($empresaId, fn($q) => $q->where('empresa_id', $empresaId))
             ->withTrashed()
             ->max('consecutivo');
@@ -124,6 +125,22 @@ class Factura extends Model
         }
 
         $numero = !empty($prefijo) ? $prefijo . '-' . $consecutivo : (string) $consecutivo;
+
+        // Asegurar que no colisione con facturas previas en la empresa (incluso anuladas/eliminadas)
+        while (static::withoutGlobalScopes()
+            ->withTrashed()
+            ->when($empresaId, fn($q) => $q->where('empresa_id', $empresaId))
+            ->where(function ($q) use ($numero, $consecutivo, $prefijo) {
+                $q->where('numero', $numero)
+                  ->orWhere(function ($q2) use ($consecutivo, $prefijo) {
+                      $q2->where('consecutivo', $consecutivo)
+                         ->where('prefijo', $prefijo);
+                  });
+            })
+            ->exists()) {
+            $consecutivo++;
+            $numero = !empty($prefijo) ? $prefijo . '-' . $consecutivo : (string) $consecutivo;
+        }
 
         return compact('consecutivo', 'numero');
     }

@@ -21,13 +21,18 @@ class ConvertirRemisionAFacturaAction
         $userId = auth()->id();
 
         return DB::transaction(function () use ($remision, $userId) {
-            $consecutivo = Factura::siguienteConsecutivo();
+            $empresaId   = $remision->empresa_id ?? session('empresa_activa_id') ?? 1;
+            $empresa     = \App\Models\Empresa::find($empresaId) ?? \App\Models\Empresa::obtener();
+            $prefijo     = $empresa?->prefijo_factura ?? 'FE';
+            $consecutivo = Factura::siguienteConsecutivo($prefijo, $empresaId);
 
             $subtotal = $remision->items->sum(fn ($i) => $i->cantidad * $i->precio_unitario);
             $iva = $remision->items->sum(fn ($i) => $i->cantidad * $i->precio_unitario * 0.19);
 
             $factura = Factura::create([
+                'empresa_id'        => $empresaId,
                 'numero'            => $consecutivo['numero'],
+                'prefijo'           => $prefijo,
                 'consecutivo'       => $consecutivo['consecutivo'],
                 'tipo'              => 'factura',
                 'cliente_id'        => $remision->cliente_id,

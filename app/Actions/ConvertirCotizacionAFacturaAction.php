@@ -18,10 +18,15 @@ class ConvertirCotizacionAFacturaAction
         $userId = auth()->id();
 
         return DB::transaction(function () use ($cotizacion, $userId) {
-            $consecutivo = Factura::siguienteConsecutivo();
+            $empresaId   = $cotizacion->empresa_id ?? session('empresa_activa_id') ?? 1;
+            $empresa     = \App\Models\Empresa::find($empresaId) ?? \App\Models\Empresa::obtener();
+            $prefijo     = $empresa?->prefijo_factura ?? 'FE';
+            $consecutivo = Factura::siguienteConsecutivo($prefijo, $empresaId);
 
             $factura = Factura::create([
+                'empresa_id'        => $empresaId,
                 'numero'            => $consecutivo['numero'],
+                'prefijo'           => $prefijo,
                 'consecutivo'       => $consecutivo['consecutivo'],
                 'tipo'              => 'factura',
                 'cliente_id'        => $cotizacion->cliente_id,

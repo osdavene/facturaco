@@ -22,7 +22,7 @@ class FacturaService
         return DB::transaction(function () use ($request, $empresa, $userId) {
             $cliente     = Cliente::findOrFail($request->cliente_id);
             $prefijo     = $empresa->prefijo_factura ?? 'FE';
-            $consecutivo = Factura::siguienteConsecutivo($prefijo);
+            $consecutivo = Factura::siguienteConsecutivo($prefijo, $empresa->id);
             $calc        = $this->documentos->calcularItems($request->items);
             $ret         = $this->documentos->calcularRetenciones(
                 $calc['subtotal'], $calc['iva'],

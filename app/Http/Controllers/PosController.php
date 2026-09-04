@@ -111,7 +111,7 @@ class PosController extends Controller
                 }
 
                 $prefijo     = $empresa->prefijo_factura ?? 'FE';
-                $consecutivo = Factura::siguienteConsecutivo($prefijo);
+                $consecutivo = Factura::siguienteConsecutivo($prefijo, $empresa->id);
                 $calc        = $this->documentos->calcularItems($request->items);
                 $ret         = $this->documentos->calcularRetenciones(
                     $calc['subtotal'],
