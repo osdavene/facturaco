@@ -31,7 +31,7 @@
             <span class="hidden sm:inline text-xs font-medium">Dashboard</span>
         </a>
         <div class="font-display font-black text-xl text-white">
-            Factura<span class="text-amber-500">CO</span>
+            Fac<span class="text-amber-500">Col</span>
             <span class="hidden sm:inline text-slate-400 font-normal text-sm ml-2">Punto de Venta</span>
         </div>
         <div class="ml-auto flex items-center gap-3">
@@ -422,36 +422,78 @@
 </div>
 
 {{-- ── MODAL APERTURA EN POS ───────────────────────── --}}
-<div id="modal-pos-apertura" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-    <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
-        <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
-            <i class="fas fa-key text-amber-500"></i>
-            <span>Apertura de Turno en Caja</span>
-        </h3>
-        <p class="text-xs text-slate-400 mb-4">
-            Ingresa la base inicial de dinero en efectivo para comenzar a registrar ventas.
-        </p>
+<div id="modal-pos-apertura" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="bg-[#141c2e] border border-amber-500/40 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg flex-shrink-0">
+                <i class="fas fa-key"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white leading-tight">
+                    Apertura de Turno de Caja
+                </h3>
+                <p class="text-xs text-amber-400 font-medium mt-0.5">
+                    Obligatorio para comenzar a facturar en el POS
+                </p>
+            </div>
+        </div>
+
+        {{-- Tarjeta de info del cajero y terminal --}}
+        <div class="bg-[#111827] border border-[#1e2d47] rounded-xl p-3.5 mb-4 space-y-1.5 text-xs">
+            <div class="flex justify-between">
+                <span class="text-slate-400">Cajero responsable:</span>
+                <span class="font-bold text-slate-200">{{ auth()->user()->name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-400">Terminal:</span>
+                <span class="font-bold text-slate-200">Caja Principal</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-400">Fecha y Hora:</span>
+                <span class="text-slate-300 font-mono">{{ now('America/Bogota')->locale('es')->isoFormat('D MMM YYYY, h:mm A') }}</span>
+            </div>
+        </div>
 
         <form id="form-apertura-pos" onsubmit="guardarAperturaPos(event)">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
                         Base Inicial en Efectivo ($)
                     </label>
-                    <input id="pos-input-apertura" type="number" step="100" min="0" required value="100000"
-                           class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-3 text-xl font-bold text-amber-400 focus:outline-none focus:border-amber-500">
+                    <input id="pos-input-apertura" type="number" step="1000" min="0" required value="100000"
+                           class="w-full bg-[#1a2235] border-2 border-amber-500/50 rounded-xl px-4 py-3 text-2xl font-black text-amber-400 text-center focus:outline-none focus:border-amber-500">
+                    
+                    {{-- Botones rápidos de base --}}
+                    <div class="grid grid-cols-4 gap-1.5 mt-2">
+                        <button type="button" onclick="document.getElementById('pos-input-apertura').value=50000"
+                                class="bg-[#1a2235] hover:bg-[#222f47] border border-[#1e2d47] text-slate-300 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                            $50.000
+                        </button>
+                        <button type="button" onclick="document.getElementById('pos-input-apertura').value=100000"
+                                class="bg-[#1a2235] hover:bg-[#222f47] border border-[#1e2d47] text-slate-300 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                            $100.000
+                        </button>
+                        <button type="button" onclick="document.getElementById('pos-input-apertura').value=200000"
+                                class="bg-[#1a2235] hover:bg-[#222f47] border border-[#1e2d47] text-slate-300 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                            $200.000
+                        </button>
+                        <button type="button" onclick="document.getElementById('pos-input-apertura').value=500000"
+                                class="bg-[#1a2235] hover:bg-[#222f47] border border-[#1e2d47] text-slate-300 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                            $500.000
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div class="flex items-center justify-end gap-3 mt-6">
-                <button type="button" onclick="document.getElementById('modal-pos-apertura').classList.add('hidden')"
-                        class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors">
-                    Cancelar
-                </button>
+                <a href="{{ route('dashboard') }}"
+                   class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors">
+                    Salir al Dashboard
+                </a>
                 <button type="submit" id="btn-submit-apertura"
-                        class="bg-amber-500 hover:bg-amber-600 text-black font-bold px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20">
+                        class="bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-black font-extrabold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2 shadow-lg shadow-amber-500/25">
                     <i class="fas fa-check"></i>
-                    <span>Abrir Turno</span>
+                    <span>Confirmar Apertura</span>
                 </button>
             </div>
         </form>
@@ -627,6 +669,12 @@ function filtrarCategoria(catId) {
 
 // ── Carrito ──────────────────────────────────────────
 function agregarAlCarrito(card) {
+    if (!turnoActivo) {
+        mostrarToast('Debes abrir la caja antes de agregar productos', 'error');
+        abrirModalAperturaPos();
+        return;
+    }
+
     const stock = parseFloat(card.dataset.stock);
     if (stock <= 0 && card.dataset.esServicio !== '1') {
         mostrarToast('Sin stock disponible', 'error');
@@ -878,6 +926,11 @@ document.addEventListener('click', e => {
 
 // ── Cobrar ───────────────────────────────────────────
 async function cobrar() {
+    if (!turnoActivo) {
+        mostrarToast('Debes abrir el turno de caja antes de facturar', 'error');
+        abrirModalAperturaPos();
+        return;
+    }
     if (carrito.length === 0) return;
     const formaPago = document.querySelector('input[name="forma_pago"]:checked').value;
     const efectivo  = parseFloat(document.getElementById('monto-efectivo').value) || 0;
@@ -1162,7 +1215,11 @@ document.addEventListener('keydown', e => {
     // F2 foco en búsqueda de producto
     if (e.key === 'F2') { e.preventDefault(); document.getElementById('buscar-producto').focus(); }
     // F4 cobrar
-    if (e.key === 'F4') { e.preventDefault(); cobrar(); }
+// ── Auto-abrir modal de apertura si no hay turno activo ─────
+document.addEventListener('DOMContentLoaded', () => {
+    if (!turnoActivo) {
+        setTimeout(() => abrirModalAperturaPos(), 300);
+    }
 });
 </script>
 </body>

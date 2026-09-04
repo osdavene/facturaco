@@ -314,7 +314,7 @@
     </div>
 
     <div class="pie">
-        FacturaCO — Reporte Oficial de Arqueo y Cierre
+        FacCol — Reporte Oficial de Arqueo y Cierre
     </div>
 
     <div class="corte-papel no-print">

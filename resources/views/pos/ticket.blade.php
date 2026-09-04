@@ -340,7 +340,7 @@
     <div class="separator"></div>
     <div class="pie">
         ¡Gracias por su compra!<br>
-        {{ $empresa->pie_factura ?: 'Sistema de Facturación y POS — FacturaCO' }}
+        {{ $empresa->pie_factura ?: 'Sistema de Facturación y POS — FacCol' }}
     </div>
 
     <div class="corte-papel no-print">

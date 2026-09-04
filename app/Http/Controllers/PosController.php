@@ -71,11 +71,19 @@ class PosController extends Controller
         $userId  = Auth::id();
         $empresa = Empresa::obtener();
 
-        // Buscar o vincular turno activo
+        // Validar que el usuario tenga un turno de caja abierto para poder facturar
         $turnoActivo = CajaTurno::where('estado', 'abierto')
             ->where('user_id', $userId)
             ->latest('id')
             ->first();
+
+        if (!$turnoActivo) {
+            return response()->json([
+                'success'           => false,
+                'requiere_apertura' => true,
+                'message'           => 'No puedes facturar porque no tienes un turno de caja abierto. Por favor ingresa la base inicial para abrir caja.',
+            ], 422);
+        }
 
         $facturaId = DB::transaction(function () use ($request, $userId, $empresa, $turnoActivo) {
 

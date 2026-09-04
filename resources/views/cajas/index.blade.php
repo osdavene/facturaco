@@ -213,7 +213,7 @@
     {{-- ── MODAL APERTURA DE CAJA ──────────────────────── --}}
     <div x-show="modalApertura" x-cloak
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-        <div class="bg-[#141c2e] border border-[#1e2d47] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <div class="bg-[#141c2e] border border-amber-500/30 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
                 <i class="fas fa-key text-amber-500"></i>
                 <span>Apertura de Turno de Caja</span>
@@ -222,15 +222,46 @@
                 Ingresa la base inicial en efectivo con la que iniciarás las ventas en el turno.
             </p>
 
+            {{-- Info cajero --}}
+            <div class="bg-[#111827] border border-[#1e2d47] rounded-xl p-3 mb-4 space-y-1 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Cajero responsable:</span>
+                    <span class="font-bold text-slate-200">{{ auth()->user()->name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Terminal:</span>
+                    <span class="font-bold text-slate-200">Caja Principal</span>
+                </div>
+            </div>
+
             <form @submit.prevent="guardarApertura()">
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
                             Base Inicial en Efectivo ($)
                         </label>
-                        <input type="number" step="100" min="0" x-model="formApertura.monto_apertura" required
+                        <input type="number" step="1000" min="0" x-model="formApertura.monto_apertura" required
                                placeholder="Ej: 100000"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-3 text-lg font-bold text-amber-400 focus:outline-none focus:border-amber-500">
+                               class="w-full bg-[#1a2235] border border-amber-500/50 rounded-xl px-4 py-3 text-xl font-bold text-amber-400 text-center focus:outline-none focus:border-amber-500">
+                        
+                        <div class="grid grid-cols-4 gap-1.5 mt-2">
+                            <button type="button" @click="formApertura.monto_apertura = 50000"
+                                    class="bg-[#1a2235] hover:bg-[#222f47] border border-[#1e2d47] text-slate-300 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                                $50.000
+                            </button>
+                            <button type="button" @click="formApertura.monto_apertura = 100000"
+                                    class="bg-[#1a2235] hover:bg-[#222f47] border border-[#1e2d47] text-slate-300 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                                $100.000
+                            </button>
+                            <button type="button" @click="formApertura.monto_apertura = 200000"
+                                    class="bg-[#1a2235] hover:bg-[#222f47] border border-[#1e2d47] text-slate-300 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                                $200.000
+                            </button>
+                            <button type="button" @click="formApertura.monto_apertura = 500000"
+                                    class="bg-[#1a2235] hover:bg-[#222f47] border border-[#1e2d47] text-slate-300 py-1.5 rounded-lg text-[11px] font-semibold transition-all">
+                                $500.000
+                            </button>
+                        </div>
                     </div>
 
                     <div>
@@ -238,7 +269,7 @@
                             Observaciones (Opcional)
                         </label>
                         <input type="text" x-model="formApertura.observaciones" placeholder="Ej: Turno mañana"
-                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                               class="w-full bg-[#1a2235] border border-[#1e2d47] rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
 

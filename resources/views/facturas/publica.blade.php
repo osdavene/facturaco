@@ -209,7 +209,7 @@
 
     {{-- FOOTER --}}
     <footer class="border-t border-[#1e2d47] bg-[#111827] py-4 text-center text-xs text-slate-500">
-        <p>Facturación electrónica y gestión empresarial con <strong class="text-amber-500">FacturaCO</strong></p>
+        <p>Facturación electrónica y gestión empresarial con <strong class="text-amber-500">FacCol</strong></p>
     </footer>
 
 </body>
