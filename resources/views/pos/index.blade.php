@@ -1213,8 +1213,11 @@ document.addEventListener('keydown', e => {
         document.getElementById('modal-pos-cierre')?.classList.add('hidden');
     }
     // F2 foco en búsqueda de producto
-    if (e.key === 'F2') { e.preventDefault(); document.getElementById('buscar-producto').focus(); }
+    if (e.key === 'F2') { e.preventDefault(); document.getElementById('buscar-producto')?.focus(); }
     // F4 cobrar
+    if (e.key === 'F4') { e.preventDefault(); cobrar(); }
+});
+
 // ── Auto-abrir modal de apertura si no hay turno activo ─────
 document.addEventListener('DOMContentLoaded', () => {
     if (!turnoActivo) {
